@@ -3,7 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
-import { validateDTO } from 'src/utils/validateDTO';
+import { validateDTO } from '../../../utils/validateDTO';
 import { GithubBlob } from '../schemas/github-blob.dto';
 import { GithubRepository } from '../schemas/github-repository.dto';
 import { GithubTree } from '../schemas/github-tree.dto';

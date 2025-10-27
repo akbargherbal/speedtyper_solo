@@ -1,24 +1,32 @@
-import { IncomingMessage } from 'http';
 import { INestApplication } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
-import { NextFunction } from 'express';
 import { Server, Socket } from 'socket.io';
+import { User } from '../users/entities/user.entity';
 
 type SocketIOCompatibleMiddleware = (
-  r: IncomingMessage,
-  object: object,
-  next: NextFunction,
+  req: any,
+  res: any,
+  next: (err?: any) => void,
 ) => void;
 
-export function makeSocketIOReadMiddleware(
-  middleware: SocketIOCompatibleMiddleware,
-) {
-  return (socket: Socket, next: NextFunction) => {
-    return middleware(socket.request, {}, next);
-  };
-}
+type NextFunction = (err?: Error) => void;
 
-export const denyWithoutUserInSession = (
+const makeSocketIOReadMiddleware =
+  (middleware: SocketIOCompatibleMiddleware) =>
+  (socket: Socket, next: NextFunction) => {
+    middleware(socket.request, {}, next);
+  };
+
+// NEW: Add guest user if session exists but has no user
+const ensureGuestUser = (socket: Socket, next: NextFunction) => {
+  if (socket.request.session && !socket.request.session.user) {
+    console.log('Creating guest user for WebSocket connection:', socket.id);
+    socket.request.session.user = User.generateAnonymousUser();
+  }
+  next();
+};
+
+const denyWithoutUserInSession = (
   socket: Socket,
   next: NextFunction,
 ) => {
@@ -46,6 +54,7 @@ export class SessionAdapter extends IoAdapter {
   createIOServer(port: number, opt?: any): any {
     const server: Server = super.createIOServer(port, opt);
     server.use(makeSocketIOReadMiddleware(this.sessionMiddleware));
+    server.use(ensureGuestUser); // NEW: Add this line
     server.use(denyWithoutUserInSession);
     return server;
   }
