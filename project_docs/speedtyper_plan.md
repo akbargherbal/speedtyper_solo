@@ -662,7 +662,7 @@ When starting next coding session, provide:
 1. ✅ This implementation plan
 2. ✅ Project context document
 3. ✅ Current phase (e.g., "Starting Phase 3")
-4. ✅ Specific files being modified (don't reshare entire codebase)
+4. ✅ Specific files being modified / When in doubt or need further information, always explicitly ask for the file/files, don't make guesses and assumptions!
 5. ✅ Any errors/blockers encountered
 
 Don't re-explain architectural decisions—reference context doc instead.
