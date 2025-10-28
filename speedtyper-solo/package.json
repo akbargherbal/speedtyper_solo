@@ -1,7 +1,7 @@
 {
-  "name": "speedtyper-local",
+  "name": "speedtyper-solo",
   "version": "1.0.0",
-  "description": "Personal typing practice tool - local fork of speedtyper.dev",
+  "description": "Personal typing practice tool for coding snippets (solo fork of speedtyper.dev)",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -10,14 +10,20 @@
     "dev": "concurrently -n backend,frontend -c blue,green \"npm run backend\" \"npm run frontend\"",
     "backend": "cd packages/back-nest && npm run start:dev",
     "frontend": "cd packages/webapp-next && npm run dev",
-    "reimport": "cd packages/back-nest && npm run command import-local-snippets"
+    "reimport": "cd packages/back-nest && npm run command import-local-snippets",
+    "reset-db": "bash reset-db.sh"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"
   },
-  "engines": {
-    "node": ">=16.0.0",
-    "yarn": ">=1.22.0"
-  },
-  "packageManager": "yarn@1.22.19"
+  "keywords": [
+    "typing",
+    "practice",
+    "code",
+    "snippets",
+    "solo",
+    "local"
+  ],
+  "author": "Fork for solo practice",
+  "license": "MIT"
 }
