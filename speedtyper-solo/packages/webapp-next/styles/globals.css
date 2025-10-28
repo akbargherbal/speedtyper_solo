@@ -30,20 +30,21 @@ a {
   border-radius: 100px;
 }
 
-
 /* ============================================
    SOLO MODE: Hide Multiplayer UI Elements
    ============================================ */
 
-/* Hide GitHub login button */
+/* Hide ALL authentication elements */
 button[aria-label*="Login"],
 button[aria-label*="login"],
 a[href*="github/login"],
+a[href*="login"],
+a[href*="signup"],
 .github-login-button {
   display: none !important;
 }
 
-/* Hide battle/multiplayer matcher */
+/* Hide battle/multiplayer features */
 [data-testid="battle-matcher"],
 .battle-matcher,
 button[aria-label*="Battle"],
@@ -53,22 +54,20 @@ button[aria-label*="Multiplayer"] {
 
 /* Hide invite/share buttons */
 button[aria-label*="Invite"],
-button[aria-label*="Share race"],
+button[aria-label*="Share"],
 button[aria-label*="Copy link"] {
   display: none !important;
 }
 
-/* Hide leaderboard/social elements (keep if you want stats) */
-/* Uncomment these if you want to hide leaderboards too:
-.leaderboard-link,
-nav a[href*="leaderboard"] {
-  display: none !important;
-}
-*/
-
-/* Hide any multiplayer status indicators */
+/* Hide multiplayer status indicators */
 .player-count,
 .waiting-for-players,
 [data-testid="race-members"] {
+  display: none !important;
+}
+
+/* Hide user profile button if it requires login */
+.user-avatar:not(.guest-avatar),
+button[aria-label*="Profile"] {
   display: none !important;
 }

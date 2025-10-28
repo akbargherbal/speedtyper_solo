@@ -34,6 +34,7 @@ export function NextChar({ focused }: NextCharProps) {
       <AnimatePresence>
         <motion.span
           ref={nextCharRef}
+          data-active="true"
           animate={controls}
           className="rounded-sm pb-1 pt-2"
           transition={{
