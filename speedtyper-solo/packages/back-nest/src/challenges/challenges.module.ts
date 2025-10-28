@@ -1,3 +1,4 @@
+import { LocalImportRunner } from './commands/local-import-runner';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GithubConnectorModule } from 'src/connectors/github/github.module';
@@ -28,6 +29,8 @@ import { UnsyncedFileService } from './services/unsynced-file.service';
     ChallengeService,
     LiteralService,
     ChallengeImportRunner,
+      LocalImportRunner,  // ← ADD THIS
+
     UnsyncedFileFilterer,
     UnsyncedFileImporter,
     UnsyncedFileImportRunner,
