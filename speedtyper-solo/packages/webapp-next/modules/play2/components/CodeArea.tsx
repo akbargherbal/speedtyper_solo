@@ -1,6 +1,7 @@
-import { ReactNode } from "react";
+import { ReactNode, useRef, useEffect } from "react";
 import Countdown from "../../../components/Countdown";
 import { useGameStore } from "../state/game-store";
+import { useCodeStore } from "../state/code-store";
 
 interface CodeAreaProps {
   filePath: string;
@@ -16,14 +17,52 @@ export function CodeArea({
   staticHeigh = true,
 }: CodeAreaProps) {
   const countDown = useGameStore((state) => state.countdown);
+  const index = useCodeStore((state) => state.index);
+  const codeRef = useRef<HTMLPreElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Smooth scroll to keep active character centered vertically and horizontally
+  useEffect(() => {
+    if (!focused || !codeRef.current || !containerRef.current) return;
+
+    const container = containerRef.current;
+    const pre = codeRef.current;
+
+    const activeChar = pre.querySelector('[data-active="true"]') as HTMLElement;
+
+    if (activeChar) {
+      // Vertical Scrolling
+      const verticalScrollTop =
+        activeChar.offsetTop -
+        container.offsetTop -
+        container.clientHeight / 2 +
+        activeChar.clientHeight / 2;
+
+      // Horizontal Scrolling
+      const horizontalScrollLeft =
+        activeChar.offsetLeft -
+        container.offsetLeft -
+        container.clientWidth * 0.4; // Keep cursor at 40% of the screen width
+
+      container.scrollTo({
+        top: Math.max(0, verticalScrollTop),
+        left: Math.max(0, horizontalScrollLeft),
+        behavior: "smooth",
+      });
+    }
+  }, [focused, index]); // Trigger on index change (every keystroke)
+
   return (
     <div
+      ref={containerRef}
       className={`${
         staticHeigh ? "h-[250px] sm:h-[420px]" : ""
-      } bg-dark-lake text-faded-gray flex-shrink tracking-tight sm:tracking-wider rounded-xl p-4 text-xs sm:text-2xl w-full`}
+      } bg-dark-lake text-faded-gray flex-shrink tracking-tight sm:tracking-wider rounded-xl p-4 text-xs sm:text-2xl w-full overflow-auto`} // Changed overflow-y-auto to overflow-auto
       style={{
         fontFamily: "Fira Code",
         fontWeight: "normal",
+        scrollBehavior: "smooth",
+        whiteSpace: "pre", // Ensures long lines don't wrap
       }}
     >
       {!focused && (
@@ -36,9 +75,11 @@ export function CodeArea({
           <Countdown countdown={countDown} />
         </div>
       )}
-
       <CodeAreaHeader filePath={filePath} />
-      <pre className={focused ? "blur-none opacity-100" : "blur-sm opacity-40"}>
+      <pre
+        ref={codeRef}
+        className={focused ? "blur-none opacity-100" : "blur-sm opacity-40"}
+      >
         <code>{children}</code>
       </pre>
     </div>

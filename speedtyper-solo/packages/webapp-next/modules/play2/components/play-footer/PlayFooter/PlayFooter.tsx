@@ -117,7 +117,8 @@ export function PlayFooter({ challenge }: PlayFooterProps) {
               <div className="flex row justify-between items-top">
                 <ActionButtons />
                 <div className="text-faded-gray flex gap-4">
-                  {isAnonymous && (
+                  {/* SOLO MODE: Login/Signup button removed */}
+                  {/* {isAnonymous && (
                     <>
                       <button
                         onClick={openProfileModal}
@@ -132,7 +133,7 @@ export function PlayFooter({ challenge }: PlayFooterProps) {
                         <GithubLoginOverlay closeModal={closeModals} />
                       )}
                     </>
-                  )}
+                  )} */}
                   {challenge.projectName && (
                     <ChallengeSource
                       name={challenge.projectName}
@@ -222,7 +223,8 @@ function ActionButtons() {
           }
         />
       )}
-      <ActionButton
+      {/* SOLO MODE: Invite button removed */}
+      {/* <ActionButton
         text="invite"
         title="Invite your friends to play"
         icon={
@@ -237,7 +239,7 @@ function ActionButtons() {
           }
           copyToClipboard(url.toString(), `${url} copied to clipboard`);
         }}
-      />
+      /> */}
       {isOwner && <RaceSettings />}
       {canManuallyStartGame && (
         <ActionButton
