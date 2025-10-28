@@ -38,3 +38,4 @@ typings/
 
 # development
 .idea
+packages/back-nest/speedtyper-local.db
