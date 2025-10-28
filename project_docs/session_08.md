@@ -152,7 +152,7 @@ Also added long-format language codes to mapping:
 - `python: 'Python'`
 
 ---
-
+**IMPORTANT**: THIS PROTOCOL IS PERMANENT IN ALL SESSION SUMMARIES - DO NOT REMOVE!
 ## 📋 Updated Collaboration Protocol (Minimum Friction)
 
 ### Command Patterns We're Using:
