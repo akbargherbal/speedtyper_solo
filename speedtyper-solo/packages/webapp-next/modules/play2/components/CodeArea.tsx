@@ -21,27 +21,33 @@ export function CodeArea({
   const codeRef = useRef<HTMLPreElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Smooth scroll to keep active character centered
+  // Smooth scroll to keep active character centered vertically and horizontally
   useEffect(() => {
     if (!focused || !codeRef.current || !containerRef.current) return;
-    
+
     const container = containerRef.current;
     const pre = codeRef.current;
-    
-    // Find the active character (NextChar component)
+
     const activeChar = pre.querySelector('[data-active="true"]') as HTMLElement;
-    
+
     if (activeChar) {
-      const containerRect = container.getBoundingClientRect();
-      const activeRect = activeChar.getBoundingClientRect();
-      
-      // Calculate scroll position to center the active character
-      const relativeTop = activeChar.offsetTop - container.offsetTop;
-      const scrollTop = relativeTop - (container.clientHeight / 2) + (activeChar.clientHeight / 2);
-      
+      // Vertical Scrolling
+      const verticalScrollTop =
+        activeChar.offsetTop -
+        container.offsetTop -
+        container.clientHeight / 2 +
+        activeChar.clientHeight / 2;
+
+      // Horizontal Scrolling
+      const horizontalScrollLeft =
+        activeChar.offsetLeft -
+        container.offsetLeft -
+        container.clientWidth * 0.4; // Keep cursor at 40% of the screen width
+
       container.scrollTo({
-        top: Math.max(0, scrollTop),
-        behavior: 'smooth'
+        top: Math.max(0, verticalScrollTop),
+        left: Math.max(0, horizontalScrollLeft),
+        behavior: "smooth",
       });
     }
   }, [focused, index]); // Trigger on index change (every keystroke)
@@ -51,11 +57,12 @@ export function CodeArea({
       ref={containerRef}
       className={`${
         staticHeigh ? "h-[250px] sm:h-[420px]" : ""
-      } bg-dark-lake text-faded-gray flex-shrink tracking-tight sm:tracking-wider rounded-xl p-4 text-xs sm:text-2xl w-full overflow-y-auto`}
+      } bg-dark-lake text-faded-gray flex-shrink tracking-tight sm:tracking-wider rounded-xl p-4 text-xs sm:text-2xl w-full overflow-auto`} // Changed overflow-y-auto to overflow-auto
       style={{
         fontFamily: "Fira Code",
         fontWeight: "normal",
-        scrollBehavior: 'smooth',
+        scrollBehavior: "smooth",
+        whiteSpace: "pre", // Ensures long lines don't wrap
       }}
     >
       {!focused && (
