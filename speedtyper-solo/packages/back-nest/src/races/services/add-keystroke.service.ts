@@ -44,7 +44,8 @@ export class AddKeyStrokeService {
     }
     this.syncStartTime(raceId, new Date(keyStroke.timestamp));
     const race = this.manager.getRace(raceId);
-    this.resultHandler.handleResult(race, user);
+    // SOLO MODE: Pass socket to result handler
+    this.resultHandler.handleResult(race, user, socket);
   }
 
   async syncStartTime(raceId: string, timestamp: Date) {

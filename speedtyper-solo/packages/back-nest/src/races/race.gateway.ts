@@ -161,13 +161,14 @@ export class RaceGateway {
     });
   }
 
-  @SubscribeMessage('start_race')
+@SubscribeMessage('start_race')
   async onStart(socket: Socket) {
     const user = this.session.getUser(socket);
     const raceID = this.session.getRaceID(socket);
     const race = this.raceManager.getRace(raceID);
     if (race.canStartRace(user.id)) {
-      this.countdownService.countdown(race);
+      // SOLO MODE: Pass socket so countdown emits to correct player
+      this.countdownService.countdown(race, socket);
     }
   }
 }

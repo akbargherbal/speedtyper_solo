@@ -13,51 +13,59 @@ export class RaceEvents {
     return this.server.sockets.sockets.size;
   }
 
+  // SOLO MODE: No room joining needed, emit directly to socket
   createdRace(socket: Socket, race: Race) {
-    socket.join(race.id);
+    // REMOVED: socket.join(race.id);
     socket.emit('race_joined', race);
     socket.emit('challenge_selected', race.challenge);
   }
 
-  countdown(raceID: string, i: number) {
+  // SOLO MODE: Emit countdown only to single socket (stored in race context)
+  // Note: In solo mode, countdown is instant since there's no coordination needed
+  countdown(socket: Socket, i: number) {
     const event = 'countdown';
-    this.server.to(raceID).emit(event, i);
+    socket.emit(event, i);
   }
 
-  raceStarted(race: Race) {
-    this.server.to(race.id).emit('race_started', race.startTime);
+  // SOLO MODE: Emit race start only to the player
+  raceStarted(socket: Socket, startTime: Date) {
+    socket.emit('race_started', startTime);
   }
 
-  updatedRace(_: Socket, race: Race) {
-    this.server.to(race.id).emit('race_joined', race);
-    this.server.to(race.id).emit('challenge_selected', race.challenge);
-  }
-
-  joinedRace(socket: Socket, race: Race, user: User) {
-    socket.join(race.id);
+  // SOLO MODE: Emit updated race only to requesting socket
+  updatedRace(socket: Socket, race: Race) {
     socket.emit('race_joined', race);
-    socket.to(race.id).emit('member_joined', race.members[user.id]);
+    socket.emit('challenge_selected', race.challenge);
   }
 
+  // SOLO MODE: No other members to notify, just emit to joining socket
+  joinedRace(socket: Socket, race: Race, user: User) {
+    // REMOVED: socket.join(race.id);
+    socket.emit('race_joined', race);
+    // REMOVED: socket.to(race.id).emit('member_joined', race.members[user.id]);
+  }
+
+  // SOLO MODE: No other members to notify about leaving
   leftRace(race: Race, user: User) {
-    this.server.to(race.id).emit('member_left', {
-      member: user.id,
-      owner: race.owner,
-    });
+    // REMOVED: this.server.to(race.id).emit('member_left', {...});
+    // In solo mode, when you leave, the race is over anyway
   }
 
+  // SOLO MODE: Only emit progress to the typing player
   progressUpdated(socket: Socket, raceId: string, player: RacePlayer) {
-    socket.to(raceId).emit('progress_updated', player);
+    // REMOVED: socket.to(raceId).emit('progress_updated', player);
     socket.emit('progress_updated', player);
   }
 
-  raceCompleted(raceId: string, result: Result) {
-    this.server.to(raceId).emit('race_completed', result);
+  // SOLO MODE: Emit completion only to the player who finished
+  raceCompleted(socket: Socket, result: Result) {
+    socket.emit('race_completed', result);
   }
 
   raceDoesNotExist(socket: Socket, id: string) {
     socket.emit('race_does_not_exist', id);
   }
+
   async logConnectedSockets() {
     const sockets = await this.server.fetchSockets();
     console.log('Connected sockets: ', sockets.length);
