@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import React, { Fragment } from "react";
 import { OnlineIcon } from "../../../assets/icons/OnlineIcon";
 import { Overlay } from "../../../common/components/Overlay";
-import { useIsOwner } from "../state/game-store";
+import { useIsOwner, useIsMultiplayer } from "../state/game-store";
 import {
   closeModals,
   openLanguageModal,
@@ -38,6 +38,11 @@ export const RaceSettings: React.FC = () => {
 
 export const RaceSettingsModal: React.FC = () => {
   const isOwner = useIsOwner();
+  const isMultiplayer = useIsMultiplayer();
+  // In solo mode, always show language selector
+  // In multiplayer mode, only owner can change language
+  const canSelectLanguage = !isMultiplayer || isOwner;
+  
   return (
     <Overlay onOverlayClick={closeModals}>
       <AnimatePresence>
@@ -50,7 +55,7 @@ export const RaceSettingsModal: React.FC = () => {
           style={{ fontFamily: "Fira Code" }}
         >
           <div className="flex flex-col gap-4 rounded-lg p-4 min-w-8">
-            {isOwner && <LanguageSelector />}
+            {canSelectLanguage && <LanguageSelector />}
           </div>
         </motion.div>
       </AnimatePresence>

@@ -18,17 +18,23 @@ export enum NodeTypes {
   FunctionDefinition = 'function_definition',
   FunctionItem = 'function_item',
   MethodDeclaration = 'method_declaration',
+  MethodDefinition = 'method_definition',
   Module = 'module',
   Call = 'call',
   UsingDirective = 'using_directive',
   NamespaceDeclaration = 'namespace_declaration',
+  // NEW: Added for JavaScript/TypeScript modern syntax
+  LexicalDeclaration = 'lexical_declaration',
+  VariableDeclaration = 'variable_declaration',
+  ArrowFunction = 'arrow_function',
 }
 
 export class Parser {
-  private MAX_NODE_LENGTH = 300;
-  private MIN_NODE_LENGTH = 100;
-  private MAX_NUM_LINES = 11;
-  private MAX_LINE_LENGTH = 55;
+  // RELAXED FILTERS: More permissive than original
+  private MAX_NODE_LENGTH = 800;  // Was 300
+  private MIN_NODE_LENGTH = 100;  // Keep same
+  private MAX_NUM_LINES = 25;     // Was 11
+  private MAX_LINE_LENGTH = 100;  // Was 55
 
   constructor(private ts: TSParser) {}
 
@@ -43,7 +49,8 @@ export class Parser {
       .filter((n) => this.filterLongNodes(n))
       .filter((n) => this.filterShortNodes(n))
       .filter((n) => this.filterTooLongLines(n))
-      .filter((n) => this.filterTooManyLines(n));
+      .filter((n) => this.filterTooManyLines(n))
+      .map((n) => this.removeCommentsAndDocstrings(n));  // NEW: Remove comments
     return nodes;
   }
 
@@ -55,14 +62,17 @@ export class Parser {
       case NodeTypes.FunctionDefinition:
       case NodeTypes.FunctionItem:
       case NodeTypes.MethodDeclaration:
+      case NodeTypes.MethodDefinition:
       case NodeTypes.Module:
       case NodeTypes.Call:
       case NodeTypes.UsingDirective:
       case NodeTypes.NamespaceDeclaration:
-        // We want method declarations if they are on the root node (i.e. golang)
+      case NodeTypes.LexicalDeclaration:      // NEW: const/let
+      case NodeTypes.VariableDeclaration:     // NEW: var
+      case NodeTypes.ArrowFunction:           // NEW: arrow functions
         return true;
       default:
-        console.log(node.type);
+        console.log(`[parser]: Skipping node type: ${node.type}`);
         return false;
     }
   }
@@ -87,6 +97,109 @@ export class Parser {
       }
     }
     return true;
+  }
+
+  /**
+   * NEW: Remove comments and docstrings from extracted code
+   * Keeps: imports, function signatures, actual code
+   * Removes: comments, docstrings, excessive blank lines
+   */
+  private removeCommentsAndDocstrings(node: TSParser.SyntaxNode): TSParser.SyntaxNode {
+    let cleanedText = node.text;
+
+    // Get all comment nodes from the syntax tree
+    const comments = this.findCommentNodes(node);
+    
+    // Sort by start position (reverse order to maintain byte offsets)
+    comments.sort((a, b) => b.startIndex - a.startIndex);
+
+    // Remove each comment from the text
+    for (const comment of comments) {
+      const before = cleanedText.substring(0, comment.startIndex);
+      const after = cleanedText.substring(comment.endIndex);
+      cleanedText = before + after;
+    }
+
+    // Clean up formatting
+    cleanedText = this.cleanupWhitespace(cleanedText);
+
+    // Return a modified node (we modify the text property)
+    return {
+      ...node,
+      text: cleanedText,
+    } as TSParser.SyntaxNode;
+  }
+
+  /**
+   * Recursively find all comment and docstring nodes
+   */
+  private findCommentNodes(node: TSParser.SyntaxNode): Array<{ startIndex: number; endIndex: number }> {
+    const comments: Array<{ startIndex: number; endIndex: number }> = [];
+
+    // Comment node types vary by language
+    const commentTypes = [
+      'comment',              // Most languages
+      'line_comment',         // C-style
+      'block_comment',        // C-style
+      'expression_statement', // Python docstrings (check if it contains string)
+    ];
+
+    const traverse = (n: TSParser.SyntaxNode) => {
+      // Check if this node is a comment
+      if (commentTypes.includes(n.type)) {
+        // Special case: Python docstrings are expression_statements with string literals
+        if (n.type === 'expression_statement') {
+          const firstChild = n.children[0];
+          if (firstChild && firstChild.type === 'string') {
+            comments.push({ startIndex: n.startIndex, endIndex: n.endIndex });
+          }
+        } else {
+          comments.push({ startIndex: n.startIndex, endIndex: n.endIndex });
+        }
+      }
+
+      // Recurse into children
+      for (const child of n.children) {
+        traverse(child);
+      }
+    };
+
+    traverse(node);
+    return comments;
+  }
+
+  /**
+   * Clean up whitespace after comment removal
+   */
+  private cleanupWhitespace(text: string): string {
+    // Remove lines that are now empty or only whitespace
+    let lines = text.split('\n');
+    
+    // Remove trailing/leading blank lines
+    while (lines.length > 0 && lines[0].trim() === '') {
+      lines.shift();
+    }
+    while (lines.length > 0 && lines[lines.length - 1].trim() === '') {
+      lines.pop();
+    }
+
+    // Collapse multiple consecutive blank lines into one
+    const cleaned: string[] = [];
+    let prevBlank = false;
+    for (const line of lines) {
+      const isBlank = line.trim() === '';
+      if (isBlank) {
+        if (!prevBlank) {
+          cleaned.push(''); // Keep one blank line
+        }
+        prevBlank = true;
+      } else {
+        cleaned.push(line);
+        prevBlank = false;
+      }
+    }
+
+    return cleaned.join('\n');
   }
 }
 

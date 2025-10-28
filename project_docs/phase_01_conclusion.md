@@ -15,6 +15,7 @@
 #### Changes Made:
 
 1. **Installed SQLite Driver**
+
    ```bash
    cd packages/back-nest
    npm install better-sqlite3
@@ -27,16 +28,16 @@
    - Switched from `'sqlite'` to `'better-sqlite3'` driver type
 
 3. **Fixed Entity Compatibility Issues**
-   
+
    **File: `src/tracking/entities/event.entity.ts`**
    - Changed `type: 'enum'` → `type: 'simple-enum'` (SQLite doesn't support PostgreSQL enums)
-   
+
    **File: `src/sessions/session.entity.ts`**
    - Changed `@Column('bigint')` → `@Column('integer')` (SQLite compatibility)
-   
+
    **File: `src/users/entities/user.entity.ts`**
    - Made `githubId`, `githubUrl`, `avatarUrl` nullable (for guest user support)
-   
+
    **File: `src/results/entities/result.entity.ts`**
    - Removed explicit `type` from `@CreateDateColumn()` (let TypeORM handle per database)
 
@@ -55,6 +56,7 @@
 #### Verification Results:
 
 ✅ **Backend starts successfully** (< 5 seconds)
+
 ```
 [Nest] LOG [NestApplication] Nest application successfully started
 [SpeedTyper.dev] Websocket Server Started.
@@ -65,12 +67,14 @@
 ✅ **All tables created**: `challenge`, `project`, `results`, `sessions`, `tracking_event`, `unsynced_file`, `untracked_project`, `users`
 
 ✅ **Guest user system working**:
+
 ```bash
 curl http://localhost:1337/api/user
 # Response: {"id":"...","username":"DeliciousMake","isAnonymous":true}
 ```
 
 ✅ **WebSocket endpoints registered**:
+
 - `refresh_challenge`
 - `play`
 - `key_stroke`
@@ -104,6 +108,7 @@ curl http://localhost:1337/api/user
 **Goal:** One command starts both backend and frontend
 
 **Tasks:**
+
 - Create root `package.json` with npm workspaces
 - Install `concurrently` package
 - Create unified `npm run dev` script
@@ -111,6 +116,7 @@ curl http://localhost:1337/api/user
 - Document new startup process
 
 **Files to Create/Modify:**
+
 - `speedtyper-solo/package.json` (new root file)
 
 ---
@@ -120,6 +126,7 @@ curl http://localhost:1337/api/user
 **Goal:** Import code from local `snippets/` folder instead of GitHub API
 
 **Tasks:**
+
 - Create `snippets/` directory structure
 - Study existing import logic (`challenge-import-runner.ts`, `parser.service.ts`)
 - Create new `local-import-runner.ts` command
@@ -128,6 +135,7 @@ curl http://localhost:1337/api/user
 - Verify snippets appear in UI
 
 **Key Files to Modify:**
+
 - `src/challenges/commands/local-import-runner.ts` (new file)
 - `src/challenges/commands/index.ts` (register command)
 - `src/challenges/challenges.module.ts` (add provider)
@@ -139,6 +147,7 @@ curl http://localhost:1337/api/user
 **Goal:** Stub multiplayer broadcasting, preserve solo typing
 
 **Tasks:**
+
 - Study `race.gateway.ts` WebSocket handlers
 - Change `server.to(roomId).emit()` → `socket.emit()`
 - Remove room join logic
@@ -147,6 +156,7 @@ curl http://localhost:1337/api/user
 - Integration testing
 
 **Key Files to Modify:**
+
 - `src/races/race.gateway.ts`
 - `src/races/services/race-manager.service.ts`
 - `packages/webapp-next/styles/globals.css`
@@ -158,12 +168,14 @@ curl http://localhost:1337/api/user
 **Goal:** Fully disable GitHub OAuth
 
 **Tasks:**
+
 - Comment out GitHub strategy in `auth.module.ts`
 - Remove auth controllers from routes
 - Verify guest middleware still works
 - Test UI without auth prompts
 
 **Key Files to Modify:**
+
 - `src/auth/auth.module.ts`
 
 ---
@@ -173,6 +185,7 @@ curl http://localhost:1337/api/user
 **Goal:** Production-ready local setup
 
 **Tasks:**
+
 - Create convenience scripts (`start.sh`, `reset-db.sh`)
 - Update README with Quick Start guide
 - Handle edge cases (empty snippets, corrupt DB)
@@ -184,6 +197,7 @@ curl http://localhost:1337/api/user
 ## 📂 Important File Locations
 
 ### Modified Files (This Session):
+
 ```
 packages/back-nest/
 ├── .env (created)
@@ -197,6 +211,7 @@ packages/back-nest/
 ```
 
 ### Files to Reference Next Session:
+
 - `speedtyper_context.md` (project context)
 - `speedtyper_plan.md` (implementation plan)
 - This summary document
@@ -206,6 +221,7 @@ packages/back-nest/
 ## 🔧 Current Development State
 
 **Backend:** ✅ Running on `http://localhost:1337`
+
 - SQLite database operational
 - Guest user system functional
 - WebSocket server active
@@ -216,6 +232,7 @@ packages/back-nest/
 **Database:** ✅ `speedtyper-local.db` with 8 tables
 
 **Dependencies Installed:**
+
 - `better-sqlite3`
 - `@types/better-sqlite3`
 

@@ -2,6 +2,7 @@ import { Command, CommandRunner } from 'nest-commander';
 import { Challenge } from '../entities/challenge.entity';
 import { ChallengeService } from '../services/challenge.service';
 import { ProjectService } from '../../projects/services/project.service';
+import { ParserService, getFormattedText } from '../services/parser.service';
 import { Project } from '../../projects/entities/project.entity';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -18,6 +19,7 @@ export class LocalImportRunner extends CommandRunner {
   constructor(
     private challengeService: ChallengeService,
     private projectService: ProjectService,
+    private parserService: ParserService,
   ) {
     super();
   }
@@ -38,13 +40,12 @@ export class LocalImportRunner extends CommandRunner {
 
     for (const file of files) {
       try {
-        const challenge = await this.importFile(file, project);
-        totalChallenges++;
+        const challenges = await this.importFile(file, project);
+        totalChallenges += challenges.length;
         filesProcessed++;
 
-        const lines = challenge.content.split('\n').length;
         console.log(
-          `[local-import]: ${filesProcessed}/${files.length} - ${file.relativePath} → ${lines} lines imported`
+          `[local-import]: ${filesProcessed}/${files.length} - ${file.relativePath} → ${challenges.length} snippets extracted`
         );
       } catch (error) {
         console.error(`[local-import]: ERROR processing ${file.relativePath}:`, error.message);
@@ -114,40 +115,88 @@ export class LocalImportRunner extends CommandRunner {
   private async importFile(
     file: { absolutePath: string; relativePath: string; extension: string },
     project: Project
-  ): Promise<Challenge> {
-    // Read entire file content (no tree-sitter parsing)
+  ): Promise<Challenge[]> {
+    // Read file content
     const content = fs.readFileSync(file.absolutePath, 'utf-8');
+    
+    // FIXED: Map extension to parser key (not display name)
+    const parserLanguage = this.mapExtensionToParserLanguage(file.extension);
+    const displayLanguage = this.mapExtensionToDisplayLanguage(file.extension);
 
-    // Create unique, stable hash from file path and content
-    const contentHash = crypto
-      .createHash('sha256')
-      .update(file.relativePath + content)
-      .digest('hex')
-      .substring(0, 16);
+    // Use tree-sitter to extract snippets
+    const parser = this.parserService.getParser(parserLanguage);
+    const nodes = parser.parseTrackedNodes(content);
 
-    // Create single challenge from entire file
-    const challenge = new Challenge();
-    challenge.id = `local-${contentHash}`;
-    challenge.sha = `sha-${contentHash}`;
-    challenge.treeSha = `tree-${contentHash}`;
-    challenge.language = this.mapExtensionToLanguage(file.extension);
-    challenge.path = file.relativePath;
-    challenge.url = `http://localhost:3001/snippets/${file.relativePath}`;
-    challenge.content = content;
-    challenge.project = project;
+    if (nodes.length === 0) {
+      console.log(`[local-import]: No valid snippets found in ${file.relativePath} (consider adjusting filters)`);
+      return [];
+    }
+
+    // Create challenges from extracted nodes
+    const challenges: Challenge[] = [];
+
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
+      
+      // Format the extracted code
+      const formattedContent = getFormattedText(node.text);
+
+      // Create unique hash for this specific snippet
+      const contentHash = crypto
+        .createHash('sha256')
+        .update(file.relativePath + i + formattedContent)
+        .digest('hex')
+        .substring(0, 16);
+
+      const challenge = new Challenge();
+      challenge.id = `local-${contentHash}`;
+      challenge.sha = `sha-${contentHash}`;
+      challenge.treeSha = `tree-${contentHash}`;
+      challenge.language = displayLanguage;  // Use display name for UI
+      challenge.path = `${file.relativePath}#snippet-${i + 1}`;
+      challenge.url = `http://localhost:3001/snippets/${file.relativePath}#${i + 1}`;
+      challenge.content = formattedContent;
+      challenge.project = project;
+
+      challenges.push(challenge);
+    }
 
     // Save to database (upsert handles duplicates)
-    await this.challengeService.upsert([challenge]);
+    await this.challengeService.upsert(challenges);
 
-    return challenge;
+    return challenges;
   }
 
-  private mapExtensionToLanguage(extension: string): string {
-    const languageMap: Record<string, string> = {
+  /**
+   * FIXED: Map file extension to parser key (what ts-parser.factory.ts expects)
+   */
+  private mapExtensionToParserLanguage(extension: string): string {
+    const parserMap: Record<string, string> = {
+      'js': 'js',       // Parser expects 'js'
+      'jsx': 'js',      // Parser expects 'js'
+      'ts': 'ts',       // Parser expects 'ts'
+      'tsx': 'ts',      // Parser expects 'ts'
+      'py': 'py',       // Parser expects 'py'
+      'java': 'java',   // Parser expects 'java'
+      'go': 'go',       // Parser expects 'go'
+      'rs': 'rs',       // Parser expects 'rs'
+      'c': 'c',         // Parser expects 'c'
+      'cpp': 'cpp',     // Parser expects 'cpp'
+      'cs': 'cs',       // Parser expects 'cs'
+    };
+
+    return parserMap[extension] || extension;
+  }
+
+  /**
+   * Map file extension to display language (for UI)
+   */
+  private mapExtensionToDisplayLanguage(extension: string): string {
+    const displayMap: Record<string, string> = {
       'js': 'javascript',
       'jsx': 'javascript',
       'ts': 'typescript',
-      'tsx': 'typescript',  // ✅ FIXED: .tsx now maps to typescript
+      'tsx': 'typescript',
       'py': 'python',
       'java': 'java',
       'go': 'go',
@@ -157,6 +206,6 @@ export class LocalImportRunner extends CommandRunner {
       'cs': 'csharp',
     };
 
-    return languageMap[extension] || extension;
+    return displayMap[extension] || extension;
   }
 }

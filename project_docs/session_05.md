@@ -9,7 +9,9 @@
 ## What We Accomplished This Session
 
 ### ✅ Verified Core Typing Flow Works Perfectly!
+
 **Tested the full typing workflow from Session 4:**
+
 - ✅ Typing mechanics work flawlessly
 - ✅ WPM calculation: 36 WPM (server-side calculation confirmed)
 - ✅ Accuracy tracking: 85% displayed correctly
@@ -20,6 +22,7 @@
 - ✅ Guest user system working ("SpotlessReactNative" username)
 
 **Console warnings (all cosmetic, safe to ignore):**
+
 - Syntax highlighter "Element previously highlighted" spam
 - Zustand deprecation warnings
 - React forwardRef warnings
@@ -28,7 +31,9 @@
 ---
 
 ### ✅ Created 30 Practice Snippets
+
 **Set up snippets directory structure:**
+
 ```
 snippets/
 ├── javascript/ (10 files)
@@ -50,9 +55,11 @@ snippets/
 ---
 
 ### ✅ Built Local Snippet Importer
+
 **Created:** `packages/back-nest/src/challenges/commands/local-import-runner.ts`
 
 **Features:**
+
 - ✅ Scans `snippets/` directory recursively
 - ✅ Reads files using `fs.readFileSync` (preserves newlines)
 - ✅ Detects language from extension (`.py` → python, `.ts` → typescript, etc.)
@@ -62,11 +69,13 @@ snippets/
 - ✅ Reports progress per file
 
 **Integration:**
+
 - ✅ Added to `challenges.module.ts` (imported and registered)
 - ✅ Compiles successfully (no TypeScript errors)
 - ✅ Command runs: `npm run command import-local-snippets`
 
 **Fixed Issues During Development:**
+
 - ❌ Initial code used wrong `ProjectService` methods (`findOne`, `create`)
 - ✅ Fixed to use correct methods (`findByFullName`, `bulkUpsert`)
 - ✅ Added `Project` entity import
@@ -76,9 +85,11 @@ snippets/
 ## 🚨 Critical Issue Discovered: Tree-Sitter Filters Too Strict
 
 ### **Problem:**
+
 Ran import command successfully, but only **2 out of 30 files** yielded snippets!
 
 **Output:**
+
 ```
 [local-import]: Found 30 files to import
 [local-import]: No valid snippets found in javascript/01-async-fetch.js
@@ -116,6 +127,7 @@ Ran import command successfully, but only **2 out of 30 files** yielded snippets
 ### **Option A: Relax Tree-Sitter Filters (Recommended for Quality)**
 
 **Modify `parser.service.ts` or create custom parser for local imports:**
+
 - Increase `MAX_NODE_LENGTH` from 300 → 800 chars
 - Increase `MAX_NUM_LINES` from 11 → 30 lines
 - Increase `MAX_LINE_LENGTH` from 55 → 100 chars
@@ -125,11 +137,13 @@ Ran import command successfully, but only **2 out of 30 files** yielded snippets
   - Maybe accept entire program for small files?
 
 **Pros:**
+
 - Maintains code quality (extracts meaningful functions/classes)
 - Better typing practice (focused snippets)
 - Respects original design intent
 
 **Cons:**
+
 - More complex implementation
 - Still might filter out some snippets
 
@@ -138,16 +152,19 @@ Ran import command successfully, but only **2 out of 30 files** yielded snippets
 ### **Option B: Whole-File Import (Quick Fix)**
 
 **Skip tree-sitter parsing entirely for local imports:**
+
 - Import each file as one complete challenge
 - No extraction, no filtering
 - Just read file → save to database
 
 **Pros:**
+
 - ✅ All 30 files imported immediately
 - ✅ Simpler implementation
 - ✅ User types complete, coherent examples
 
 **Cons:**
+
 - ❌ Longer typing sessions (whole files vs functions)
 - ❌ Some files might be too long (40+ lines)
 - ❌ Bypasses quality filtering
@@ -157,16 +174,19 @@ Ran import command successfully, but only **2 out of 30 files** yielded snippets
 ### **Option C: Hybrid Approach (Best of Both)**
 
 **Try tree-sitter first, fall back to whole-file:**
+
 1. Attempt tree-sitter parsing with relaxed filters
 2. If no snippets extracted → import whole file
 3. Log which method was used per file
 
 **Pros:**
+
 - ✅ Best quality when parsing works
 - ✅ Guaranteed import for all files
 - ✅ Flexible
 
 **Cons:**
+
 - Most complex to implement
 
 ---
@@ -174,7 +194,9 @@ Ran import command successfully, but only **2 out of 30 files** yielded snippets
 ## Additional Fixes Needed
 
 ### **1. Fix `.tsx` Parser Mapping**
+
 In `local-import-runner.ts`, update `mapExtensionToLanguage()`:
+
 ```typescript
 private mapExtensionToLanguage(extension: string): string {
   const languageMap: Record<string, string> = {
@@ -186,10 +208,13 @@ private mapExtensionToLanguage(extension: string): string {
 ```
 
 ### **2. Fix Duplicate URL Generation**
+
 In `importFile()`, make URLs more unique:
+
 ```typescript
 challenge.url = `http://localhost:3001/snippets/${file.relativePath}#${index}`;
 ```
+
 Or use hash of content instead of timestamp.
 
 ---
@@ -197,6 +222,7 @@ Or use hash of content instead of timestamp.
 ## Current System State
 
 ### ✅ Fully Working:
+
 - Backend compiles and starts successfully
 - Frontend compiles and starts successfully
 - Database: SQLite with proper schema
@@ -209,10 +235,12 @@ Or use hash of content instead of timestamp.
 - Import command: Runs successfully (but filters too strict)
 
 ### ⚠️ Partially Working:
+
 - Local snippet importer: Built and functional, but only imports 2/30 files
 - Tree-sitter parsing: Works but filters reject most snippets
 
 ### ❌ Not Working:
+
 - Importing JavaScript/TypeScript snippets (wrong node types)
 - Importing Python snippets (too long, exceeds filters)
 - `.tsx` file parsing (no parser mapping)
@@ -222,12 +250,15 @@ Or use hash of content instead of timestamp.
 ## Progress Through Implementation Plan
 
 ### ✅ Phase 1: Database Simplification (COMPLETE)
+
 - SQLite migration successful
 
 ### ✅ Phase 2: Startup Simplification (COMPLETE)
+
 - One-command startup working
 
 ### 🟨 Phase 3: Custom Snippets System (IN PROGRESS - ~60% Complete)
+
 - ✅ 3.1-3.5: Test data setup and workflow verification
 - ✅ 3.6: Created `local-import-runner.ts`
 - ✅ 3.7: Registered command in module
@@ -239,7 +270,9 @@ Or use hash of content instead of timestamp.
 **NEXT TASK:** Choose solution (A, B, or C) and implement filter fixes
 
 ### ⏸️ Phase 4: Multiplayer Removal (NOT STARTED)
+
 ### ⏸️ Phase 5: Auth Simplification (NOT STARTED)
+
 ### ⏸️ Phase 6: Polish & Documentation (NOT STARTED)
 
 ---
@@ -247,17 +280,23 @@ Or use hash of content instead of timestamp.
 ## Files Modified This Session
 
 ### 1. Created: `packages/back-nest/src/challenges/commands/local-import-runner.ts`
+
 **Full implementation of local snippet importer**
+
 - 170 lines of TypeScript
 - Scans filesystem, parses with tree-sitter, saves to DB
 
 ### 2. Modified: `packages/back-nest/src/challenges/challenges.module.ts`
+
 **Added:**
+
 - Import: `import { LocalImportRunner } from './commands/local-import-runner';`
 - Provider: `LocalImportRunner,` in providers array
 
 ### 3. Created: `snippets/` directory structure
+
 **30 files added:**
+
 - `snippets/javascript/` - 10 files
 - `snippets/python/` - 10 files
 - `snippets/typescript/` - 10 files
@@ -267,13 +306,16 @@ Or use hash of content instead of timestamp.
 ## Key Technical Context
 
 ### Import Command Execution:
+
 ```bash
 cd ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/packages/back-nest
 npm run command import-local-snippets
 ```
 
 ### Current Parser Filters (Too Strict):
+
 From `packages/back-nest/src/challenges/services/parser.service.ts`:
+
 ```typescript
 private MAX_NODE_LENGTH = 300;  // ← Need 800+
 private MIN_NODE_LENGTH = 100;  // ← OK
@@ -282,6 +324,7 @@ private MAX_LINE_LENGTH = 55;   // ← Need 100+
 ```
 
 ### Allowed Node Types (Incomplete):
+
 ```typescript
 case NodeTypes.ClassDeclaration:
 case NodeTypes.FunctionDeclaration:
@@ -297,6 +340,7 @@ case NodeTypes.FunctionDefinition:
 ### **Immediate Priority: Fix Tree-Sitter Filtering (1-2 hours)**
 
 **Decision Point:** Choose implementation approach:
+
 - **Option A:** Relax filters (better quality, more work)
 - **Option B:** Whole-file import (quick, less refined)
 - **Option C:** Hybrid (best but complex)
@@ -306,24 +350,29 @@ case NodeTypes.FunctionDefinition:
 ### **Step 1: Implement Chosen Solution (30-60 min)**
 
 **If Option B (Whole-File):**
+
 1. Modify `local-import-runner.ts`
 2. Skip tree-sitter parsing
 3. Import entire file content as single challenge
 4. Test: Should import all 30 files
 
 **If Option A (Relax Filters):**
+
 1. Create custom `LocalParserService` extending `ParserService`
 2. Override filter methods with relaxed limits
 3. Add `lexical_declaration` to allowed node types
 4. Test: Should import 20-25+ files
 
 ### **Step 2: Fix `.tsx` Parser Mapping (5 min)**
+
 Update `mapExtensionToLanguage()` to map `.tsx` → `typescript`
 
 ### **Step 3: Fix URL Collision (5 min)**
+
 Make challenge URLs unique (add hash or better ID generation)
 
 ### **Step 4: Re-run Import & Verify (15 min)**
+
 ```bash
 # Clear old data
 sqlite3 speedtyper-local.db "DELETE FROM challenge WHERE id LIKE 'local-%';"
@@ -337,12 +386,14 @@ sqlite3 speedtyper-local.db "SELECT COUNT(*) FROM challenge WHERE id LIKE 'local
 ```
 
 ### **Step 5: Test in UI (10 min)**
+
 1. Start app: `npm run dev`
 2. Navigate to practice page
 3. Verify: Your own snippets appear
 4. Type a few, confirm they work
 
 ### **Step 6: Continue to Phase 4 (If Time)**
+
 Start multiplayer removal (stub broadcasting logic)
 
 ---
@@ -350,18 +401,21 @@ Start multiplayer removal (stub broadcasting logic)
 ## Important Reminders for Next Session
 
 ### Context Files to Provide:
+
 1. ✅ This session summary (Session 5)
 2. ✅ Project context document (`speedtyper_context.md`)
 3. ✅ Implementation plan (`speedtyper_plan.md`)
 4. ✅ Session 4 summary (for historical context)
 
 ### When Asking for Help:
+
 - **State current phase:** Phase 3 (Custom Snippets) - fixing tree-sitter filters
 - **Mention the blocker:** Only 2/30 files imported due to strict filters
 - **Specify chosen solution:** Option A, B, or C (decide in next session)
 - Provide error messages verbatim if issues arise
 
 ### Files That May Need Modification:
+
 ```
 speedtyper-solo/
 ├── packages/
@@ -407,6 +461,7 @@ npm run dev
 ### Current Progress: ~50% Complete (3.5 of 6 phases)
 
 **What's Working:**
+
 - Infrastructure: ✅ 100%
 - Database: ✅ 100%
 - WebSocket: ✅ 100%
@@ -415,6 +470,7 @@ npm run dev
 - Import Command: ✅ 90% (runs, but filters need adjustment)
 
 **Remaining Work:**
+
 - Fix tree-sitter filters: 0% (~1-2 hours)
 - Multiplayer stubbing: 0% (Phase 4, ~2-3 hours)
 - Auth cleanup: 0% (Phase 5, ~1 hour)

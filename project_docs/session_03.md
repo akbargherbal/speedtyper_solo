@@ -9,6 +9,7 @@
 ## What We Accomplished Today
 
 ### ✅ Fixed WebSocket Connection Issue (MAJOR BREAKTHROUGH)
+
 **Problem:** Frontend could connect but immediately disconnected with error: `disconnect because there is no user in the session`
 
 **Root Cause:** Guest user middleware only ran for HTTP requests, not WebSocket connections. The `SessionAdapter` was rejecting connections before guest users could be created.
@@ -21,7 +22,7 @@
 // Added this middleware before denyWithoutUserInSession
 const ensureGuestUser = (socket: Socket, next: NextFunction) => {
   if (socket.request.session && !socket.request.session.user) {
-    console.log('Creating guest user for WebSocket connection:', socket.id);
+    console.log("Creating guest user for WebSocket connection:", socket.id);
     socket.request.session.user = User.generateAnonymousUser();
   }
   next();
@@ -34,6 +35,7 @@ server.use(denyWithoutUserInSession);
 ```
 
 **Result:** WebSocket now connects successfully! Backend logs show:
+
 ```
 [backend] Client connected: SparklingEmacs - Pqou91kqFm0ZcGITAAAD
 [backend] create { racesSize: 2, races: 0, players: 0 }
@@ -44,18 +46,23 @@ server.use(denyWithoutUserInSession);
 ## Current Blocker: Missing Project Data in Challenges
 
 ### The Problem
+
 Frontend crashes with:
+
 ```
 TypeError: Cannot read properties of null (reading 'fullName')
 ```
 
 **Location:** `modules/play2/hooks/useChallenge.ts` line 46
+
 ```typescript
 projectName: challenge.project.fullName,  // ❌ challenge.project is null
 ```
 
 ### Root Cause
+
 When we manually inserted test challenges in Session 2, we didn't create associated `project` records. The challenge query returns:
+
 - ✅ `challenge.content` (the code)
 - ✅ `challenge.language`
 - ❌ `challenge.project` = null
@@ -63,13 +70,16 @@ When we manually inserted test challenges in Session 2, we didn't create associa
 The frontend expects every challenge to have a project with a `fullName` property.
 
 ### Database State
+
 **Working:**
+
 - SQLite database exists: `speedtyper-local.db`
 - 3 test challenges exist (ids: test-challenge-1, test-challenge-2, test-challenge-3)
 - Challenges have content and language
 - WebSocket connects successfully
 
 **Missing:**
+
 - Project records in `project` table
 - Foreign key relationships: challenge.projectId → project.id
 
@@ -78,24 +88,29 @@ The frontend expects every challenge to have a project with a `fullName` propert
 ## Progress Through Implementation Plan
 
 ### ✅ Phase 1: Database Simplification (COMPLETE)
+
 - SQLite migration successful
 - Backend starts without PostgreSQL
 - Database file: `packages/back-nest/speedtyper-local.db`
 
 ### ✅ Phase 2: Startup Simplification (COMPLETE)
+
 - One-command startup working: `npm run dev`
 - Concurrently runs both services
 - Backend on `localhost:1337`
 - Frontend on `localhost:3001`
 
 ### ⚠️ Phase 3: Custom Snippets System (BLOCKED)
+
 - ✅ 3.1-3.5: Setup complete (test data inserted)
 - ✅ WebSocket connection fixed
 - ❌ BLOCKER: Challenge display fails due to missing project data
 - ⏸️ 3.6-3.11: Local snippet importer (not started)
 
 ### ⏸️ Phase 4: Multiplayer Removal (NOT STARTED)
+
 ### ⏸️ Phase 5: Auth Simplification (NOT STARTED)
+
 ### ⏸️ Phase 6: Polish & Documentation (NOT STARTED)
 
 ---
@@ -103,14 +118,16 @@ The frontend expects every challenge to have a project with a `fullName` propert
 ## Files Modified This Session
 
 ### 1. `packages/back-nest/src/sessions/session.adapter.ts` (NEW VERSION)
+
 **Change:** Added `ensureGuestUser` middleware for WebSocket connections
 
 **Full working file:**
+
 ```typescript
-import { INestApplication } from '@nestjs/common';
-import { IoAdapter } from '@nestjs/platform-socket.io';
-import { Server, Socket } from 'socket.io';
-import { User } from '../users/entities/user.entity';
+import { INestApplication } from "@nestjs/common";
+import { IoAdapter } from "@nestjs/platform-socket.io";
+import { Server, Socket } from "socket.io";
+import { User } from "../users/entities/user.entity";
 
 type SocketIOCompatibleMiddleware = (
   req: any,
@@ -129,19 +146,16 @@ const makeSocketIOReadMiddleware =
 // NEW: Add guest user if session exists but has no user
 const ensureGuestUser = (socket: Socket, next: NextFunction) => {
   if (socket.request.session && !socket.request.session.user) {
-    console.log('Creating guest user for WebSocket connection:', socket.id);
+    console.log("Creating guest user for WebSocket connection:", socket.id);
     socket.request.session.user = User.generateAnonymousUser();
   }
   next();
 };
 
-const denyWithoutUserInSession = (
-  socket: Socket,
-  next: NextFunction,
-) => {
+const denyWithoutUserInSession = (socket: Socket, next: NextFunction) => {
   if (!socket.request.session?.user) {
     console.log(
-      'disconnect because there is no user in the session',
+      "disconnect because there is no user in the session",
       socket.id,
     );
     socket.request.session?.destroy(() => {
@@ -179,12 +193,14 @@ export class SessionAdapter extends IoAdapter {
 **Two options to investigate:**
 
 **Option A: Add Project Records to Database (Proper Fix)**
+
 1. Check database schema for `project` table
 2. Insert test project record
 3. Update existing challenges to reference the project
 4. Verify foreign key relationships
 
 **Option B: Make Frontend Handle Null Projects (Quick Fix)**
+
 1. Get `useChallenge.ts` file
 2. Add null check: `projectName: challenge.project?.fullName || 'Local Project'`
 3. Test if challenge displays
@@ -192,6 +208,7 @@ export class SessionAdapter extends IoAdapter {
 **Recommended:** Try Option B first (quick fix), then Option A for proper data structure.
 
 **Commands to run first:**
+
 ```bash
 cd ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/packages/back-nest
 
@@ -208,7 +225,9 @@ cat ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/packages/webapp-next/mod
 ```
 
 ### Then: Complete Phase 3 (2-3 hours)
+
 Once challenge display works:
+
 1. **Test typing flow** - Type the test challenge, verify WPM calculates
 2. **Create snippets directory** - `mkdir -p snippets/python snippets/typescript`
 3. **Build local importer** - `src/challenges/commands/local-import-runner.ts`
@@ -220,6 +239,7 @@ Once challenge display works:
 ## Current System State
 
 ### ✅ Working:
+
 - Backend compiles and starts
 - Frontend compiles and starts
 - SQLite database with 3 test challenges
@@ -229,10 +249,12 @@ Once challenge display works:
 - Race manager initialized
 
 ### ❌ Not Working:
+
 - Challenge display (null project error)
 - Cannot start typing yet
 
 ### 🔍 Unknown (Need to Test After Fix):
+
 - WPM calculation
 - Race completion
 - Results display
@@ -242,14 +264,17 @@ Once challenge display works:
 ## Key Technical Details
 
 ### Tech Stack:
+
 - **Backend:** NestJS 9.0.0 + TypeORM + SQLite + Socket.IO v4.5.2
 - **Frontend:** Next.js 12.2.5 + Zustand + Socket.IO v2.x
 - **WebSocket:** Socket.IO for real-time communication
 
 ### Database Location:
+
 `~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/packages/back-nest/speedtyper-local.db`
 
 ### Test Data (Currently in DB):
+
 ```sql
 -- 3 challenges with ids: test-challenge-1, test-challenge-2, test-challenge-3
 -- All have content and language
@@ -257,6 +282,7 @@ Once challenge display works:
 ```
 
 ### WebSocket Flow (Now Working):
+
 1. Frontend connects to `ws://localhost:1337`
 2. Session middleware runs
 3. **ensureGuestUser creates anonymous user** ✅
@@ -269,6 +295,7 @@ Once challenge display works:
 ## Important Context
 
 ### Project Structure:
+
 ```
 speedtyper-solo/
 ├── packages/
@@ -288,6 +315,7 @@ speedtyper-solo/
 ```
 
 ### Key Commands:
+
 ```bash
 # Start app
 cd ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo

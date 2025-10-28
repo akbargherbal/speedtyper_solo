@@ -59,9 +59,9 @@ export class ChallengeService {
 
     return languages;
   }
-
-  private getLanguageName(language: string): string {
+private getLanguageName(language: string): string {
     const allLanguages = {
+      // Short codes (original speedtyper.dev format)
       js: 'JavaScript',
       ts: 'TypeScript',
       rs: 'Rust',
@@ -75,7 +75,14 @@ export class ChallengeService {
       rb: 'Ruby',
       cs: 'C-Sharp',
       scala: 'Scala',
+      // Long codes (your local import format)
+      javascript: 'JavaScript',
+      typescript: 'TypeScript',
+      python: 'Python',
+      rust: 'Rust',
+      ruby: 'Ruby',
+      csharp: 'C-Sharp',
     };
-    return allLanguages[language];
+    return allLanguages[language] || language; // Fallback to original code if not mapped
   }
 }
