@@ -42,3 +42,7 @@ packages/back-nest/speedtyper-local.db
 
 # Local SQLite database (user data)
 packages/back-nest/speedtyper-local.db
+
+
+# Artifacts from WSL:
+*:Zone.Identifier
