@@ -11,10 +11,11 @@
     "backend": "cd packages/back-nest && npm run start:dev",
     "frontend": "cd packages/webapp-next && npm run dev",
     "reimport": "cd packages/back-nest && npm run command import-local-snippets",
-    "reset-db": "bash reset-db.sh"
+    "reset-db": "rimraf packages/back-nest/speedtyper-local.db"
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "concurrently": "^8.2.0",
+    "rimraf": "^5.0.5"
   },
   "keywords": [
     "typing",
