@@ -10,7 +10,7 @@
     "dev": "next dev -p 3001",
     "build:css": "postcss tailwind.css -o tailwind.min.css",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3001",
     "export": "next export",
     "lint": "next lint"
   },

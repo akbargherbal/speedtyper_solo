@@ -19,10 +19,9 @@ const nextConfig = {
       process.env.NODE_ENV === "production"
         ? "https://v2.speedtyper.dev"
         : "http://localhost:5001",
+    // Use environment variable if available, otherwise fall back to localhost
     experimentalServerUrl:
-      process.env.NODE_ENV === "production"
-        ? "https://v3.speedtyper.dev"
-        : "http://localhost:1337",
+      process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:1337",
   },
 };
 

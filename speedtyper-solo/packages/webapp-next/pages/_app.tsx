@@ -1,5 +1,4 @@
 import "../styles/globals.css";
-
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import NextNProgress from "nextjs-progressbar";
@@ -50,7 +49,6 @@ function MyApp({ Component, pageProps }: AppProps) {
         </Layout>
         <Stream />
       </div>
-
       {/* SOLO MODE: TikTok banner removed */}
     </>
   );
