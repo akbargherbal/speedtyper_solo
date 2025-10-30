@@ -280,7 +280,7 @@ The project has transitioned from "transformation phase" to "enhancement phase."
 
 ---
 
-**MANDATORY PROTOCOL: COLLABORATION PROTOCOL**
+**MANDATORY PROTOCOL: ALWAYS INCLUDE THIS SECTION VERBATIM AT THE END OF EVERY SESSION SUMMARY.**
 
 ## 🤝 Collaboration Protocol (Minimum Friction)
 
@@ -313,9 +313,6 @@ I provide the full code block, you copy-paste into VS Code.
 ```bash
 cd ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo
 npm run dev
-# or
-npm run build
-npm run start
 ```
 
 **When checking database:**
