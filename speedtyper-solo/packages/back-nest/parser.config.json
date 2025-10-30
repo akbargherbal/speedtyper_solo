@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Configuration for code snippet parser and quality filters",
+  "version": "1.2.0",
+  "filters": {
+    "maxNodeLength": 500,
+    "minNodeLength": 150,
+    "maxNumLines": 15,
+    "maxLineLength": 80
+  },
+  "parsing": {
+    "removeComments": true,
+    "enableCommentSkipping": false
+  },
+  "notes": {
+    "maxNodeLength": "Maximum character count for a single snippet (default: 800)",
+    "minNodeLength": "Minimum character count to avoid trivial snippets (default: 100)",
+    "maxNumLines": "Maximum number of lines in a snippet (default: 25)",
+    "maxLineLength": "Maximum characters per line to avoid horizontal scrolling (default: 100)",
+    "removeComments": "Strip comments from snippets during import (default: true)",
+    "enableCommentSkipping": "Future: Make comments visible but not typable (default: false)"
+  }
+}

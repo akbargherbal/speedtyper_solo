@@ -2,7 +2,7 @@
 
 > A local-first typing practice tool for developers. Type your own code, track your progress, improve your speed.
 
-**Version:** 1.1.0  
+**Version:** 1.2.0  
 **Status:** ✅ Stable for daily use
 
 ---
@@ -42,12 +42,14 @@ npm run reimport
 ```
 
 This command:
+
 - Scans `snippets/` recursively
 - Parses code with tree-sitter (extracts functions/classes)
 - Filters for quality (100-300 characters, readable)
 - Saves to local SQLite database
 
 **Expected output:**
+
 ```
 Scanning snippets/...
 Found 15 files
@@ -65,6 +67,7 @@ npm run dev
 ```
 
 **What happens:**
+
 - Backend starts (NestJS on port 1337)
 - Frontend starts (Next.js on port 3001)
 - Browser opens automatically → `http://localhost:3001`
@@ -110,6 +113,7 @@ wsl bash -c "cd ~/path/to/speedtyper-local && npm run dev"
 Add `C:\Users\<YourName>\scripts\` to your PATH.
 
 Now run from any terminal:
+
 ```cmd
 speedtyper
 ```
@@ -118,11 +122,11 @@ speedtyper
 
 ## Commands Reference
 
-| Command | Purpose | When to Use |
-|---------|---------|-------------|
-| `npm run dev` | Start app (backend + frontend) | Every session |
-| `npm run reimport` | Re-import snippets | After adding/changing code |
-| `npm run reset` | Reset database (delete all data) | When starting fresh |
+| Command            | Purpose                          | When to Use                |
+| ------------------ | -------------------------------- | -------------------------- |
+| `npm run dev`      | Start app (backend + frontend)   | Every session              |
+| `npm run reimport` | Re-import snippets               | After adding/changing code |
+| `npm run reset`    | Reset database (delete all data) | When starting fresh        |
 
 ### Advanced Commands
 
@@ -146,31 +150,27 @@ sqlite> .exit
 
 ## Features
 
-### ✅ Current (v1.1.0)
+### ✅ Current (v1.2.0)
 
+- **Configurable filters**: Customize snippet length, complexity via `parser.config.json`
 - **Local snippets**: Practice your own code
 - **Tree-sitter parsing**: Smart extraction of functions/classes
 - **Real-time metrics**: WPM, accuracy, completion time
 - **Language selection**: Filter by Python, TypeScript, JavaScript, etc.
+- **Connection indicator**: Visual WebSocket status in navbar
+- **Enhanced import feedback**: Rich console output with statistics
+- **Snippet metadata**: See source file path during practice
 - **Smooth caret**: Toggle between block/smooth cursor
 - **Syntax highlighting**: Basic highlighting (toggle in settings)
 - **Clean UI**: Solo-focused, no multiplayer clutter
 - **SQLite storage**: Single-file database, easy backup
 - **Auto-browser open**: Launches automatically on startup
 
-### 🚧 Coming Soon (v1.2.0)
+### 🚧 Coming Soon (v1.3.0)
 
 - **Keyboard shortcuts**: Ctrl+L (language), Ctrl+R (refresh), Enter (next)
-- **Connection indicator**: See when backend disconnects
-- **Snippet metadata**: Know which file you're typing
-- **Better error messages**: Helpful feedback when things break
-
-### 🔮 Planned (v1.3.0+)
-
 - **Progress dashboard**: WPM trends, accuracy over time
 - **Smart snippets**: Skip comments, focus on logic
-- **Snippet collections**: Organize by topic
-- **Export data**: Backup your results
 
 See [`docs/FEATURES.md`](docs/FEATURES.md) for full roadmap.
 
@@ -195,14 +195,16 @@ Settings persist across sessions (localStorage).
 **Problem:** `npm run dev` fails
 
 **Solutions:**
+
 1. Check Node.js version: `node --version` (requires v16+)
 2. Reinstall dependencies: `rm -rf node_modules && npm install`
 3. Check ports: Kill processes on 1337 and 3001
+
    ```bash
    # Linux/Mac
    lsof -ti:1337 | xargs kill
    lsof -ti:3001 | xargs kill
-   
+
    # Windows
    netstat -ano | findstr :1337
    taskkill /PID <PID> /F
@@ -213,6 +215,7 @@ Settings persist across sessions (localStorage).
 **Problem:** Practice page is empty or shows "No challenges"
 
 **Solutions:**
+
 1. Verify files exist: `ls snippets/python/`
 2. Run import: `npm run reimport`
 3. Check database:
@@ -228,6 +231,7 @@ Settings persist across sessions (localStorage).
 **Problem:** Can't type in the code area
 
 **Solutions:**
+
 1. Click on the code area (must be focused)
 2. Refresh page (Ctrl+Shift+R)
 3. Check browser console for errors (F12 → Console)
@@ -238,6 +242,7 @@ Settings persist across sessions (localStorage).
 **Problem:** "Reconnecting..." message appears
 
 **Solutions:**
+
 1. Check backend is running (terminal should show logs)
 2. Verify port 1337 is accessible: `curl http://localhost:1337`
 3. Restart app
@@ -249,6 +254,7 @@ Settings persist across sessions (localStorage).
 **Cause:** Code files have syntax errors or unusual formatting
 
 **Solutions:**
+
 1. Verify code compiles/runs in its original environment
 2. Check file encoding (UTF-8 required)
 3. Simplify complex files (tree-sitter has limits)
@@ -303,32 +309,120 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for deep dive.
 
 ### Snippet Quality Filters
 
-Currently hardcoded in `packages/back-nest/src/challenges/services/parser.service.ts`:
+**New in v1.2.0:** Filters are now configurable via `parser.config.json`!
 
-```typescript
-minCharCount: 100    // Minimum snippet length
-maxCharCount: 300    // Maximum snippet length
-maxLines: 11         // Max lines per snippet
-maxLineLength: 55    // Max characters per line
+**Location:** `packages/back-nest/parser.config.json`
+
+**Default configuration:**
+
+```json
+{
+  "filters": {
+    "maxNodeLength": 800,
+    "minNodeLength": 100,
+    "maxNumLines": 25,
+    "maxLineLength": 100
+  },
+  "parsing": {
+    "removeComments": true,
+    "enableCommentSkipping": false
+  }
+}
 ```
 
-**To modify** (advanced):
-1. Edit `parser.service.ts`
-2. Restart backend
-3. Run `npm run reimport`
+**Filter parameters explained:**
 
-**Coming in v1.2.0:** `parser.config.json` for easier customization.
+| Parameter               | Default | Purpose                                                          |
+| ----------------------- | ------- | ---------------------------------------------------------------- |
+| `maxNodeLength`         | 800     | Maximum characters in a snippet (prevents overwhelming snippets) |
+| `minNodeLength`         | 100     | Minimum characters (filters out trivial one-liners)              |
+| `maxNumLines`           | 25      | Maximum lines per snippet (keeps it on-screen)                   |
+| `maxLineLength`         | 100     | Maximum characters per line (prevents horizontal scrolling)      |
+| `removeComments`        | true    | Strip comments during import (focus on code)                     |
+| `enableCommentSkipping` | false   | Future: Make comments visible but not typable                    |
+
+**To customize:**
+
+1. Edit `packages/back-nest/parser.config.json`
+2. Modify values (example: stricter filters)
+
+```json
+{
+  "filters": {
+    "maxNodeLength": 500,
+    "minNodeLength": 150,
+    "maxNumLines": 15,
+    "maxLineLength": 80
+  }
+}
+```
+
+3. Re-import snippets:
+
+```bash
+   npm run reimport
+```
+
+4. Shorter, more focused snippets will be imported
+
+**Validation:**
+
+- Config is validated on load
+- Invalid values (e.g., `min > max`) trigger warning and use defaults
+- Missing config file uses defaults automatically
+
+**Examples:**
+
+**For longer, more complex snippets:**
+
+```json
+{
+  "filters": {
+    "maxNodeLength": 1200,
+    "minNodeLength": 200,
+    "maxNumLines": 40,
+    "maxLineLength": 120
+  }
+}
+```
+
+**For shorter, beginner-friendly snippets:**
+
+```json
+{
+  "filters": {
+    "maxNodeLength": 400,
+    "minNodeLength": 80,
+    "maxNumLines": 12,
+    "maxLineLength": 70
+  }
+}
+```
+
+**Toggle comment removal:**
+
+```json
+{
+  "parsing": {
+    "removeComments": false
+  }
+}
+```
+
+(Keep comments in snippets if you want to practice typing them)
 
 ### Database Location
 
 `packages/back-nest/speedtyper-local.db`
 
 **To backup:**
+
 ```bash
 cp packages/back-nest/speedtyper-local.db ~/backups/speedtyper-$(date +%Y%m%d).db
 ```
 
 **To reset:**
+
 ```bash
 npm run reset
 # Or manually:
@@ -364,14 +458,17 @@ npm run reimport  # Re-import snippets
 ### Q: How is WPM calculated?
 
 **A:** Server-side via `progress.service.ts`:
+
 ```
 WPM = (characters typed / 5) / (time in minutes)
 ```
+
 Standard typing metric (5 chars = 1 word).
 
 ### Q: Can I export my results?
 
 **A:** Not yet (planned for v1.3.0). Current workaround:
+
 ```bash
 sqlite3 packages/back-nest/speedtyper-local.db ".dump result" > my-results.sql
 ```
@@ -385,6 +482,7 @@ sqlite3 packages/back-nest/speedtyper-local.db ".dump result" > my-results.sql
 **v1.1.0** - Stable for daily use
 
 **What works:**
+
 - ✅ Importing snippets
 - ✅ Typing with real-time feedback
 - ✅ Viewing results
@@ -392,6 +490,7 @@ sqlite3 packages/back-nest/speedtyper-local.db ".dump result" > my-results.sql
 - ✅ Settings persistence
 
 **Known limitations:**
+
 - No progress tracking (results stored but not visualized)
 - No keyboard shortcuts (mouse required for some actions)
 - No snippet metadata (don't know which file you're typing)
@@ -432,6 +531,7 @@ Edge cases and advanced features are still being refined.
 This is a personal fork optimized for solo use.
 
 **Contributions welcome** for:
+
 - Bug fixes
 - Documentation improvements
 - Feature implementations (aligned with roadmap)

@@ -62,25 +62,25 @@ Speedtyper Local is a **monorepo** containing two TypeScript applications that c
 
 ### Backend (packages/back-nest)
 
-| Component | Version | Purpose |
-|-----------|---------|---------|
-| **NestJS** | 9.0.0 | Application framework |
-| **TypeScript** | 4.7+ | Type-safe backend code |
-| **Socket.IO** | 4.5.2 | Real-time WebSocket communication |
-| **TypeORM** | 0.3.x | Database ORM |
-| **SQLite3** | 5.x | Embedded database |
-| **Tree-sitter** | 0.20.0 | Code parsing (AST-based) |
+| Component       | Version | Purpose                           |
+| --------------- | ------- | --------------------------------- |
+| **NestJS**      | 9.0.0   | Application framework             |
+| **TypeScript**  | 4.7+    | Type-safe backend code            |
+| **Socket.IO**   | 4.5.2   | Real-time WebSocket communication |
+| **TypeORM**     | 0.3.x   | Database ORM                      |
+| **SQLite3**     | 5.x     | Embedded database                 |
+| **Tree-sitter** | 0.20.0  | Code parsing (AST-based)          |
 
 ### Frontend (packages/webapp-next)
 
-| Component | Version | Purpose |
-|-----------|---------|---------|
-| **Next.js** | 12.2.5 | React framework (SSR/SSG) |
-| **React** | 18.2.0 | UI library |
-| **TypeScript** | 4.7+ | Type-safe frontend code |
-| **Socket.IO Client** | 2.x | WebSocket client |
-| **Zustand** | 3.7.2 | State management |
-| **Tailwind CSS** | 3.x | Utility-first styling |
+| Component            | Version | Purpose                   |
+| -------------------- | ------- | ------------------------- |
+| **Next.js**          | 12.2.5  | React framework (SSR/SSG) |
+| **React**            | 18.2.0  | UI library                |
+| **TypeScript**       | 4.7+    | Type-safe frontend code   |
+| **Socket.IO Client** | 2.x     | WebSocket client          |
+| **Zustand**          | 3.7.2   | State management          |
+| **Tailwind CSS**     | 3.x     | Utility-first styling     |
 
 ### Notable Dependencies
 
@@ -225,6 +225,7 @@ Log: "Imported X snippets"
 ```
 
 **Key Files:**
+
 - `packages/back-nest/src/challenges/commands/local-import-runner.ts`
 - `packages/back-nest/src/challenges/services/parser.service.ts`
 
@@ -306,24 +307,24 @@ The frontend and backend communicate via **11 core events**:
 
 #### Frontend → Backend (Emits)
 
-| Event | Payload | Purpose |
-|-------|---------|---------|
-| `play` | `RaceSettingsDTO` | Request new race |
-| `join` | `raceId: string` | Join existing race (unused in solo) |
-| `start_race` | None | Start countdown (solo: instant) |
-| `key_stroke` | `KeystrokeDTO` | Send typed character |
-| `refresh_challenge` | `RaceSettingsDTO` | Get new snippet without restarting |
+| Event               | Payload           | Purpose                             |
+| ------------------- | ----------------- | ----------------------------------- |
+| `play`              | `RaceSettingsDTO` | Request new race                    |
+| `join`              | `raceId: string`  | Join existing race (unused in solo) |
+| `start_race`        | None              | Start countdown (solo: instant)     |
+| `key_stroke`        | `KeystrokeDTO`    | Send typed character                |
+| `refresh_challenge` | `RaceSettingsDTO` | Get new snippet without restarting  |
 
 #### Backend → Frontend (Emits)
 
-| Event | Payload | Purpose |
-|-------|---------|---------|
-| `race_joined` | `Race` | Race created/joined successfully |
-| `challenge_selected` | `Challenge` | Snippet to type |
-| `countdown` | `number` | Countdown timer (solo: always instant) |
-| `race_started` | `Date` | Race officially began (timer start) |
-| `progress_updated` | `RacePlayer` | Updated WPM/accuracy/position |
-| `race_completed` | `Result` | Typing finished, results ready |
+| Event                | Payload      | Purpose                                |
+| -------------------- | ------------ | -------------------------------------- |
+| `race_joined`        | `Race`       | Race created/joined successfully       |
+| `challenge_selected` | `Challenge`  | Snippet to type                        |
+| `countdown`          | `number`     | Countdown timer (solo: always instant) |
+| `race_started`       | `Date`       | Race officially began (timer start)    |
+| `progress_updated`   | `RacePlayer` | Updated WPM/accuracy/position          |
+| `race_completed`     | `Result`     | Typing finished, results ready         |
 
 **CRITICAL**: Do not modify this contract without updating both sides.
 
@@ -334,6 +335,7 @@ The frontend and backend communicate via **11 core events**:
 ### Tables
 
 **challenge** (Snippets to type)
+
 ```sql
 - id: UUID (primary key)
 - content: TEXT (the code to type)
@@ -346,6 +348,7 @@ The frontend and backend communicate via **11 core events**:
 ```
 
 **user** (Guest users)
+
 ```sql
 - id: UUID (primary key)
 - username: VARCHAR (auto-generated, e.g., "guest-abc123")
@@ -354,6 +357,7 @@ The frontend and backend communicate via **11 core events**:
 ```
 
 **result** (Completed races)
+
 ```sql
 - id: UUID (primary key)
 - userId: UUID (foreign key to user)
@@ -365,6 +369,7 @@ The frontend and backend communicate via **11 core events**:
 ```
 
 **session** (WebSocket sessions)
+
 ```sql
 - id: VARCHAR (session ID)
 - userId: UUID (foreign key to user)
@@ -373,6 +378,7 @@ The frontend and backend communicate via **11 core events**:
 ```
 
 **project** (For GitHub imports, minimal use in local mode)
+
 ```sql
 - id: UUID (primary key)
 - fullName: VARCHAR (e.g., "user/repo")
@@ -384,6 +390,7 @@ The frontend and backend communicate via **11 core events**:
 `packages/back-nest/speedtyper-local.db`
 
 **Reset database:**
+
 ```bash
 npm run reset
 # Or manually:
@@ -411,11 +418,11 @@ The existing Socket.IO infrastructure is fast and reliable. Ripping it out for m
 
 **Tradeoffs:**
 
-| PostgreSQL | SQLite |
-|------------|--------|
-| ✅ Production-grade | ✅ Zero setup |
-| ✅ Better for multi-user | ✅ Single file (easy backup) |
-| ❌ Requires Docker | ✅ Portable |
+| PostgreSQL               | SQLite                           |
+| ------------------------ | -------------------------------- |
+| ✅ Production-grade      | ✅ Zero setup                    |
+| ✅ Better for multi-user | ✅ Single file (easy backup)     |
+| ❌ Requires Docker       | ✅ Portable                      |
 | ❌ Overkill for solo use | ✅ Fast for read-heavy workloads |
 
 Since this is a **local dev tool** with a **single user**, SQLite is the right choice.
@@ -423,11 +430,13 @@ Since this is a **local dev tool** with a **single user**, SQLite is the right c
 ### 3. Why Comment Out Multiplayer Instead of Deleting?
 
 **Reasoning:**
+
 1. **Future-proofing**: User might want to re-enable it later
 2. **Learning**: Commented code serves as documentation
 3. **Safety**: Easier to verify what was removed
 
 **Example** (race-events.service.ts):
+
 ```typescript
 // SOLO MODE: No room joining needed
 createdRace(socket: Socket, race: Race) {
@@ -441,6 +450,7 @@ createdRace(socket: Socket, race: Race) {
 **Question**: Why not just use regex to extract functions?
 
 **Answer**: Tree-sitter is a **production-grade parser** that:
+
 - Handles edge cases (nested functions, decorators, etc.)
 - Works across 15+ languages with identical API
 - Filters by quality (avoids imports, one-liners, etc.)
@@ -453,23 +463,23 @@ Building custom heuristics would take weeks and produce inferior results.
 
 ### Backend
 
-| File | Why It's Critical | Modification Risk |
-|------|-------------------|-------------------|
-| `race.gateway.ts` | WebSocket event handlers | 🔴 HIGH (breaks typing) |
-| `race-manager.service.ts` | Race state machine | 🔴 HIGH (logic errors) |
-| `progress.service.ts` | WPM calculation | 🟡 MEDIUM (wrong metrics) |
-| `parser.service.ts` | Snippet extraction | 🟡 MEDIUM (quality issues) |
-| `challenge.entity.ts` | Database schema | 🟢 LOW (just a model) |
+| File                      | Why It's Critical        | Modification Risk          |
+| ------------------------- | ------------------------ | -------------------------- |
+| `race.gateway.ts`         | WebSocket event handlers | 🔴 HIGH (breaks typing)    |
+| `race-manager.service.ts` | Race state machine       | 🔴 HIGH (logic errors)     |
+| `progress.service.ts`     | WPM calculation          | 🟡 MEDIUM (wrong metrics)  |
+| `parser.service.ts`       | Snippet extraction       | 🟡 MEDIUM (quality issues) |
+| `challenge.entity.ts`     | Database schema          | 🟢 LOW (just a model)      |
 
 ### Frontend
 
-| File | Why It's Critical | Modification Risk |
-|------|-------------------|-------------------|
-| `Game.ts` | Main game controller | 🔴 HIGH (breaks everything) |
-| `CodeArea.tsx` | Typing interface | 🔴 HIGH (breaks input) |
-| `game-store.ts` | Race state | 🟡 MEDIUM (state bugs) |
-| `code-store.ts` | Typing state | 🟡 MEDIUM (state bugs) |
-| `useKeyMap.ts` | Keyboard shortcuts | 🟢 LOW (isolated) |
+| File            | Why It's Critical    | Modification Risk           |
+| --------------- | -------------------- | --------------------------- |
+| `Game.ts`       | Main game controller | 🔴 HIGH (breaks everything) |
+| `CodeArea.tsx`  | Typing interface     | 🔴 HIGH (breaks input)      |
+| `game-store.ts` | Race state           | 🟡 MEDIUM (state bugs)      |
+| `code-store.ts` | Typing state         | 🟡 MEDIUM (state bugs)      |
+| `useKeyMap.ts`  | Keyboard shortcuts   | 🟢 LOW (isolated)           |
 
 **Rule of thumb**: If you're touching files in `races/` or `modules/play2/`, test extensively.
 
@@ -525,11 +535,13 @@ sqlite> .exit
 ### Debugging WebSocket Events
 
 **Backend (NestJS logs):**
+
 - Check terminal running `npm run dev`
 - Look for `[RaceGateway]` logs
 - Add `console.log()` in `race.gateway.ts` handlers
 
 **Frontend (Browser console):**
+
 - Open DevTools → Console
 - Look for Socket.IO connection messages
 - Add `console.log()` in `Game.ts` event listeners
@@ -554,10 +566,77 @@ sqlite> .exit
 
 ### Modifying Snippet Filtering
 
+**New in v1.2.0:** Snippet filters are now configurable via `parser.config.json`!
+
+**Quick method (recommended):**
+
+1. **Edit**: `packages/back-nest/parser.config.json`
+2. **Modify**: Filter values
+
+```json
+{
+  "filters": {
+    "maxNodeLength": 500, // Was 800
+    "minNodeLength": 150, // Was 100
+    "maxNumLines": 15, // Was 25
+    "maxLineLength": 80 // Was 100
+  }
+}
+```
+
+3. **Test**: Run `npm run reimport`, check snippet quality
+4. **Revert**: If too strict/loose, adjust values and re-import
+
+**Advanced method (code-level customization):**
+
 1. **Edit**: `packages/back-nest/src/challenges/services/parser.service.ts`
-2. **Find**: `parseNodesFromContent()` method
-3. **Modify**: Filter conditions (e.g., change `maxLines` from 11 to 20)
+2. **Find**: `loadConfig()` method
+3. **Modify**: Add custom validation logic or filter behavior
 4. **Test**: Run `npm run reimport`, check snippet quality
+
+**Available filter parameters:**
+
+| Parameter        | Default | Purpose                                     |
+| ---------------- | ------- | ------------------------------------------- |
+| `maxNodeLength`  | 800     | Maximum characters per snippet              |
+| `minNodeLength`  | 100     | Minimum characters (avoid trivial snippets) |
+| `maxNumLines`    | 25      | Maximum lines per snippet                   |
+| `maxLineLength`  | 100     | Maximum characters per line                 |
+| `removeComments` | true    | Strip comments during import                |
+
+**Validation rules:**
+
+- `minNodeLength` must be less than `maxNodeLength`
+- All values must be positive integers
+- Invalid config triggers console warning and uses defaults
+
+**Example configurations:**
+
+_For longer, complex snippets:_
+
+```json
+{
+  "filters": {
+    "maxNodeLength": 1200,
+    "minNodeLength": 200,
+    "maxNumLines": 40,
+    "maxLineLength": 120
+  }
+}
+```
+
+_For shorter, beginner-friendly snippets:_
+
+```json
+{
+  "filters": {
+    "maxNodeLength": 400,
+    "minNodeLength": 80,
+    "maxNumLines": 12,
+    "maxLineLength": 70
+  }
+}
+```
 
 ### Adding a New Language
 
@@ -597,6 +676,79 @@ NEXT_PUBLIC_WS_URL=ws://localhost:1337
 
 ---
 
+## Configuration Files
+
+### Parser Configuration
+
+**File:** `packages/back-nest/parser.config.json`
+
+**Purpose:** Controls snippet quality filters and parsing behavior
+
+**Structure:**
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Configuration for code snippet parser and quality filters",
+  "version": "1.0.0",
+  "filters": {
+    "maxNodeLength": 800,
+    "minNodeLength": 100,
+    "maxNumLines": 25,
+    "maxLineLength": 100
+  },
+  "parsing": {
+    "removeComments": true,
+    "enableCommentSkipping": false
+  },
+  "notes": {
+    "maxNodeLength": "Maximum character count for a single snippet",
+    "minNodeLength": "Minimum character count to avoid trivial snippets",
+    "maxNumLines": "Maximum number of lines in a snippet",
+    "maxLineLength": "Maximum characters per line to avoid horizontal scrolling",
+    "removeComments": "Strip comments from snippets during import",
+    "enableCommentSkipping": "Future: Make comments visible but not typable"
+  }
+}
+```
+
+**Loading behavior:**
+
+- Read once on parser service initialization (backend startup)
+- Validates structure and values
+- Falls back to hardcoded defaults if missing or invalid
+- Logs configuration to console on successful load
+
+**Error handling:**
+
+```typescript
+// Invalid config scenarios:
+// 1. File doesn't exist → Use defaults
+// 2. Invalid JSON → Use defaults, log error
+// 3. minNodeLength >= maxNodeLength → Use defaults, log warning
+// 4. Negative/zero values → Use defaults, log warning
+```
+
+**To apply changes:**
+
+```bash
+# Edit config file
+code packages/back-nest/parser.config.json
+
+# Restart backend (config loads on startup)
+npm run dev
+
+# Re-import snippets with new filters
+npm run reimport
+```
+
+**Implementation details:**
+
+- **Location**: `packages/back-nest/src/challenges/services/parser-config.interface.ts`
+- **Interface**: `ParserConfig` (TypeScript type definition)
+- **Defaults**: `DEFAULT_PARSER_CONFIG` constant
+- **Loader**: `Parser.loadConfig()` method in `parser.service.ts`
+
 ## Testing Strategy
 
 ### Current Approach
@@ -613,6 +765,7 @@ NEXT_PUBLIC_WS_URL=ws://localhost:1337
 The original codebase has minimal test coverage. Adding comprehensive tests is a **future enhancement** (see FEATURES.md).
 
 **Why not now?**
+
 - Time-intensive (would delay features)
 - Typing engine is stable (works in production upstream)
 - Manual testing catches regressions effectively for solo use
@@ -624,6 +777,7 @@ The original codebase has minimal test coverage. Adding comprehensive tests is a
 ### Database Queries
 
 - **Challenge selection**: Random query with language filter
+
   - Optimized via index on `language` column
   - Typical: <5ms query time
 
@@ -651,6 +805,7 @@ The original codebase has minimal test coverage. Adding comprehensive tests is a
 **Current**: Guest-only (no passwords, no GitHub OAuth)
 
 **Implications**:
+
 - ✅ Zero friction for local use
 - ❌ No user isolation (single-user assumption)
 - ❌ Not suitable for multi-user deployment
@@ -660,6 +815,7 @@ The original codebase has minimal test coverage. Adding comprehensive tests is a
 **Current**: SQLite file with no access control
 
 **Implications**:
+
 - Anyone with filesystem access can read/modify database
 - Fine for local dev tool
 - **Do not** deploy this to a public server
@@ -689,6 +845,7 @@ The original codebase has minimal test coverage. Adding comprehensive tests is a
 ### Future Considerations
 
 If planning to add:
+
 - **Progress tracking**: Add dashboard page, REST endpoints, aggregate queries
 - **Smart snippets**: Modify WebSocket payload, add `nonTypableRanges` field
 - **Syntax highlighting**: Integrate library like Prism.js or Monaco, rewrite CodeArea.tsx

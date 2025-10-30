@@ -1,6 +1,9 @@
 import * as TSParser from 'tree-sitter';
 import { Injectable } from '@nestjs/common';
 import { getTSLanguageParser } from './ts-parser.factory';
+import { ParserConfig, DEFAULT_PARSER_CONFIG } from './parser-config.interface';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // TODO: Chars like ♡ should be filtered out
 @Injectable()
@@ -30,13 +33,67 @@ export enum NodeTypes {
 }
 
 export class Parser {
-  // RELAXED FILTERS: More permissive than original
-  private MAX_NODE_LENGTH = 800;  // Was 300
-  private MIN_NODE_LENGTH = 100;  // Keep same
-  private MAX_NUM_LINES = 25;     // Was 11
-  private MAX_LINE_LENGTH = 100;  // Was 55
+  // Configuration loaded from parser.config.json
+  private config: ParserConfig;
+  private MAX_NODE_LENGTH: number;
+  private MIN_NODE_LENGTH: number;
+  private MAX_NUM_LINES: number;
+  private MAX_LINE_LENGTH: number;
+  private REMOVE_COMMENTS: boolean;
 
-  constructor(private ts: TSParser) {}
+  constructor(private ts: TSParser) {
+    this.config = this.loadConfig();
+    this.MAX_NODE_LENGTH = this.config.filters.maxNodeLength;
+    this.MIN_NODE_LENGTH = this.config.filters.minNodeLength;
+    this.MAX_NUM_LINES = this.config.filters.maxNumLines;
+    this.MAX_LINE_LENGTH = this.config.filters.maxLineLength;
+    this.REMOVE_COMMENTS = this.config.parsing.removeComments;
+  }
+
+  /**
+   * Load parser configuration from parser.config.json
+   * Falls back to defaults if file is missing or invalid
+   */
+  private loadConfig(): ParserConfig {
+    try {
+      const configPath = path.join(process.cwd(), 'parser.config.json');
+      
+      if (!fs.existsSync(configPath)) {
+        console.log('[Parser] No parser.config.json found, using defaults');
+        return DEFAULT_PARSER_CONFIG;
+      }
+
+      const configFile = fs.readFileSync(configPath, 'utf8');
+      const parsedConfig = JSON.parse(configFile);
+
+      // Validate config structure
+      if (!parsedConfig.filters || !parsedConfig.parsing) {
+        console.warn('[Parser] Invalid config structure, using defaults');
+        return DEFAULT_PARSER_CONFIG;
+      }
+
+      // Validate filter values
+      const filters = parsedConfig.filters;
+      if (filters.minNodeLength >= filters.maxNodeLength) {
+        console.warn('[Parser] Invalid config: minNodeLength must be < maxNodeLength, using defaults');
+        return DEFAULT_PARSER_CONFIG;
+      }
+
+      if (filters.maxNumLines <= 0 || filters.maxLineLength <= 0) {
+        console.warn('[Parser] Invalid config: maxNumLines and maxLineLength must be > 0, using defaults');
+        return DEFAULT_PARSER_CONFIG;
+      }
+
+      console.log('[Parser] ✅ Loaded custom configuration from parser.config.json');
+      console.log(`[Parser] Filters: ${filters.minNodeLength}-${filters.maxNodeLength} chars, max ${filters.maxNumLines} lines, max ${filters.maxLineLength} chars/line`);
+      
+      return parsedConfig as ParserConfig;
+    } catch (error) {
+      console.error('[Parser] Error loading config:', error.message);
+      console.log('[Parser] Falling back to default configuration');
+      return DEFAULT_PARSER_CONFIG;
+    }
+  }
 
   parseTrackedNodes(content: string) {
     const root = this.ts.parse(content).rootNode;
@@ -50,7 +107,7 @@ export class Parser {
       .filter((n) => this.filterShortNodes(n))
       .filter((n) => this.filterTooLongLines(n))
       .filter((n) => this.filterTooManyLines(n))
-      .map((n) => this.removeCommentsAndDocstrings(n));  // NEW: Remove comments
+      .map((n) => this.REMOVE_COMMENTS ? this.removeCommentsAndDocstrings(n) : n);  // Configurable comment removal
     return nodes;
   }
 
@@ -109,7 +166,7 @@ export class Parser {
 
     // Get all comment nodes from the syntax tree
     const comments = this.findCommentNodes(node);
-    
+
     // Sort by start position (reverse order to maintain byte offsets)
     comments.sort((a, b) => b.startIndex - a.startIndex);
 
@@ -174,7 +231,7 @@ export class Parser {
   private cleanupWhitespace(text: string): string {
     // Remove lines that are now empty or only whitespace
     let lines = text.split('\n');
-    
+
     // Remove trailing/leading blank lines
     while (lines.length > 0 && lines[0].trim() === '') {
       lines.shift();
