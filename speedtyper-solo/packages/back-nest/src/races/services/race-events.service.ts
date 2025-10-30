@@ -20,6 +20,15 @@ export class RaceEvents {
     socket.emit('challenge_selected', race.challenge);
   }
 
+  // SOLO MODE: Emit error message to socket
+  emitError(socket: Socket, error: string, details?: string) {
+    socket.emit('race_error', {
+      message: error,
+      details:
+        details || 'Please check the terminal logs for more information.',
+    });
+  }
+
   // SOLO MODE: Emit countdown only to single socket (stored in race context)
   // Note: In solo mode, countdown is instant since there's no coordination needed
   countdown(socket: Socket, i: number) {

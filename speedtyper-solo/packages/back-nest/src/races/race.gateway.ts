@@ -115,7 +115,7 @@ export class RaceGateway {
     });
   }
 
-  @UsePipes(new ValidationPipe())
+@UsePipes(new ValidationPipe())
   @SubscribeMessage('play')
   async onPlay(socket: Socket, settings: RaceSettingsDTO) {
     const socketID = socket.id;
@@ -123,9 +123,17 @@ export class RaceGateway {
       const user = this.session.getUser(socket);
       const raceId = this.session.getRaceID(socket);
       this.raceManager.leaveRace(user, raceId);
-      const race = await this.raceManager.create(user, settings);
-      this.raceEvents.createdRace(socket, race);
-      this.session.saveRaceID(socket, race.id);
+      
+      try {
+        const race = await this.raceManager.create(user, settings);
+        this.raceEvents.createdRace(socket, race);
+        this.session.saveRaceID(socket, race.id);
+      } catch (error) {
+        const message = error.message || 'Failed to create race';
+        this.raceEvents.emitError(socket, message);
+        console.error('[RaceGateway] Error creating race:', error.message);
+        return;
+      }
     });
   }
 
@@ -161,7 +169,7 @@ export class RaceGateway {
     });
   }
 
-@SubscribeMessage('start_race')
+  @SubscribeMessage('start_race')
   async onStart(socket: Socket) {
     const user = this.session.getUser(socket);
     const raceID = this.session.getRaceID(socket);

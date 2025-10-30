@@ -26,18 +26,19 @@ export class ChallengeService {
     let query = this.challengeRepository
       .createQueryBuilder('challenge')
       .leftJoinAndSelect('challenge.project', 'project');
-
     if (language) {
       query = query.where('challenge.language = :language', {
         language,
       });
     }
-
     const randomChallenge = await query.orderBy('RANDOM()').getOne();
-
-    if (!randomChallenge)
-      throw new BadRequestException(`No challenges for language: ${language}`);
-
+    if (!randomChallenge) {
+      // Throw proper error with helpful message
+      const message = language
+        ? `No challenges found for language: ${language}`
+        : 'No challenges found. Add code to snippets/ folder and run: npm run reimport';
+      throw new BadRequestException(message);
+    }
     return randomChallenge;
   }
 
@@ -59,7 +60,7 @@ export class ChallengeService {
 
     return languages;
   }
-private getLanguageName(language: string): string {
+  private getLanguageName(language: string): string {
     const allLanguages = {
       // Short codes (original speedtyper.dev format)
       js: 'JavaScript',
