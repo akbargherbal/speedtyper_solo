@@ -25,34 +25,89 @@ export class LocalImportRunner extends CommandRunner {
   }
 
   async run(): Promise<void> {
-    console.log('[local-import]: Starting local snippet import...');
-    console.log(`[local-import]: Scanning directory: ${this.SNIPPETS_DIR}`);
+    console.log('╔════════════════════════════════════════════════════════════╗');
+    console.log('║       Speedtyper Local - Snippet Import Tool              ║');
+    console.log('╚════════════════════════════════════════════════════════════╝');
+    console.log(`📁 Scanning: ${this.SNIPPETS_DIR}\n`);
+
+    // Check if directory exists
+    if (!fs.existsSync(this.SNIPPETS_DIR)) {
+      console.error('❌ ERROR: Snippets directory not found!');
+      console.error(`   Expected location: ${this.SNIPPETS_DIR}`);
+      console.error('\n💡 To fix this:');
+      console.error('   1. Create the snippets directory: mkdir -p snippets');
+      console.error('   2. Add subdirectories: mkdir -p snippets/python snippets/typescript snippets/javascript');
+      console.error('   3. Place your code files inside\n');
+      process.exit(1);
+    }
 
     // Ensure the project exists
     const project = await this.ensureProject();
 
     // Scan and import files
     const files = this.scanSnippetsDirectory();
-    console.log(`[local-import]: Found ${files.length} files to import`);
+    
+    if (files.length === 0) {
+      console.log('⚠️  No supported files found in snippets directory!');
+      console.log('\n💡 Supported file types:');
+      console.log('   JavaScript: .js, .jsx');
+      console.log('   TypeScript: .ts, .tsx');
+      console.log('   Python: .py');
+      console.log('   Others: .java, .go, .rs, .c, .cpp, .cs\n');
+      console.log('📝 Add some code files to the snippets directory and run this command again.\n');
+      return;
+    }
+
+    console.log(`✓ Found ${files.length} file(s) to process\n`);
 
     let totalChallenges = 0;
     let filesProcessed = 0;
+    let filesWithErrors = 0;
+    let filesWithNoSnippets = 0;
 
     for (const file of files) {
       try {
         const challenges = await this.importFile(file, project);
-        totalChallenges += challenges.length;
-        filesProcessed++;
-
-        console.log(
-          `[local-import]: ${filesProcessed}/${files.length} - ${file.relativePath} → ${challenges.length} snippets extracted`
-        );
+        
+        if (challenges.length === 0) {
+          filesWithNoSnippets++;
+          console.log(`  ⊘ ${file.relativePath} - No valid snippets (file too short or no functions/classes)`);
+        } else {
+          totalChallenges += challenges.length;
+          filesProcessed++;
+          console.log(`  ✓ ${file.relativePath} - Extracted ${challenges.length} snippet(s)`);
+        }
       } catch (error) {
-        console.error(`[local-import]: ERROR processing ${file.relativePath}:`, error.message);
+        filesWithErrors++;
+        console.error(`  ✗ ${file.relativePath} - ERROR: ${error.message}`);
       }
     }
 
-    console.log(`[local-import]: ✅ Complete! Imported ${totalChallenges} snippets from ${filesProcessed} files`);
+    // Summary report
+    console.log('\n╔════════════════════════════════════════════════════════════╗');
+    console.log('║                    Import Summary                          ║');
+    console.log('╚════════════════════════════════════════════════════════════╝');
+    console.log(`✅ Success: ${filesProcessed} file(s) processed`);
+    console.log(`📦 Snippets: ${totalChallenges} snippet(s) imported`);
+    
+    if (filesWithNoSnippets > 0) {
+      console.log(`⊘  Skipped: ${filesWithNoSnippets} file(s) had no valid snippets`);
+      console.log('   💡 Tip: Valid snippets must be 100-300 characters, max 11 lines');
+    }
+    
+    if (filesWithErrors > 0) {
+      console.log(`❌ Errors: ${filesWithErrors} file(s) failed to parse`);
+    }
+
+    console.log('\n🎮 Ready to practice! Run: npm run dev\n');
+
+    if (totalChallenges === 0) {
+      console.log('⚠️  Warning: No snippets were imported!');
+      console.log('💡 This usually means:');
+      console.log('   • Files are too short (need 100-300 char functions/classes)');
+      console.log('   • Files contain only imports/comments');
+      console.log('   • Syntax errors preventing parsing\n');
+    }
   }
 
   private async ensureProject() {
@@ -60,7 +115,7 @@ export class LocalImportRunner extends CommandRunner {
     let project = await this.projectService.findByFullName(fullName);
 
     if (!project) {
-      console.log('[local-import]: Creating Local/Practice project...');
+      console.log('📂 Creating "Local/Practice" project...');
       const newProject = new Project();
       newProject.id = 'local-practice';
       newProject.fullName = fullName;
@@ -73,6 +128,7 @@ export class LocalImportRunner extends CommandRunner {
 
       await this.projectService.bulkUpsert([newProject]);
       project = newProject;
+      console.log('✓ Project created\n');
     }
 
     return project;
@@ -80,10 +136,6 @@ export class LocalImportRunner extends CommandRunner {
 
   private scanSnippetsDirectory() {
     const files: Array<{ absolutePath: string; relativePath: string; extension: string }> = [];
-
-    if (!fs.existsSync(this.SNIPPETS_DIR)) {
-      throw new Error(`Snippets directory not found: ${this.SNIPPETS_DIR}`);
-    }
 
     const scanDir = (dir: string, baseDir: string = this.SNIPPETS_DIR) => {
       const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -118,7 +170,7 @@ export class LocalImportRunner extends CommandRunner {
   ): Promise<Challenge[]> {
     // Read file content
     const content = fs.readFileSync(file.absolutePath, 'utf-8');
-    
+
     // FIXED: Map extension to parser key (not display name)
     const parserLanguage = this.mapExtensionToParserLanguage(file.extension);
     const displayLanguage = this.mapExtensionToDisplayLanguage(file.extension);
@@ -128,7 +180,6 @@ export class LocalImportRunner extends CommandRunner {
     const nodes = parser.parseTrackedNodes(content);
 
     if (nodes.length === 0) {
-      console.log(`[local-import]: No valid snippets found in ${file.relativePath} (consider adjusting filters)`);
       return [];
     }
 
@@ -137,7 +188,7 @@ export class LocalImportRunner extends CommandRunner {
 
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i];
-      
+
       // Format the extracted code
       const formattedContent = getFormattedText(node.text);
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { TerminalIcon } from "../../assets/icons/TerminalIcon";
 import { Logo, WebsiteName } from "../../components/Navbar";
 import { useGameStore } from "../../modules/play2/state/game-store";
+import { useConnectionStore } from "../../modules/play2/state/connection-store";
 import { useIsPlaying } from "../hooks/useIsPlaying";
 import { PlayingNow } from "./BattleMatcher";
 import Button from "./Button";
@@ -26,6 +27,28 @@ const HomeLink = () => {
   );
 };
 
+const ConnectionStatus = () => {
+  const isConnected = useConnectionStore((state) => state.isConnected);
+  
+  return (
+    <div className="flex items-center gap-2 text-xs text-gray-400 mr-4">
+      <div className="relative">
+        <div
+          className={`w-2 h-2 rounded-full ${
+            isConnected ? "bg-green-500" : "bg-red-500"
+          }`}
+        />
+        {isConnected && (
+          <div className="absolute inset-0 w-2 h-2 rounded-full bg-green-500 animate-ping opacity-75" />
+        )}
+      </div>
+      <span className="hidden sm:inline">
+        {isConnected ? "Connected" : "Reconnecting..."}
+      </span>
+    </div>
+  );
+};
+
 const ProfileSection = () => {
   const isPlaying = useIsPlaying();
   return (
@@ -40,6 +63,7 @@ const ProfileSection = () => {
             transition={{ duration: 0.5 }}
           >
             <div className="text-sm flex-grow"></div>
+            <ConnectionStatus />
             <NewGithubLoginModal />
           </motion.div>
         </AnimatePresence>

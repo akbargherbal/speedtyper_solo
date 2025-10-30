@@ -97,6 +97,27 @@ export function WarningContainer() {
   );
 }
 
+function SnippetMetadata({ challenge }: { challenge: ChallengeInfo }) {
+  if (!challenge.filePath) {
+    return null;
+  }
+
+  // Extract snippet number if present (e.g., "python/script.py#snippet-2" -> "#2")
+  const snippetMatch = challenge.filePath.match(/#snippet-(\d+)$/);
+  const snippetNumber = snippetMatch ? `#${snippetMatch[1]}` : "";
+  const cleanPath = challenge.filePath.replace(/#snippet-\d+$/, "");
+
+  return (
+    <div className="flex items-center gap-2 text-xs text-gray-400">
+      <span className="hidden sm:inline">From:</span>
+      <span className="text-gray-300 font-mono">{cleanPath}</span>
+      {snippetNumber && (
+        <span className="text-purple-400 font-semibold">{snippetNumber}</span>
+      )}
+    </div>
+  );
+}
+
 export function PlayFooter({ challenge }: PlayFooterProps) {
   const isPlaying = useIsPlaying();
   const totalSeconds = useCodeStoreTotalSeconds();
@@ -116,7 +137,8 @@ export function PlayFooter({ challenge }: PlayFooterProps) {
             <div className="w-full">
               <div className="flex row justify-between items-top">
                 <ActionButtons />
-                <div className="text-faded-gray flex gap-4">
+                <div className="text-faded-gray flex gap-4 items-center">
+                  <SnippetMetadata challenge={challenge} />
                   {/* SOLO MODE: Login/Signup button removed */}
                   {/* {isAnonymous && (
                     <>
