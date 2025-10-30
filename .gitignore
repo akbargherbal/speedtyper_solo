@@ -39,3 +39,6 @@ typings/
 # development
 .idea
 packages/back-nest/speedtyper-local.db
+
+# Ignore Windows/WSL Zone.Identifier streams
+*Zone.Identifier*

@@ -1,0 +1,79 @@
+[
+  {
+    "feature_id": "cleanup_ui",
+    "tier": 1,
+    "feature_name": "Hunt and Remove Broken UI Elements",
+    "description": "Remove non-functional UI elements like the crashing leaderboard button and fake data panels (daily streak, trends).",
+    "impact": "Improves stability and declutters the UI for a cleaner, solo-focused experience.",
+    "effort": "Very Low",
+    "risk": "Low",
+    "domain": "Frontend",
+    "verification": "Crown icon, daily streak, and average wpm panels are gone from the UI. App does not crash."
+  },
+  {
+    "feature_id": "keyboard_shortcuts",
+    "tier": 1,
+    "feature_name": "Configurable Keyboard Shortcut System",
+    "description": "Implement keyboard shortcuts for core actions (Next Race, Refresh Snippet, Select Language) with user-configurable bindings.",
+    "impact": "Reduces mouse friction for a faster 'flow state' and provides power-user control.",
+    "effort": "Low-to-Medium",
+    "risk": "Low",
+    "domain": "Frontend",
+    "verification": "Default shortcuts work. Custom JSON bindings override defaults and persist after page refresh."
+  },
+  {
+    "feature_id": "persist_language",
+    "tier": 1,
+    "feature_name": "Persist Language Selection",
+    "description": "Application will remember the last selected programming language between sessions using localStorage.",
+    "impact": "Removes the repetitive friction of re-selecting the language on every visit.",
+    "effort": "Very Low",
+    "risk": "Very Low",
+    "domain": "Frontend",
+    "verification": "Select a language, close tab, reopen. The language selection should be the same."
+  },
+  {
+    "feature_id": "progress_tracking",
+    "tier": 2,
+    "feature_name": "User Progress Tracking & Persistence",
+    "description": "Make the 'guest user' permanent and build a new UI to display historical performance (WPM trends, accuracy).",
+    "impact": "Transforms the app from a 'practice tool' to a 'personal improvement tool', providing motivation.",
+    "effort": "High",
+    "risk": "High",
+    "domain": "Full-stack",
+    "verification": "User ID persists in localStorage. Results are saved to DB against this ID. New UI displays historical data."
+  },
+  {
+    "feature_id": "smart_snippets",
+    "tier": 2,
+    "feature_name": "Smart Snippets (Skippable Comments)",
+    "description": "Display comments visually in snippets but automatically skip them during typing, using on-the-fly backend parsing.",
+    "impact": "Makes practice more realistic by retaining code context while allowing focus on core logic.",
+    "effort": "High",
+    "risk": "High",
+    "domain": "Full-stack",
+    "verification": "Backend sends 'nonTypableRanges'. Frontend renders comments differently and cursor jumps over them."
+  },
+  {
+    "feature_id": "syntax_highlighting",
+    "tier": 3,
+    "feature_name": "Language-Aware Syntax Highlighting",
+    "description": "Display code with IDE-like syntax highlighting for keywords, strings, etc.",
+    "impact": "Massive visual upgrade, making the experience feel more professional and polished.",
+    "effort": "High",
+    "risk": "Very High",
+    "domain": "Frontend",
+    "verification": "Snippets are rendered with multiple colors before typing. Typing progress overlays correctly."
+  },
+  {
+    "feature_id": "snippet_filters",
+    "tier": 3,
+    "feature_name": "Configurable Snippet Filters",
+    "description": "Control snippet characteristics (length, line count) by editing a backend JSON config file.",
+    "impact": "Gives the user control over the difficulty and style of their practice material.",
+    "effort": "Low",
+    "risk": "Low",
+    "domain": "Backend",
+    "verification": "Set an extreme filter in the config file. Re-import snippets. Verify via SQL that no snippets violate the new rule."
+  }
+]

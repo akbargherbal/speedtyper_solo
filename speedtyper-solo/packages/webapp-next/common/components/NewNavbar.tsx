@@ -2,7 +2,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { TerminalIcon } from "../../assets/icons/TerminalIcon";
 import { Logo, WebsiteName } from "../../components/Navbar";
-import { LeaderboardButton } from "../../modules/play2/components/leaderboard/LeaderboardButton";
 import { useGameStore } from "../../modules/play2/state/game-store";
 import { useIsPlaying } from "../hooks/useIsPlaying";
 import { PlayingNow } from "./BattleMatcher";
@@ -71,7 +70,6 @@ export const NewNavbar = () => {
                   leftIcon={<TerminalIcon />}
                 />
               </Link>
-              <LeaderboardButton />
               <SettingsModal />
               <PlayingNow />
             </div>

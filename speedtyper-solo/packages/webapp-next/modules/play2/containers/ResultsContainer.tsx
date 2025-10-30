@@ -163,7 +163,6 @@ export function ResultsContainer() {
         </div>
       </div>
       <div className="w-full flex flex-col sm:flex-row">
-        {!result.user.isAnonymous ? <TrendsWPM currWPM={wpm} /> : null}
         <ResultsChart />
       </div>
     </div>
