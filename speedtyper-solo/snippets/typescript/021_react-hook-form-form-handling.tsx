@@ -1,3 +1,5 @@
+// PATTERN: React Hook Form (Form Handling)
+
 import { useForm } from 'react-hook-form';
 function MyForm() {
   const { register, handleSubmit } = useForm();
@@ -9,6 +11,8 @@ function MyForm() {
     </form>
   );
 }
+
+// PATTERN: React Hook Form (Form Handling)
 
 import { useForm } from 'react-hook-form';
 function MyForm() {
@@ -22,6 +26,8 @@ function MyForm() {
   );
 }
 
+// PATTERN: React Hook Form (Form Handling)
+
 import { useForm } from 'react-hook-form';
 function MyForm() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -32,6 +38,8 @@ function MyForm() {
     </form>
   );
 }
+
+// PATTERN: React Hook Form (Form Handling)
 
 import { useForm } from 'react-hook-form';
 function MyForm() {
@@ -45,6 +53,8 @@ function MyForm() {
   );
 }
 
+// PATTERN: React Hook Form (Form Handling)
+
 import { useForm } from 'react-hook-form';
 function MyForm() {
   const { register, watch } = useForm();
@@ -56,6 +66,8 @@ function MyForm() {
     </form>
   );
 }
+
+// PATTERN: React Hook Form (Form Handling)
 
 import { useForm } from 'react-hook-form';
 function MyForm() {
@@ -71,6 +83,8 @@ function MyForm() {
     </form>
   );
 }
+
+// PATTERN: React Hook Form (Form Handling)
 
 import { useForm } from 'react-hook-form';
 function MyForm() {

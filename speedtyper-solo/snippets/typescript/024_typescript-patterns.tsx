@@ -1,3 +1,5 @@
+// PATTERN: TypeScript Patterns
+
 interface UserProps {
   name: string;
   age: number;
@@ -5,6 +7,8 @@ interface UserProps {
 const UserComponent: React.FC<UserProps> = ({ name, age }) => {
   return <div>{name} is {age} years old.</div>;
 };
+
+// PATTERN: TypeScript Patterns
 
 import { useState } from 'react';
 const Counter: React.FC = () => {
@@ -16,6 +20,8 @@ const Counter: React.FC = () => {
     </div>
   );
 };
+
+// PATTERN: TypeScript Patterns
 
 import { useState, useEffect } from 'react';
 interface User {

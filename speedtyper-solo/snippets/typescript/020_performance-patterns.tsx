@@ -1,3 +1,5 @@
+// PATTERN: Performance Patterns
+
 import React, { useMemo, useState } from 'react';
 
 function FilteredList({ items }) {
@@ -13,6 +15,8 @@ function FilteredList({ items }) {
   );
 }
 
+// PATTERN: Performance Patterns
+
 import React, { useCallback, useState } from 'react';
 
 function Counter() {
@@ -25,6 +29,8 @@ function Counter() {
     </div>
   );
 }
+
+// PATTERN: Performance Patterns
 
 import React from 'react';
 

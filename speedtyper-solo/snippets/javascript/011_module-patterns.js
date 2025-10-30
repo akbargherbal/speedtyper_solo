@@ -1,3 +1,5 @@
+// PATTERN: Module Patterns
+
 const calculator = (() => {
   let result = 0;
   const add = (x) => result += x;
@@ -5,6 +7,8 @@ const calculator = (() => {
   const getResult = () => result;
   return { add, subtract, getResult };
 })();
+
+// PATTERN: Module Patterns
 
 const Logger = (() => {
   let instance;
@@ -22,6 +26,8 @@ const Logger = (() => {
     }
   };
 })();
+
+// PATTERN: Module Patterns
 
 function createProduct(name, price) {
   return {

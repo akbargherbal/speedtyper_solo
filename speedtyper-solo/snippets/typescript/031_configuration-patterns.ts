@@ -1,3 +1,5 @@
+// PATTERN: Configuration Patterns
+
 {
   "compilerOptions": {
     "target": "ES2020",
@@ -7,6 +9,8 @@
   }
 }
 
+// PATTERN: Configuration Patterns
+
 {
   "compilerOptions": {
     "strict": true,
@@ -15,11 +19,15 @@
   }
 }
 
+// PATTERN: Configuration Patterns
+
 interface User {
   id: number;
   name: string;
 }
 declare const currentUser: User;
+
+// PATTERN: Configuration Patterns
 
 declare module "external-lib" {
   export function init(config: object): void;

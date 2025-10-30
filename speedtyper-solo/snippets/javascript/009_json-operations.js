@@ -1,3 +1,5 @@
+// PATTERN: JSON Operations
+
 const jsonString = '{"name":"Alice", "age":30}';
 const user = JSON.parse(jsonString);
 console.log(user.name);
@@ -9,6 +11,8 @@ console.log(jsonString);
 const user = {name: "Charlie", age:35};
 const prettyJson = JSON.stringify(user, null, 2);
 console.log(prettyJson);
+
+// PATTERN: JSON Operations
 
 const invalidJson = '{"name": "Dave", "age": }';
 try {

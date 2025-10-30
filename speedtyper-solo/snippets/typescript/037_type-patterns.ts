@@ -1,12 +1,18 @@
+// PATTERN: Type Patterns
+
 type UserProfile = {
   username: string;
   email: string;
   age: number;
 };
 
+// PATTERN: Type Patterns
+
 function formatInput(input: string | number): string {
   return input.toString().trim();
 }
+
+// PATTERN: Type Patterns
 
 type Admin = {
   permissions: string[];
@@ -18,8 +24,12 @@ type User = {
 
 type AdminUser = Admin & User;
 
+// PATTERN: Type Patterns
+
 type Theme = 'light' | 'dark' | 'auto';
 const currentTheme: Theme = 'dark';
+
+// PATTERN: Type Patterns
 
 function processValue(value: string | number) {
   if (typeof value === 'string') {
@@ -27,6 +37,8 @@ function processValue(value: string | number) {
   }
   return value.toFixed(2);
 }
+
+// PATTERN: Type Patterns
 
 class ApiError extends Error {
   statusCode: number;
@@ -38,6 +50,8 @@ function handleError(error: Error) {
   }
 }
 
+// PATTERN: Type Patterns
+
 interface Cat {
   meow(): void;
 }
@@ -45,6 +59,8 @@ interface Cat {
 function isCat(pet: any): pet is Cat {
   return typeof pet.meow === 'function';
 }
+
+// PATTERN: Type Patterns
 
 type Success = {
   type: 'success';
@@ -58,8 +74,12 @@ type Error = {
 
 type Result = Success | Error;
 
+// PATTERN: Type Patterns
+
 const userInput = document.getElementById('user-input') as HTMLInputElement;
 const value = userInput.value;
+
+// PATTERN: Type Patterns
 
 function getElement(): HTMLElement | null {
   return document.getElementById('content');

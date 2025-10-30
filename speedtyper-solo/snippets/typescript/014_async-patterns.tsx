@@ -1,3 +1,5 @@
+// PATTERN: Async Patterns
+
 import React, { useEffect, useState } from 'react';
 
 function UserProfile({ userId }) {
@@ -14,6 +16,8 @@ function UserProfile({ userId }) {
 
   return <div>{user ? user.name : 'Loading...'}</div>;
 }
+
+// PATTERN: Async Patterns
 
 import React, { useState } from 'react';
 
@@ -34,6 +38,8 @@ function SubmitButton() {
 
   return <button onClick={handleSubmit} disabled={loading}>{loading ? 'Submitting...' : 'Submit'}</button>;
 }
+
+// PATTERN: Async Patterns
 
 import React from 'react';
 

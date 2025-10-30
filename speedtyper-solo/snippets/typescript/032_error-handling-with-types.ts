@@ -1,3 +1,5 @@
+// PATTERN: Error Handling with Types
+
 try {
   JSON.parse("invalid json");
 } catch (error) {
@@ -10,6 +12,8 @@ try {
   }
 }
 
+// PATTERN: Error Handling with Types
+
 class NetworkError extends Error {
   constructor(message: string) {
     super(message);
@@ -18,6 +22,8 @@ class NetworkError extends Error {
 }
 
 throw new NetworkError("Failed to connect");
+
+// PATTERN: Error Handling with Types
 
 type Result<T, E = Error> = { ok: true; value: T } | { ok: false; error: E };
 
@@ -34,6 +40,8 @@ if (result.ok) {
 } else {
   console.log(result.error.message);
 }
+
+// PATTERN: Error Handling with Types
 
 async function riskyOperation() {
   throw "Unexpected error";

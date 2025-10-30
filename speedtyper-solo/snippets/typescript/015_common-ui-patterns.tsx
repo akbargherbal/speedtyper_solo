@@ -1,3 +1,5 @@
+// PATTERN: Common UI Patterns
+
 import React, { useState } from 'react';
 
 function ModalToggle() {
@@ -15,6 +17,8 @@ function ModalToggle() {
     </div>
   );
 }
+
+// PATTERN: Common UI Patterns
 
 import React, { useState } from 'react';
 
@@ -35,6 +39,8 @@ function Accordion() {
     </div>
   );
 }
+
+// PATTERN: Common UI Patterns
 
 import React, { useState } from 'react';
 
@@ -57,6 +63,8 @@ function Tabs() {
     </div>
   );
 }
+
+// PATTERN: Common UI Patterns
 
 import React, { useState, useEffect } from 'react';
 
@@ -83,6 +91,8 @@ function DebouncedInput() {
     </div>
   );
 }
+
+// PATTERN: Common UI Patterns
 
 import React, { useState, useEffect, useRef } from 'react';
 

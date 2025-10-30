@@ -1,3 +1,5 @@
+// PATTERN: Zustand (State Management)
+
 import { create } from 'zustand'
 
 const useCounterStore = create((set) => ({
@@ -6,6 +8,8 @@ const useCounterStore = create((set) => ({
   decrement: () => set((state) => ({ count: state.count - 1 })),
 }))
 
+// PATTERN: Zustand (State Management)
+
 import { useCounterStore } from './store'
 
 function CounterDisplay() {
@@ -13,16 +17,22 @@ function CounterDisplay() {
   return <div>Current count: {count}</div>
 }
 
+// PATTERN: Zustand (State Management)
+
 const useTodoStore = create((set) => ({
   todos: [],
   addTodo: (text) => set((state) => ({ todos: [...state.todos, text] })),
 }))
+
+// PATTERN: Zustand (State Management)
 
 const useCartStore = create((set, get) => ({
   items: [],
   getTotalPrice: () => get().items.reduce((sum, item) => sum + item.price, 0),
   addItem: (item) => set((state) => ({ items: [...state.items, item] })),
 }))
+
+// PATTERN: Zustand (State Management)
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'

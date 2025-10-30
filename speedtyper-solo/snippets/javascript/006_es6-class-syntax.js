@@ -1,3 +1,5 @@
+// PATTERN: ES6+ Class Syntax
+
 class Animal {
   constructor(name) {
     this.name = name;
@@ -6,6 +8,8 @@ class Animal {
     console.log(`${this.name} makes a noise.`);
   }
 }
+
+// PATTERN: ES6+ Class Syntax
 
 class Car {
   constructor(brand, model) {
@@ -17,6 +21,8 @@ class Car {
   }
 }
 
+// PATTERN: ES6+ Class Syntax
+
 class Calculator {
   add(a, b) {
     return a + b;
@@ -26,6 +32,8 @@ class Calculator {
   }
 }
 
+// PATTERN: ES6+ Class Syntax
+
 class MathUtility {
   static multiply(a, b) {
     return a * b;
@@ -34,6 +42,8 @@ class MathUtility {
     return a / b;
   }
 }
+
+// PATTERN: ES6+ Class Syntax
 
 class Vehicle {
   constructor(type) {
@@ -46,6 +56,8 @@ class Car extends Vehicle {
     this.brand = brand;
   }
 }
+
+// PATTERN: ES6+ Class Syntax
 
 class Animal {
   eat() {

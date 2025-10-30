@@ -1,3 +1,5 @@
+// PATTERN: Context API
+
 import React, { createContext, useState } from 'react';
 const UserContext = createContext();
 function App() {
@@ -8,6 +10,8 @@ function App() {
     </UserContext.Provider>
   );
 }
+
+// PATTERN: Context API
 
 import React, { useContext } from 'react';
 import { UserContext } from './UserContext';

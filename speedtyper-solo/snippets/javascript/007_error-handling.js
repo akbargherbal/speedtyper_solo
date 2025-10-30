@@ -1,3 +1,5 @@
+// PATTERN: Error Handling
+
 try {
   const data = JSON.parse('{"name": "John"}');
   console.log(data.name);
@@ -5,12 +7,16 @@ try {
   console.error('Parsing error:', error.message);
 }
 
+// PATTERN: Error Handling
+
 function divide(a, b) {
   if (b === 0) {
     throw new Error('Division by zero is not allowed');
   }
   return a / b;
 }
+
+// PATTERN: Error Handling
 
 class ValidationError extends Error {
   constructor(message) {
@@ -24,6 +30,8 @@ function validateEmail(email) {
     throw new ValidationError('Invalid email format');
   }
 }
+
+// PATTERN: Error Handling
 
 try {
   undefinedFunction();

@@ -1,3 +1,5 @@
+// PATTERN: Class Patterns (TypeScript-Specific)
+
 class Person {
   name: string;
   age: number;
@@ -7,9 +9,13 @@ class Person {
   }
 }
 
+// PATTERN: Class Patterns (TypeScript-Specific)
+
 class Person {
   constructor(public name: string, public age: number) {}
 }
+
+// PATTERN: Class Patterns (TypeScript-Specific)
 
 class BankAccount {
   public balance: number;
@@ -22,12 +28,16 @@ class BankAccount {
   }
 }
 
+// PATTERN: Class Patterns (TypeScript-Specific)
+
 class Circle {
   readonly radius: number;
   constructor(radius: number) {
     this.radius = radius;
   }
 }
+
+// PATTERN: Class Patterns (TypeScript-Specific)
 
 abstract class Animal {
   abstract makeSound(): void;
@@ -37,6 +47,8 @@ class Dog extends Animal {
     console.log("Woof!");
   }
 }
+
+// PATTERN: Class Patterns (TypeScript-Specific)
 
 interface Vehicle {
   start(): void;
@@ -51,12 +63,16 @@ class Car implements Vehicle {
   }
 }
 
+// PATTERN: Class Patterns (TypeScript-Specific)
+
 class MathHelper {
   static readonly PI: number = 3.14159;
   static calculateArea(radius: number): number {
     return this.PI * radius * radius;
   }
 }
+
+// PATTERN: Class Patterns (TypeScript-Specific)
 
 class Temperature {
   private _celsius: number;

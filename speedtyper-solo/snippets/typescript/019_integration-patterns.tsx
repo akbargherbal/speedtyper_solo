@@ -1,9 +1,13 @@
+// PATTERN: Integration Patterns
+
 import axios from 'axios';
 const apiClient = axios.create({
   baseURL: 'https://jsonplaceholder.typicode.com',
   timeout: 5000,
 });
 export default apiClient;
+
+// PATTERN: Integration Patterns
 
 import { useState, useEffect } from 'react';
 const useApi = (url) => {
@@ -28,6 +32,8 @@ const useApi = (url) => {
   return { data, error, loading };
 };
 
+// PATTERN: Integration Patterns
+
 import { useState } from 'react';
 const useToasts = () => {
   const [toasts, setToasts] = useState([]);
@@ -41,6 +47,8 @@ const useToasts = () => {
   };
   return { toasts, addToast, removeToast };
 };
+
+// PATTERN: Integration Patterns
 
 const LoadingSpinner = ({ isLoading }) => {
   if (!isLoading) return null;

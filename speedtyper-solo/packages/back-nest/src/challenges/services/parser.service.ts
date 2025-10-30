@@ -57,7 +57,7 @@ export class Parser {
   private loadConfig(): ParserConfig {
     try {
       const configPath = path.join(process.cwd(), 'parser.config.json');
-      
+
       if (!fs.existsSync(configPath)) {
         console.log('[Parser] No parser.config.json found, using defaults');
         return DEFAULT_PARSER_CONFIG;
@@ -86,7 +86,7 @@ export class Parser {
 
       console.log('[Parser] ✅ Loaded custom configuration from parser.config.json');
       console.log(`[Parser] Filters: ${filters.minNodeLength}-${filters.maxNodeLength} chars, max ${filters.maxNumLines} lines, max ${filters.maxLineLength} chars/line`);
-      
+
       return parsedConfig as ParserConfig;
     } catch (error) {
       console.error('[Parser] Error loading config:', error.message);
@@ -95,9 +95,171 @@ export class Parser {
     }
   }
 
+  /**
+   * ENHANCED: Parse tracked nodes with support for pattern block extraction
+   * If file contains PATTERN: markers (// or # style), use block extraction mode
+   * Otherwise, fall back to tree-sitter extraction
+   */
   parseTrackedNodes(content: string) {
+    // Check for pattern markers (supports both // and # comment styles)
+    if (content.match(/^(?:\/\/|#)\s*PATTERN:/m)) {
+      console.log('[parser]: Detected PATTERN markers, using block extraction mode');
+      return this.extractPatternBlocks(content);
+    }
+
+    // Default tree-sitter mode
     const root = this.ts.parse(content).rootNode;
     return this.filterNodes(root);
+  }
+
+  /**
+   * NEW: Extract pattern blocks delimited by PATTERN: markers
+   * Supports both // (JS/TS) and # (Python) comment styles
+   * Each block is a self-contained code snippet for pattern memorization
+   */
+  private extractPatternBlocks(content: string): TSParser.SyntaxNode[] {
+    const blocks: TSParser.SyntaxNode[] = [];
+    
+    // Normalize line endings: Convert CRLF (\r\n) to LF (\n)
+    const normalizedContent = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const lines = normalizedContent.split('\n');
+    
+    let currentPattern: string | null = null;
+    let currentBlock: string[] = [];
+    let blockStartLine = 0;
+    let markerCount = 0;
+
+    console.log(`[parser]: Starting pattern extraction from ${lines.length} lines`);
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      // Match both // and # style comments with PATTERN: marker
+      // Examples:
+      //   // PATTERN: Array Methods
+      //   # PATTERN: List Comprehension
+      const match = line.match(/^(?:\/\/|#)\s*PATTERN:\s*(.+)$/);
+
+      if (match) {
+        markerCount++;
+        console.log(`[parser]: Found marker #${markerCount} at line ${i + 1}: "${match[1]}"`);
+        
+        // Save previous block if exists
+        if (currentPattern && currentBlock.length > 0) {
+          const blockText = currentBlock.join('\n').trim();
+          console.log(`[parser]: Processing previous block (${blockText.length} chars, ${currentBlock.length} lines)`);
+          if (this.isValidPatternBlock(blockText)) {
+            blocks.push(this.createSyntaxNodeLike(blockText, blockStartLine));
+          }
+        }
+
+        // Start new block
+        currentPattern = match[1].trim();
+        currentBlock = [];
+        blockStartLine = i + 1;
+      } else if (currentPattern) {
+        // Accumulate lines for current block (skip empty lines immediately after marker)
+        if (currentBlock.length > 0 || line.trim() !== '') {
+          currentBlock.push(line);
+        }
+      }
+    }
+
+    // Save final block
+    if (currentPattern && currentBlock.length > 0) {
+      const blockText = currentBlock.join('\n').trim();
+      console.log(`[parser]: Processing final block (${blockText.length} chars, ${currentBlock.length} lines)`);
+      if (this.isValidPatternBlock(blockText)) {
+        blocks.push(this.createSyntaxNodeLike(blockText, blockStartLine));
+      }
+    }
+
+    console.log(`[parser]: Found ${markerCount} marker(s), extracted ${blocks.length} valid block(s)`);
+    return blocks;
+  }
+
+  /**
+   * NEW: Validate pattern block against quality filters
+   * Uses same filters as tree-sitter extraction for consistency
+   */
+  private isValidPatternBlock(text: string): boolean {
+    const lines = text.split('\n');
+    const charCount = text.length;
+
+    // Apply existing filters
+    const meetsMinLength = charCount >= this.MIN_NODE_LENGTH;
+    const meetsMaxLength = charCount <= this.MAX_NODE_LENGTH;
+    const meetsLineCount = lines.length >= 2 && lines.length <= this.MAX_NUM_LINES;
+    const meetsLineLength = lines.every(line => line.length <= this.MAX_LINE_LENGTH);
+
+    const isValid = meetsMinLength && meetsMaxLength && meetsLineCount && meetsLineLength;
+
+    // Always log validation attempts for debugging
+    console.log(`[parser]: Validating block: ${charCount} chars, ${lines.length} lines`);
+    if (!isValid) {
+      console.log(`[parser]: ❌ REJECTED:`);
+      if (!meetsMinLength) console.log(`  - Below min length (need ${this.MIN_NODE_LENGTH}, got ${charCount})`);
+      if (!meetsMaxLength) console.log(`  - Above max length (max ${this.MAX_NODE_LENGTH}, got ${charCount})`);
+      if (!meetsLineCount) console.log(`  - Line count outside range (need 2-${this.MAX_NUM_LINES}, got ${lines.length})`);
+      if (!meetsLineLength) {
+        const longLines = lines.filter(line => line.length > this.MAX_LINE_LENGTH);
+        console.log(`  - ${longLines.length} line(s) too long (max ${this.MAX_LINE_LENGTH} chars)`);
+        longLines.slice(0, 3).forEach((line, i) => {
+          console.log(`    Line ${i + 1} (${line.length} chars): ${line.substring(0, 60)}...`);
+        });
+      }
+    } else {
+      console.log(`[parser]: ✅ ACCEPTED`);
+    }
+
+    return isValid;
+  }
+
+  /**
+   * NEW: Create a minimal SyntaxNode-like object for pattern blocks
+   * This allows pattern blocks to be processed like tree-sitter nodes
+   */
+  private createSyntaxNodeLike(text: string, startLine: number): TSParser.SyntaxNode {
+    // Create a minimal object that matches SyntaxNode interface
+    // Cast to unknown first to bypass strict type checking, then to SyntaxNode
+    return {
+      text,
+      type: 'pattern_block',
+      typeId: 0,
+      startIndex: 0,
+      endIndex: text.length,
+      startPosition: { row: startLine, column: 0 },
+      endPosition: { row: startLine + text.split('\n').length, column: 0 },
+      children: [],
+      childCount: 0,
+      namedChildren: [],
+      namedChildCount: 0,
+      parent: null,
+      nextSibling: null,
+      nextNamedSibling: null,
+      previousSibling: null,
+      previousNamedSibling: null,
+      firstChild: null,
+      firstNamedChild: null,
+      lastChild: null,
+      lastNamedChild: null,
+      tree: null as any,
+      hasChanges: () => false,
+      hasError: () => false,
+      isMissing: () => false,
+      isNamed: () => true,
+      toString: () => text,
+      child: () => null,
+      namedChild: () => null,
+      childForFieldName: () => null,
+      firstChildForIndex: () => null,
+      firstNamedChildForIndex: () => null,
+      descendantForIndex: () => null as any,
+      namedDescendantForIndex: () => null as any,
+      descendantForPosition: () => null as any,
+      namedDescendantForPosition: () => null as any,
+      descendantsOfType: () => [],
+      walk: () => null as any,
+    } as unknown as TSParser.SyntaxNode;
   }
 
   private filterNodes(root: TSParser.SyntaxNode) {
@@ -107,7 +269,7 @@ export class Parser {
       .filter((n) => this.filterShortNodes(n))
       .filter((n) => this.filterTooLongLines(n))
       .filter((n) => this.filterTooManyLines(n))
-      .map((n) => this.REMOVE_COMMENTS ? this.removeCommentsAndDocstrings(n) : n);  // Configurable comment removal
+      .map((n) => this.REMOVE_COMMENTS ? this.removeCommentsAndDocstrings(n) : n);
     return nodes;
   }
 
@@ -124,9 +286,9 @@ export class Parser {
       case NodeTypes.Call:
       case NodeTypes.UsingDirective:
       case NodeTypes.NamespaceDeclaration:
-      case NodeTypes.LexicalDeclaration:      // NEW: const/let
-      case NodeTypes.VariableDeclaration:     // NEW: var
-      case NodeTypes.ArrowFunction:           // NEW: arrow functions
+      case NodeTypes.LexicalDeclaration:
+      case NodeTypes.VariableDeclaration:
+      case NodeTypes.ArrowFunction:
         return true;
       default:
         console.log(`[parser]: Skipping node type: ${node.type}`);
@@ -157,7 +319,7 @@ export class Parser {
   }
 
   /**
-   * NEW: Remove comments and docstrings from extracted code
+   * Remove comments and docstrings from extracted code
    * Keeps: imports, function signatures, actual code
    * Removes: comments, docstrings, excessive blank lines
    */
@@ -195,10 +357,10 @@ export class Parser {
 
     // Comment node types vary by language
     const commentTypes = [
-      'comment',              // Most languages
-      'line_comment',         // C-style
-      'block_comment',        // C-style
-      'expression_statement', // Python docstrings (check if it contains string)
+      'comment',
+      'line_comment',
+      'block_comment',
+      'expression_statement', // Python docstrings
     ];
 
     const traverse = (n: TSParser.SyntaxNode) => {
@@ -229,7 +391,6 @@ export class Parser {
    * Clean up whitespace after comment removal
    */
   private cleanupWhitespace(text: string): string {
-    // Remove lines that are now empty or only whitespace
     let lines = text.split('\n');
 
     // Remove trailing/leading blank lines
@@ -247,7 +408,7 @@ export class Parser {
       const isBlank = line.trim() === '';
       if (isBlank) {
         if (!prevBlank) {
-          cleaned.push(''); // Keep one blank line
+          cleaned.push('');
         }
         prevBlank = true;
       } else {

@@ -1,3 +1,5 @@
+// PATTERN: React Router (Navigation)
+
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import UserProfile from './UserProfile';
@@ -11,6 +13,8 @@ export default function App() {
   return <RouterProvider router={router} />;
 }
 
+// PATTERN: React Router (Navigation)
+
 import { Link } from 'react-router-dom';
 
 export default function Navigation() {
@@ -21,6 +25,8 @@ export default function Navigation() {
     </nav>
   );
 }
+
+// PATTERN: React Router (Navigation)
 
 import { useNavigate } from 'react-router-dom';
 
@@ -34,6 +40,8 @@ export default function LoginForm() {
   return <button onClick={handleLogin}>Login</button>;
 }
 
+// PATTERN: React Router (Navigation)
+
 import { useParams } from 'react-router-dom';
 
 export default function UserDetail() {
@@ -41,6 +49,8 @@ export default function UserDetail() {
   
   return <h1>User ID: {userId}</h1>;
 }
+
+// PATTERN: React Router (Navigation)
 
 import { useSearchParams } from 'react-router-dom';
 
@@ -51,6 +61,8 @@ export default function SearchResults() {
   return <div>Search results for: {query}</div>;
 }
 
+// PATTERN: React Router (Navigation)
+
 import { Navigate } from 'react-router-dom';
 
 export default function ProtectedRoute({ children }) {
@@ -58,6 +70,8 @@ export default function ProtectedRoute({ children }) {
   
   return isAuthenticated ? children : <Navigate to="/login" />;
 }
+
+// PATTERN: React Router (Navigation)
 
 import { Outlet } from 'react-router-dom';
 

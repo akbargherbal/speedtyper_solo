@@ -3,10 +3,10 @@
   "description": "Configuration for code snippet parser and quality filters",
   "version": "1.2.0",
   "filters": {
-    "maxNodeLength": 500,
-    "minNodeLength": 150,
-    "maxNumLines": 15,
-    "maxLineLength": 80
+    "minNodeLength": 100,
+    "maxNodeLength": 600,
+    "maxNumLines": 20,
+    "maxLineLength": 100
   },
   "parsing": {
     "removeComments": true,

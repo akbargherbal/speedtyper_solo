@@ -1,3 +1,5 @@
+// PATTERN: Functional Programming Patterns
+
 function calculateArea(width, height) {
   return width * height;
 }
@@ -5,10 +7,14 @@ function calculateArea(width, height) {
 const user = { name: 'Alice', age: 30 };
 const updatedUser = { ...user, age: 31 };
 
+// PATTERN: Functional Programming Patterns
+
 const compose = (f, g) => (x) => f(g(x));
 const addOne = x => x + 1;
 const double = x => x * 2;
 const addOneThenDouble = compose(double, addOne);
+
+// PATTERN: Functional Programming Patterns
 
 const add = a => b => a + b;
 const add5 = add(5);

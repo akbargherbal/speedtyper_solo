@@ -1,7 +1,11 @@
+// PATTERN: Function Patterns
+
 type MathOperation = (a: number, b: number) => number;
 const multiply: MathOperation = (x, y) => x * y;
 const result = multiply(4, 5);
 console.log(result);
+
+// PATTERN: Function Patterns
 
 function createUser(name: string, age?: number): string {
   return age ? `${name} is ${age} years old` : `User ${name}`;
@@ -9,17 +13,23 @@ function createUser(name: string, age?: number): string {
 console.log(createUser("Alice"));
 console.log(createUser("Bob", 30));
 
+// PATTERN: Function Patterns
+
 function greetUser(name: string, greeting: string = "Hello"): string {
   return `${greeting}, ${name}!`;
 }
 console.log(greetUser("Charlie"));
 console.log(greetUser("Dana", "Hi"));
 
+// PATTERN: Function Patterns
+
 function calculateAverage(...scores: number[]): number {
   const total = scores.reduce((sum, score) => sum + score, 0);
   return total / scores.length;
 }
 console.log(calculateAverage(85, 90, 78));
+
+// PATTERN: Function Patterns
 
 function parseInput(input: string): string;
 function parseInput(input: number): number;
@@ -30,9 +40,13 @@ function parseInput(input: any): any {
 console.log(parseInput("  hello  "));
 console.log(parseInput(10));
 
+// PATTERN: Function Patterns
+
 const isEven = (num: number): boolean => num % 2 === 0;
 console.log(isEven(4));
 console.log(isEven(7));
+
+// PATTERN: Function Patterns
 
 type DataHandler = (data: string) => void;
 function fetchData(callback: DataHandler): void {
@@ -40,10 +54,14 @@ function fetchData(callback: DataHandler): void {
 }
 fetchData((data) => console.log(data));
 
+// PATTERN: Function Patterns
+
 function delay(ms: number): Promise<string> {
   return new Promise((resolve) => setTimeout(() => resolve("Done"), ms));
 }
 delay(1000).then(console.log);
+
+// PATTERN: Function Patterns
 
 async function getUser(id: number): Promise<{ name: string }> {
   return { name: `User${id}` };

@@ -1,3 +1,5 @@
+// PATTERN: Data Transformation Patterns
+
 import React from 'react';
 
 const UserList = ({ users }) => {
@@ -6,6 +8,8 @@ const UserList = ({ users }) => {
     .map(user => <li key={user.id}>{user.name}</li>);
   return <ul>{activeUserElements}</ul>;
 };
+
+// PATTERN: Data Transformation Patterns
 
 import React from 'react';
 
@@ -22,6 +26,8 @@ const ProductGroups = ({ products }) => {
   ));
 };
 
+// PATTERN: Data Transformation Patterns
+
 import React from 'react';
 
 const SortedList = ({ items }) => {
@@ -32,6 +38,8 @@ const SortedList = ({ items }) => {
     </ul>
   );
 };
+
+// PATTERN: Data Transformation Patterns
 
 import React from 'react';
 
@@ -44,6 +52,8 @@ const UniqueCategories = ({ items }) => {
   );
 };
 
+// PATTERN: Data Transformation Patterns
+
 import React from 'react';
 
 const UserCard = ({ name, email, age }) => {
@@ -55,6 +65,8 @@ const UserCard = ({ name, email, age }) => {
     </div>
   );
 };
+
+// PATTERN: Data Transformation Patterns
 
 import React, { useState } from 'react';
 

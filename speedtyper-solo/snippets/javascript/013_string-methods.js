@@ -1,3 +1,5 @@
+// PATTERN: String Methods
+
 const userInput = "  hello world  ";
 const cleanInput = userInput.trim();
 console.log(cleanInput);
@@ -14,23 +16,33 @@ const message = "Welcome to JavaScript";
 const hasJavaScript = message.includes("JavaScript");
 console.log(hasJavaScript);
 
+// PATTERN: String Methods
+
 const filename = "document.pdf";
 const isPdf = filename.endsWith(".pdf");
 const isDocument = filename.startsWith("document");
 console.log(isPdf, isDocument);
 
+// PATTERN: String Methods
+
 const text = "I like cats. Cats are nice.";
 const updatedText = text.replaceAll("cats", "dogs");
 console.log(updatedText);
+
+// PATTERN: String Methods
 
 const mixedCase = "Hello World";
 const lowerCase = mixedCase.toLowerCase();
 const upperCase = mixedCase.toUpperCase();
 console.log(lowerCase, upperCase);
 
+// PATTERN: String Methods
+
 const number = "42";
 const paddedNumber = number.padStart(5, "0");
 console.log(paddedNumber);
+
+// PATTERN: String Methods
 
 const name = "Alice";
 const age = 30;

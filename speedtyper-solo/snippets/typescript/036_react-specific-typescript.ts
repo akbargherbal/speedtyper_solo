@@ -1,3 +1,5 @@
+// PATTERN: React-Specific TypeScript
+
 import React from 'react';
 
 interface GreetingProps {
@@ -8,6 +10,8 @@ const Greeting: React.FC<GreetingProps> = ({ name }) => {
   return <h1>Hello, {name}!</h1>;
 };
 
+// PATTERN: React-Specific TypeScript
+
 interface ButtonProps {
   onClick: () => void;
   label: string;
@@ -17,6 +21,8 @@ const Button: React.FC<ButtonProps> = ({ onClick, label }) => {
   return <button onClick={onClick}>{label}</button>;
 };
 
+// PATTERN: React-Specific TypeScript
+
 interface ContainerProps {
   children: React.ReactNode;
 }
@@ -25,6 +31,8 @@ const Container: React.FC<ContainerProps> = ({ children }) => {
   return <div>{children}</div>;
 };
 
+// PATTERN: React-Specific TypeScript
+
 const Input: React.FC = () => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value);
@@ -32,6 +40,8 @@ const Input: React.FC = () => {
 
   return <input type="text" onChange={handleChange} />;
 };
+
+// PATTERN: React-Specific TypeScript
 
 const Counter: React.FC = () => {
   const [count, setCount] = React.useState(0);
@@ -42,6 +52,8 @@ const Counter: React.FC = () => {
     </button>
   );
 };
+
+// PATTERN: React-Specific TypeScript
 
 interface User {
   id: number;
@@ -54,6 +66,8 @@ const UserProfile: React.FC = () => {
   return <div>{user ? user.name : 'No user'}</div>;
 };
 
+// PATTERN: React-Specific TypeScript
+
 const InputFocus: React.FC = () => {
   const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -63,6 +77,8 @@ const InputFocus: React.FC = () => {
 
   return <input ref={inputRef} type="text" />;
 };
+
+// PATTERN: React-Specific TypeScript
 
 const MessageDisplay: React.FC = () => {
   const [name, setName] = React.useState('');
@@ -75,6 +91,8 @@ const MessageDisplay: React.FC = () => {
   return <p>{message}</p>;
 };
 
+// PATTERN: React-Specific TypeScript
+
 import { useState } from 'react';
 
 function useToggle(initialState: boolean = false) {
@@ -82,6 +100,8 @@ function useToggle(initialState: boolean = false) {
   const toggle = () => setState(!state);
   return [state, toggle] as const;
 }
+
+// PATTERN: React-Specific TypeScript
 
 import React from 'react';
 
@@ -100,6 +120,8 @@ const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     </ThemeContext.Provider>
   );
 };
+
+// PATTERN: React-Specific TypeScript
 
 import React from 'react';
 
