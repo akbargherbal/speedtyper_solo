@@ -16,25 +16,25 @@ This session focused on establishing a reliable cross-platform workflow, enablin
 
 ### ✅ Browser Auto-Open Implementation
 
--   **Problem:** Had to manually open `localhost:3001` after starting servers.
--   **Solution:** Installed `open-cli` and added a script to the root `package.json` that waits 5 seconds for servers to start, then opens the browser automatically.
--   **Result:** The app now opens in the default browser automatically after running `npm run dev`.
+- **Problem:** Had to manually open `localhost:3001` after starting servers.
+- **Solution:** Installed `open-cli` and added a script to the root `package.json` that waits 5 seconds for servers to start, then opens the browser automatically.
+- **Result:** The app now opens in the default browser automatically after running `npm run dev`.
 
 ### ✅ Windows Native Module Issue Diagnosed
 
--   **Problem:** `npm install` failed on native Windows due to a `gyp ERR!`, as native C++ modules (`tree-sitter`, `sqlite3`) require Visual Studio Build Tools (~7GB).
--   **Decision:** Instead of installing heavy dependencies on Windows, the workflow will leverage WSL for its superior Node.js compatibility. Copying `node_modules` from WSL to Windows is not possible as the compiled binaries are OS-specific.
+- **Problem:** `npm install` failed on native Windows due to a `gyp ERR!`, as native C++ modules (`tree-sitter`, `sqlite3`) require Visual Studio Build Tools (~7GB).
+- **Decision:** Instead of installing heavy dependencies on Windows, the workflow will leverage WSL for its superior Node.js compatibility. Copying `node_modules` from WSL to Windows is not possible as the compiled binaries are OS-specific.
 
 ### ✅ Pragmatic Cross-Platform Workflow Established
 
--   **Architecture:** The development servers (backend and frontend) will run inside WSL.
--   **Access:** The user will access the application via `http://localhost:3001` from any browser on the Windows host.
--   **Reasoning:** WSL2 automatically shares its `localhost` with Windows, providing a seamless experience with zero configuration and perfect compatibility for native Node.js modules.
+- **Architecture:** The development servers (backend and frontend) will run inside WSL.
+- **Access:** The user will access the application via `http://localhost:3001` from any browser on the Windows host.
+- **Reasoning:** WSL2 automatically shares its `localhost` with Windows, providing a seamless experience with zero configuration and perfect compatibility for native Node.js modules.
 
 ### ✅ Zero-Friction Windows Shortcut Designed
 
--   **Goal:** Allow the user to start the entire application from any Windows terminal (CMD, PowerShell, etc.) with a single command.
--   **Solution:** A batch file (`speedtyper.bat`) will be created containing a `wsl` command to navigate to the project directory and run `npm run dev`. Placing this script in a folder that is added to the Windows PATH will make the `speedtyper` command globally available.
+- **Goal:** Allow the user to start the entire application from any Windows terminal (CMD, PowerShell, etc.) with a single command.
+- **Solution:** A batch file (`speedtyper.bat`) will be created containing a `wsl` command to navigate to the project directory and run `npm run dev`. Placing this script in a folder that is added to the Windows PATH will make the `speedtyper` command globally available.
 
 ---
 
@@ -42,9 +42,9 @@ This session focused on establishing a reliable cross-platform workflow, enablin
 
 ### 1. Modified: `package.json` (root)
 
--   Added `open-cli` to `devDependencies`.
--   Updated the `dev` script to be `concurrently -n backend,frontend,browser ...`
--   Added the `open-browser` script: `"sleep 5 && npx open-cli http://localhost:3001"`
+- Added `open-cli` to `devDependencies`.
+- Updated the `dev` script to be `concurrently -n backend,frontend,browser ...`
+- Added the `open-browser` script: `"sleep 5 && npx open-cli http://localhost:3001"`
 
 ---
 
@@ -52,18 +52,18 @@ This session focused on establishing a reliable cross-platform workflow, enablin
 
 ### 1. Create Windows Shortcut (Optional, 5 minutes)
 
--   Create a new folder: `C:\Users\DELL\scripts`
--   Inside that folder, create `speedtyper.bat` with the following content:
-    ```batch
-    @echo off
-    wsl bash -c "cd ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo && npm run dev"
-    ```
--   Add `C:\Users\DELL\scripts` to your Windows PATH environment variable.
--   After this, the `speedtyper` command will work in any new terminal.
+- Create a new folder: `C:\Users\DELL\scripts`
+- Inside that folder, create `speedtyper.bat` with the following content:
+  ```batch
+  @echo off
+  wsl bash -c "cd ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo && npm run dev"
+  ```
+- Add `C:\Users\DELL\scripts` to your Windows PATH environment variable.
+- After this, the `speedtyper` command will work in any new terminal.
 
 ### 2. Create Helper Scripts (Optional)
 
--   You can also create `speedtyper-reimport.bat` and `speedtyper-reset.bat` in the same scripts folder for convenience.
+- You can also create `speedtyper-reimport.bat` and `speedtyper-reset.bat` in the same scripts folder for convenience.
 
 ---
 
@@ -79,16 +79,15 @@ The user will choose the next focus area from the following options:
 
 ## Git Status After Session
 
--   **Changes Committed:** Browser auto-open feature was committed to the `main` branch and pushed.
--   **Commit Message:** `"Add browser auto-open with open-cli for cross-platform dev workflow"`
--   **Uncommitted Changes:** None.
+- **Changes Committed:** Browser auto-open feature was committed to the `main` branch and pushed.
+- **Commit Message:** `"Add browser auto-open with open-cli for cross-platform dev workflow"`
+- **Uncommitted Changes:** None.
 
 ---
 
 **End of Session 17**
 
 A robust cross-platform workflow is now in place. We successfully diagnosed and bypassed Windows native module compilation issues by adopting a pragmatic WSL-first approach. The design for a universal `speedtyper` command is ready for a quick implementation by the user.
-
 
 ---
 
@@ -99,23 +98,29 @@ A robust cross-platform workflow is now in place. We successfully diagnosed and 
 ### Command Patterns We're Using:
 
 **When I (Claude) need to see a file:**
+
 ```bash
 cat ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/path/to/file
 ```
+
 You copy-paste the output back to me.
 
 **When I (Claude) need to see specific lines:**
+
 ```bash
 cat ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/path/to/file | grep -A 20 "searchTerm"
 ```
 
 **When you need to edit a file:**
+
 ```bash
 code ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/path/to/file
 ```
+
 I provide the full code block, you copy-paste into VS Code.
 
 **When testing:**
+
 ```bash
 cd ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo
 npm run dev
@@ -125,12 +130,14 @@ npm run start
 ```
 
 **When checking database:**
+
 ```bash
 cd ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/packages/back-nest
 sqlite3 speedtyper-local.db "SELECT COUNT(*) FROM challenge WHERE id LIKE 'local-%';"
 ```
 
 **When searching for files/content:**
+
 ```bash
 find ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo -name "filename"
 grep -r "searchterm" --include="*.tsx" ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/
