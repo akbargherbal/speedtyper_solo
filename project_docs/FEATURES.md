@@ -44,26 +44,25 @@ Features are organized by:
 
 **Theme:** Stability and Keyboard-Centric Workflow
 
-### 1. Backend Crash Resilience
+### 1. Backend Crash Resilience ✅
 
-**Status:** **NEW** (High Priority, Low Effort)
+**Status:** **COMPLETED** (Session 24 - October 31, 2025)
 
-**What It Is:**
-Fix the `TypeError: Cannot read properties of undefined (reading 'request')` crash that occurs in the backend when it fails to find a challenge for a requested language.
+**What It Was:**
+Backend would log errors when no challenges existed for a language, but the frontend would show a blank screen with no user feedback.
 
-**Why It's Important:**
-The backend should never crash, especially during a predictable error condition. It should handle the error gracefully and inform the client. This is a critical stability improvement.
+**What We Fixed:**
+- Added `listenForRaceError()` method to `Game.ts`
+- Frontend now displays user-friendly alert when backend emits `race_error` event
+- Alert includes actionable guidance: "Add code to snippets/ folder and run 'npm run reimport'"
+- Connection state properly updated so user can recover by changing language
 
-**Implementation (1-2 hours):**
+**Files Modified:**
+- `packages/webapp-next/modules/play2/services/Game.ts`
 
-1. **Investigate:** `RaceDoesNotExistFilter` in `race.exceptions.ts` and `SessionState.removeRaceID` in `session-state.service.ts`.
-2. **Hypothesis:** The `socket` object passed to the exception filter lacks the `request.session` property when the error originates deep within the race creation logic.
-3. **Fix:** Add defensive code (e.g., optional chaining `socket?.request?.session`) to ensure the filter can run without crashing.
-4. **Enhance:** The filter should also emit a WebSocket event like `race_creation_failed` back to the client with an error message.
+**Implementation Time:** 15 minutes
 
-**Risk:** 🟢 Low (Improves stability, low chance of regression).
-
----
+**Risk:** 🟢 Low (Additive change, no breaking modifications)
 
 ### 2. Configurable Keyboard Shortcuts ⚠️
 
