@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { useSocket } from "../common/hooks/useSocket";
 import { Keys, useKeyMap } from "../hooks/useKeyMap";
 import { CodeTypingContainer } from "../modules/play2/containers/CodeTypingContainer";
@@ -20,13 +20,19 @@ import {
   closeModals,
   useHasOpenModal,
   useSettingsStore,
+  setLanguage,
+  LanguageDTO,
 } from "../modules/play2/state/settings-store";
 import { useIsPlaying } from "../common/hooks/useIsPlaying";
 import { refreshTrends } from "../modules/play2/state/trends-store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
+import useSWR from "swr";
+import { getExperimentalServerUrl } from "../common/utils/getServerUrl";
 
 export const config = { runtime: "experimental-edge" };
+
+const baseUrl = getExperimentalServerUrl();
 
 function Play2Page() {
   const user = useUser();
@@ -39,6 +45,51 @@ function Play2Page() {
   const game = useGame();
   const challenge = useChallenge();
   const [isThrottled, setIsThrottled] = useState(false);
+
+  // Fetch available languages for cycling
+  const { data: languagesData } = useSWR(
+    baseUrl + "/api/languages",
+    (...args) => fetch(...args).then((res) => res.json())
+  );
+  const languages = (languagesData as undefined | LanguageDTO[]) || [];
+  const selectedLanguage = useSettingsStore((s) => s.languageSelected);
+
+  // Language cycling helper
+  const cycleLanguage = useCallback(
+    (direction: "next" | "prev") => {
+      if (languages.length === 0) return;
+
+      const currentIndex = selectedLanguage
+        ? languages.findIndex((l) => l.language === selectedLanguage.language)
+        : -1;
+
+      let newIndex: number;
+      if (direction === "next") {
+        newIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % languages.length;
+      } else {
+        newIndex =
+          currentIndex === -1
+            ? languages.length - 1
+            : (currentIndex - 1 + languages.length) % languages.length;
+      }
+
+      const newLanguage = languages[newIndex];
+      setLanguage(newLanguage);
+      game?.next();
+
+      // Show toast notification
+      toast.info(`Switched to ${newLanguage.name}`, {
+        position: "bottom-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeButton: false,
+        className: "bg-dark-lake text-off-white",
+      });
+    },
+    [languages, selectedLanguage, game]
+  );
+
+  // Tab key - Next snippet (existing functionality)
   const { capsLockActive } = useKeyMap(
     true,
     Keys.Tab,
@@ -52,6 +103,52 @@ function Play2Page() {
       }, 2000);
     }, [isThrottled, hasOpenModal, game])
   );
+
+  // Enter key - Start next race (only on results page)
+  useKeyMap(
+    isCompleted && !hasOpenModal,
+    Keys.Enter,
+    useCallback(() => {
+      if (isThrottled) return;
+      game?.next();
+      setIsThrottled(true);
+      setTimeout(() => {
+        setIsThrottled(false);
+      }, 1000);
+    }, [isCompleted, isThrottled, game]),
+    { blockWhenTyping: false }
+  );
+
+  // Alt + Right Arrow - Next language
+  useKeyMap(
+    !hasOpenModal && languages.length > 0,
+    Keys.ArrowRight,
+    useCallback(() => {
+      if (isThrottled) return;
+      cycleLanguage("next");
+      setIsThrottled(true);
+      setTimeout(() => {
+        setIsThrottled(false);
+      }, 1000);
+    }, [isThrottled, cycleLanguage]),
+    { requireAlt: true, blockWhenTyping: false }
+  );
+
+  // Alt + Left Arrow - Previous language
+  useKeyMap(
+    !hasOpenModal && languages.length > 0,
+    Keys.ArrowLeft,
+    useCallback(() => {
+      if (isThrottled) return;
+      cycleLanguage("prev");
+      setIsThrottled(true);
+      setTimeout(() => {
+        setIsThrottled(false);
+      }, 1000);
+    }, [isThrottled, cycleLanguage]),
+    { requireAlt: true, blockWhenTyping: false }
+  );
+
   useSettingsStore((s) => s.settingsModalIsOpen);
   useResetStateOnUnmount();
   useEndGame();
@@ -82,7 +179,21 @@ function Play2Page() {
             transition={{ duration: 0.5 }}
             className="w-full"
           >
-            {isCompleted && <ResultsContainer />}
+            {isCompleted && (
+              <>
+                <ResultsContainer />
+                {/* Keyboard shortcut hints */}
+                <div className="flex flex-col items-center gap-2 mt-4 text-sm text-faded-gray">
+                  <div>
+                    Press <kbd className="px-2 py-1 mx-1 bg-dark-lake rounded">Enter</kbd> or{" "}
+                    <kbd className="px-2 py-1 mx-1 bg-dark-lake rounded">Tab</kbd> to continue
+                  </div>
+                  <div className="text-xs">
+                    <kbd className="px-2 py-1 mx-1 bg-dark-lake rounded">Alt + ←/→</kbd> to change language
+                  </div>
+                </div>
+              </>
+            )}
           </motion.div>
         </AnimatePresence>
         <AnimatePresence>
