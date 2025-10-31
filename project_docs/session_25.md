@@ -250,6 +250,9 @@ cat ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/packages/webapp-next/mod
 
 ## **Next:** Complete Enhanced User Feedback to ship v1.3.0, or begin Progress Dashboard architecture for v1.4.0.
 
+
+---
+
 ## 🤝 Collaboration Protocol (Minimum Friction)
 
 ### Command Patterns We're Using:
@@ -258,6 +261,14 @@ cat ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/packages/webapp-next/mod
 
 ```bash
 cat ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/path/to/file
+```
+
+You copy-paste the output back to me.
+
+**When I (Claude) need to see specific lines:**
+
+```bash
+cat ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/path/to/file | grep -A 20 "searchTerm"
 ```
 
 **When you need to edit a file:**
@@ -275,10 +286,33 @@ cd ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo
 npm run dev
 ```
 
+**When checking database:**
+
+```bash
+cd ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/packages/back-nest
+sqlite3 speedtyper-local.db "SELECT COUNT(*) FROM challenge WHERE id LIKE 'local-%';"
+```
+
+**When searching for files/content:**
+
+```bash
+find ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo -name "filename"
+grep -r "searchterm" --include="*.tsx" ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo/
+```
+
+**When checking line endings or hidden characters:**
+
+```bash
+head -1 file.js | od -c              # Show character codes
+file file.js                          # Check file encoding
+hexdump -C file.js | head -3         # Show hex dump
+```
+
 ### Key Principles:
 
-1. ✅ **Always use full absolute paths** from home directory
-2. ✅ **I provide `code` commands**, not `nano` (you prefer VS Code)
-3. ✅ **I give you full code blocks to copy-paste**, not diffs
-4. ✅ **You only upload specific files** when I ask (not entire codebase)
-5. ✅ **Terminal-based workflow** (cat, grep, code, npm) - fast and efficient
+1.  ✅ **Always use full absolute paths** from home directory
+2.  ✅ **I provide `code` commands**, not `nano` (you prefer VS Code)
+3.  ✅ **I give you full code blocks to copy-paste**, not diffs
+4.  ✅ **You only upload specific files** when I ask (not entire codebase)
+5.  ✅ **Terminal-based workflow** (cat, grep, code, npm) - fast and efficient
+6.  ✅ **Hex dumps for debugging** encoding/line ending issues

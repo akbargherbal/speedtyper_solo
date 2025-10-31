@@ -3,7 +3,10 @@ import Link from "next/link";
 import { TerminalIcon } from "../../assets/icons/TerminalIcon";
 import { Logo, WebsiteName } from "../../components/Navbar";
 import { useGameStore } from "../../modules/play2/state/game-store";
-import { useConnectionStore } from "../../modules/play2/state/connection-store";
+import {
+  useConnectionStore,
+  ConnectionStatus as ConnectionStatusType,
+} from "../../modules/play2/state/connection-store";
 import { useIsPlaying } from "../hooks/useIsPlaying";
 import { PlayingNow } from "./BattleMatcher";
 import Button from "./Button";
@@ -28,23 +31,52 @@ const HomeLink = () => {
 };
 
 const ConnectionStatus = () => {
-  const isConnected = useConnectionStore((state) => state.isConnected);
-  
+  const connectionStatus = useConnectionStore(
+    (state) => state.connectionStatus
+  );
+
+  const getStatusDetails = (status: ConnectionStatusType) => {
+    switch (status) {
+      case "connected":
+        return {
+          color: "bg-green-500",
+          text: "Connected",
+          animate: true,
+        };
+      case "connecting":
+        return {
+          color: "bg-yellow-500",
+          text: "Connecting...",
+          animate: true,
+        };
+      case "disconnected":
+        return {
+          color: "bg-red-500",
+          text: "Disconnected",
+          animate: false,
+        };
+      default:
+        return {
+          color: "bg-gray-500",
+          text: "Unknown",
+          animate: false,
+        };
+    }
+  };
+
+  const { color, text, animate } = getStatusDetails(connectionStatus);
+
   return (
     <div className="flex items-center gap-2 text-xs text-gray-400 mr-4">
       <div className="relative">
-        <div
-          className={`w-2 h-2 rounded-full ${
-            isConnected ? "bg-green-500" : "bg-red-500"
-          }`}
-        />
-        {isConnected && (
-          <div className="absolute inset-0 w-2 h-2 rounded-full bg-green-500 animate-ping opacity-75" />
+        <div className={`w-2 h-2 rounded-full ${color}`} />
+        {animate && (
+          <div
+            className={`absolute inset-0 w-2 h-2 rounded-full ${color} animate-ping opacity-75`}
+          />
         )}
       </div>
-      <span className="hidden sm:inline">
-        {isConnected ? "Connected" : "Reconnecting..."}
-      </span>
+      <span className="hidden sm:inline">{text}</span>
     </div>
   );
 };

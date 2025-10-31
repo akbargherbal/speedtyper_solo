@@ -5,15 +5,19 @@ import SocketLatest from "../../../common/services/Socket";
 import { updateUserInStore } from "../../../common/state/user-store";
 import { useGameStore } from "./game-store";
 
+export type ConnectionStatus = "connected" | "disconnected" | "connecting";
+
 export interface ConnectionState {
-  isConnected: boolean;
+  isConnected: boolean; // Keep for backward compatibility if needed elsewhere
+  connectionStatus: ConnectionStatus;
   raceExistsInServer: boolean;
   alreadyPlaying: boolean;
   socket?: SocketLatest;
 }
 
 export const useConnectionStore = create<ConnectionState>((_set, _get) => ({
-  isConnected: true,
+  isConnected: false, // Default to false
+  connectionStatus: "connecting", // Initial state
   raceExistsInServer: true,
   alreadyPlaying: false,
 }));
@@ -47,9 +51,14 @@ export const useConnectionManager = () => {
   const socket = useConnectionStore((s) => s.socket);
   const isConnected = useConnectionStore((state) => state.isConnected);
   const raceId = useGameStore((state) => state.id);
+
   const onConnect = useCallback(
     (_err: string | null, _msg: string) => {
-      useConnectionStore.setState((state) => ({ ...state, isConnected: true }));
+      useConnectionStore.setState((state) => ({
+        ...state,
+        isConnected: true,
+        connectionStatus: "connected",
+      }));
       if (raceId && !isConnected) {
         fetchRaceStatus(raceId).then(({ ok }) => {
           const currentRaceID = useGameStore.getState().id;
@@ -64,6 +73,7 @@ export const useConnectionManager = () => {
     },
     [isConnected, raceId]
   );
+
   useEffect(() => {
     const onAlreadyPlaying = () => {
       console.log("alreadyPlaying received");
@@ -72,15 +82,30 @@ export const useConnectionManager = () => {
         alreadyPlaying: true,
       }));
     };
+
     const onDisconnect = (_err: string | null, _msg: string) => {
       useConnectionStore.setState((state) => ({
         ...state,
         isConnected: false,
+        connectionStatus: "disconnected",
       }));
     };
+
+    const onConnecting = () => {
+      useConnectionStore.setState((state) => ({
+        ...state,
+        isConnected: false,
+        connectionStatus: "connecting",
+      }));
+    };
+
     socket?.subscribe("already_playing", onAlreadyPlaying);
     socket?.subscribe("connect_error", onDisconnect);
     socket?.subscribe("disconnect", onDisconnect);
     socket?.subscribe("connect", onConnect);
+    // Listen for the reconnecting event from socket.io client
+    socket?.subscribe("reconnecting", onConnecting);
+    socket?.subscribe("reconnect_attempt", onConnecting);
+
   }, [socket, onConnect]);
 };
