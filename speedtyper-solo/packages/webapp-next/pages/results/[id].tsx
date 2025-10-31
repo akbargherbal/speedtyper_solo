@@ -1,46 +1,53 @@
-import { AnimatePresence, motion } from "framer-motion";
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
+import { AnimatePresence, motion } from 'framer-motion';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 import {
   ResultsText,
   ShareResultButton,
-} from "../../modules/play2/containers/ResultsContainer";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCode } from "@fortawesome/free-solid-svg-icons";
-import { CodeArea } from "../../modules/play2/components/CodeArea";
-import useSWR from "swr";
-import { getExperimentalServerUrl } from "../../common/utils/getServerUrl";
-import { useRouter } from "next/router";
-import { cpmToWPM } from "../../common/utils/cpmToWPM";
-import { toHumanReadableTime } from "../../common/utils/toHumanReadableTime";
-import Image from "next/image";
-import { format } from "date-fns";
-import { ActionButton } from "../../modules/play2/components/play-footer/PlayFooter";
-import { ChallengeSource } from "../../modules/play2/components/play-footer/ChallengeSource";
-import { useInitializeUserStore } from "../../common/state/user-store";
-import { useUser } from "../../common/api/user";
-import Head from "next/head";
-import { TweetResult } from "../../modules/play2/components/TweetResult";
+} from '../../modules/play2/containers/ResultsContainer';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCode } from '@fortawesome/free-solid-svg-icons';
+import { CodeArea } from '../../modules/play2/components/CodeArea';
+import useSWR from 'swr';
+import { getExperimentalServerUrl } from '../../common/utils/getServerUrl';
+import { useRouter } from 'next/router';
+import { cpmToWPM } from '../../common/utils/cpmToWPM';
+import { toHumanReadableTime } from '../../common/utils/toHumanReadableTime';
+import Image from 'next/image';
+import { format } from 'date-fns';
+import { ActionButton } from '../../modules/play2/components/play-footer/PlayFooter';
+import { ChallengeSource } from '../../modules/play2/components/play-footer/ChallengeSource';
+import { useInitializeUserStore } from '../../common/state/user-store';
+import { useUser } from '../../common/api/user';
+import Head from 'next/head';
+import { TweetResult } from '../../modules/play2/components/TweetResult';
 
 const baseURL = getExperimentalServerUrl();
 
-export const config = { runtime: "experimental-edge" };
+export const config = { runtime: 'experimental-edge' };
 
 function ResultPage() {
   const user = useUser();
   useInitializeUserStore(user);
   const router = useRouter();
   const { id } = router.query;
-  const { data, isLoading } = useSWR(
-    `${baseURL}/api/results/${id}`,
-    (...args) => id && fetch(...args).then((res) => res.json())
-  );
-  const base = typeof window !== "undefined" ? window.location.origin : "";
+
+  const fetcher = (...args: Parameters<typeof fetch>) =>
+    id ? fetch(...args).then((res) => res.json()) : null;
+
+  const { data, isLoading } = useSWR(`${baseURL}/api/results/${id}`, fetcher, {
+    // ELEGANT FIX: Retry up to 5 times with increasing delay if the fetch fails.
+    // This gives the backend a few seconds to finish saving the result.
+    errorRetryCount: 5,
+    errorRetryInterval: 1000, // Start with 1s, SWR will increase it exponentially
+  });
+
+  const base = typeof window !== 'undefined' ? window.location.origin : '';
   const url = `${base}/results/${id}`;
 
   const resultTitle = data?.user
     ? `${data.user.username} ${cpmToWPM(data.cpm)}wpm`
-    : "Result";
+    : 'Result';
 
   return (
     <>
@@ -71,7 +78,7 @@ function ResultPage() {
                   </h1>
                 </div>
                 <span className="text-sm font-light">
-                  {format(new Date(data.createdAt), "yyyy-MM-dd HH:mm")}
+                  {format(new Date(data.createdAt), 'yyyy-MM-dd HH:mm')}
                 </span>
               </div>
               <div className="w-full grid grid-cols-2 sm:flex sm:flex-row sm:justify-center gap-2">
@@ -116,7 +123,7 @@ function ResultPage() {
                 <ActionButton
                   text="play"
                   title="Start playing"
-                  onClick={() => router.push("/")}
+                  onClick={() => router.push('/')}
                   icon={
                     <div className="h-3 w-3 flex items-center">
                       <FontAwesomeIcon icon={faCode} />
@@ -145,7 +152,7 @@ function ResultPage() {
 function truncateFile(file: string) {
   const cutoff = 40;
   return file.length > cutoff + 3
-    ? file.substring(0, cutoff).trim().concat("...")
+    ? file.substring(0, cutoff).trim().concat('...')
     : file;
 }
 

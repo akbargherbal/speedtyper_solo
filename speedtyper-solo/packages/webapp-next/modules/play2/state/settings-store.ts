@@ -1,5 +1,5 @@
-import create from "zustand";
-import { getExperimentalServerUrl } from "../../../common/utils/getServerUrl";
+import create from 'zustand';
+import { getExperimentalServerUrl } from '../../../common/utils/getServerUrl';
 
 export interface LanguageDTO {
   language: string;
@@ -20,42 +20,48 @@ export interface SettingsState {
   defaultIsPublic: boolean;
 }
 
-const SYNTAX_HIGHLIGHTING_KEY = "syntaxHighlighting";
+const SYNTAX_HIGHLIGHTING_KEY = 'syntaxHighlighting';
 
-const SMOOTH_CARET_KEY = "smoothCaret";
+const SMOOTH_CARET_KEY = 'smoothCaret';
 
-const DEFAULT_RACE_IS_PUBLIC_KEY = "defaultRaceIsPublic2";
+const DEFAULT_RACE_IS_PUBLIC_KEY = 'defaultRaceIsPublic2';
 
-const LANGUAGE_KEY = "language";
+const LANGUAGE_KEY = 'language';
 
 function getInitialToggleStateFromLocalStorage(
   key: string,
-  defaultToggleValue: boolean
+  defaultToggleValue: boolean,
 ): boolean {
-  if (typeof document !== "undefined" && window) {
+  if (typeof document !== 'undefined' && window) {
     let toggleStateStr = localStorage.getItem(key);
     if (!toggleStateStr) {
       localStorage.setItem(key, defaultToggleValue.toString());
       toggleStateStr = defaultToggleValue.toString();
     }
-    return toggleStateStr === "true" ?? false;
+    return toggleStateStr === 'true' ?? false;
   }
   return defaultToggleValue;
 }
 
 function getInitialLanguageFromLocalStorage(key: string): LanguageDTO | null {
-  if (typeof document !== "undefined" && window) {
-    let languageStr = localStorage.getItem(key) ?? "";
+  if (typeof document !== 'undefined' && window) {
+    let languageStr = localStorage.getItem(key) ?? '';
     let lang;
     try {
       lang = JSON.parse(languageStr);
-    } catch (e) {}
+    } catch (e) {
+      // ignore parsing error
+    }
     if (!lang?.language || !lang?.name) {
-      return null;
+      // ELEGANT FIX: If no language is stored, default to JavaScript.
+      const defaultLang = { language: 'javascript', name: 'JavaScript' };
+      localStorage.setItem(key, JSON.stringify(defaultLang));
+      return defaultLang;
     }
     return lang;
   }
-  return null;
+  // ELEGANT FIX: Default for non-browser environments (SSR)
+  return { language: 'javascript', name: 'JavaScript' };
 }
 
 export const useSettingsStore = create<SettingsState>((_set, _get) => ({
@@ -68,24 +74,24 @@ export const useSettingsStore = create<SettingsState>((_set, _get) => ({
   smoothCaret: getInitialToggleStateFromLocalStorage(SMOOTH_CARET_KEY, false),
   syntaxHighlighting: getInitialToggleStateFromLocalStorage(
     SYNTAX_HIGHLIGHTING_KEY,
-    false
+    false,
   ),
   raceIsPublic: false,
   defaultIsPublic: getInitialToggleStateFromLocalStorage(
     DEFAULT_RACE_IS_PUBLIC_KEY,
-    false
+    false,
   ),
   languageSelected: getInitialLanguageFromLocalStorage(LANGUAGE_KEY),
 }));
 
-export const setCaretType = (caretType: "smooth" | "block") => {
-  const smoothCaret = caretType === "smooth";
+export const setCaretType = (caretType: 'smooth' | 'block') => {
+  const smoothCaret = caretType === 'smooth';
   localStorage.setItem(SMOOTH_CARET_KEY, smoothCaret.toString());
   useSettingsStore.setState((state) => ({ ...state, smoothCaret }));
 };
 
 export const setLanguage = (language: LanguageDTO | null) => {
-  let stored = "";
+  let stored = '';
   if (language) {
     stored = JSON.stringify(language);
   }
@@ -98,7 +104,7 @@ export const setLanguage = (language: LanguageDTO | null) => {
 
 export const toggleDefaultRaceIsPublic = () => {
   const booleanStrValue = localStorage.getItem(DEFAULT_RACE_IS_PUBLIC_KEY);
-  let defaultIsPublic = booleanStrValue === "true";
+  let defaultIsPublic = booleanStrValue === 'true';
   defaultIsPublic = !defaultIsPublic;
   localStorage.setItem(DEFAULT_RACE_IS_PUBLIC_KEY, defaultIsPublic.toString());
   useSettingsStore.setState((state) => ({ ...state, defaultIsPublic }));
@@ -106,7 +112,7 @@ export const toggleDefaultRaceIsPublic = () => {
 
 export const toggleSyntaxHighlightning = () => {
   const syntaxHighlightingStr = localStorage.getItem(SYNTAX_HIGHLIGHTING_KEY);
-  let syntaxHighlighting = syntaxHighlightingStr === "true";
+  let syntaxHighlighting = syntaxHighlightingStr === 'true';
   syntaxHighlighting = !syntaxHighlighting;
   localStorage.setItem(SYNTAX_HIGHLIGHTING_KEY, syntaxHighlighting.toString());
   useSettingsStore.setState((state) => ({ ...state, syntaxHighlighting }));
@@ -162,7 +168,7 @@ export const openProjectModal = () => {
 
 export const useHasOpenModal = () => {
   const leaderboardModalIsOpen = useSettingsStore(
-    (s) => s.leaderboardModalIsOpen
+    (s) => s.leaderboardModalIsOpen,
   );
   const settingsModalIsOpen = useSettingsStore((s) => s.settingsModalIsOpen);
   return leaderboardModalIsOpen || settingsModalIsOpen;
@@ -182,13 +188,13 @@ export const closeModals = () => {
 
 export const toggleRaceIsPublic = () => {
   const baseUrl = getExperimentalServerUrl();
-  const url = baseUrl + "/api/races/online";
+  const url = baseUrl + '/api/races/online';
   fetch(url, {
-    method: "POST",
-    credentials: "include",
+    method: 'POST',
+    credentials: 'include',
   }).then((res) =>
     res.json().then(({ isPublic: raceIsPublic }) => {
       useSettingsStore.setState((s) => ({ ...s, raceIsPublic }));
-    })
+    }),
   );
 };
