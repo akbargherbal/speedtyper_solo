@@ -1,0 +1,363 @@
+
+speedtyper-solo/
+├── COMPLETION.md
+├── CONTRIBUTING.md
+├── LICENSE
+├── Makefile
+├── package-lock.json
+├── package.json
+├── packages/
+│   ├── back-nest/
+│   │   ├── docker-compose.yml
+│   │   ├── Dockerfile
+│   │   ├── nest-cli.json
+│   │   ├── package-lock.json
+│   │   ├── package.json
+│   │   ├── parser.config.json
+│   │   ├── README.md
+│   │   ├── scripts/
+│   │   │   ├── seed-local.sh
+│   │   │   └── seed-production.sh
+│   │   ├── speedtyper-local.db
+│   │   ├── src/
+│   │   │   ├── app.module.ts
+│   │   │   ├── auth/
+│   │   │   │   ├── auth.module.ts
+│   │   │   │   └── github/
+│   │   │   │       ├── github.controller.ts
+│   │   │   │       ├── github.guard.ts
+│   │   │   │       └── github.strategy.ts
+│   │   │   ├── challenges/
+│   │   │   │   ├── challenges.module.ts
+│   │   │   │   ├── commands/
+│   │   │   │   │   ├── calculate-language-runner.ts
+│   │   │   │   │   ├── challenge-import-runner.ts
+│   │   │   │   │   ├── local-import-runner.ts
+│   │   │   │   │   ├── reformat-challenges-runner.ts
+│   │   │   │   │   └── unsynced-file-import-runner.ts
+│   │   │   │   ├── entities/
+│   │   │   │   │   ├── challenge.entity.ts
+│   │   │   │   │   ├── language.dto.ts
+│   │   │   │   │   └── unsynced-file.entity.ts
+│   │   │   │   ├── languages.controller.ts
+│   │   │   │   └── services/
+│   │   │   │       ├── challenge.service.ts
+│   │   │   │       ├── literal.service.ts
+│   │   │   │       ├── parser-config.interface.ts
+│   │   │   │       ├── parser.service.ts
+│   │   │   │       ├── tests/
+│   │   │   │       │   └── parser.service.spec.ts
+│   │   │   │       ├── ts-parser.factory.ts
+│   │   │   │       ├── unsynced-file-filterer.ts
+│   │   │   │       ├── unsynced-file-importer.ts
+│   │   │   │       └── unsynced-file.service.ts
+│   │   │   ├── commands.ts
+│   │   │   ├── config/
+│   │   │   │   ├── cors.ts
+│   │   │   │   └── postgres.ts
+│   │   │   ├── connectors/
+│   │   │   │   └── github/
+│   │   │   │       ├── github.module.ts
+│   │   │   │       ├── schemas/
+│   │   │   │       │   ├── github-blob.dto.ts
+│   │   │   │       │   ├── github-repository.dto.ts
+│   │   │   │       │   └── github-tree.dto.ts
+│   │   │   │       └── services/
+│   │   │   │           └── github-api.ts
+│   │   │   ├── database.module.ts
+│   │   │   ├── filters/
+│   │   │   │   └── exception.filter.ts
+│   │   │   ├── main.ts
+│   │   │   ├── middlewares/
+│   │   │   │   └── guest-user.ts
+│   │   │   ├── projects/
+│   │   │   │   ├── commands/
+│   │   │   │   │   ├── import-untracked-projects-runner.ts
+│   │   │   │   │   └── sync-untracked-projects-runner.ts
+│   │   │   │   ├── entities/
+│   │   │   │   │   ├── project.entity.ts
+│   │   │   │   │   └── untracked-project.entity.ts
+│   │   │   │   ├── project.controller.ts
+│   │   │   │   ├── projects.module.ts
+│   │   │   │   └── services/
+│   │   │   │       ├── project.service.ts
+│   │   │   │       ├── projects-from-file-reader.ts
+│   │   │   │       └── untracked-projects.service.ts
+│   │   │   ├── races/
+│   │   │   │   ├── entities/
+│   │   │   │   │   └── race-settings.dto.ts
+│   │   │   │   ├── race.controllers.ts
+│   │   │   │   ├── race.exceptions.ts
+│   │   │   │   ├── race.gateway.ts
+│   │   │   │   ├── races.module.ts
+│   │   │   │   └── services/
+│   │   │   │       ├── add-keystroke.service.ts
+│   │   │   │       ├── countdown.service.ts
+│   │   │   │       ├── keystroke-validator.service.ts
+│   │   │   │       ├── locker.service.ts
+│   │   │   │       ├── progress.service.ts
+│   │   │   │       ├── race-events.service.ts
+│   │   │   │       ├── race-manager.service.ts
+│   │   │   │       ├── race-player.service.ts
+│   │   │   │       ├── race.service.ts
+│   │   │   │       ├── results-handler.service.ts
+│   │   │   │       ├── session-state.service.ts
+│   │   │   │       └── tests/
+│   │   │   │           └── race-player.service.spec.ts
+│   │   │   ├── results/
+│   │   │   │   ├── entities/
+│   │   │   │   │   ├── leaderboard-result.dto.ts
+│   │   │   │   │   └── result.entity.ts
+│   │   │   │   ├── errors.ts
+│   │   │   │   ├── results.controller.ts
+│   │   │   │   ├── results.module.ts
+│   │   │   │   └── services/
+│   │   │   │       ├── result-calculation.service.ts
+│   │   │   │       ├── result-factory.service.ts
+│   │   │   │       └── results.service.ts
+│   │   │   ├── seeder/
+│   │   │   │   ├── commands/
+│   │   │   │   │   └── challenge.seeder.ts
+│   │   │   │   └── seeder.module.ts
+│   │   │   ├── sessions/
+│   │   │   │   ├── session.adapter.ts
+│   │   │   │   ├── session.entity.ts
+│   │   │   │   ├── session.middleware.ts
+│   │   │   │   └── types.d.ts
+│   │   │   ├── tracking/
+│   │   │   │   ├── entities/
+│   │   │   │   │   └── event.entity.ts
+│   │   │   │   ├── tracking.module.ts
+│   │   │   │   └── tracking.service.ts
+│   │   │   ├── users/
+│   │   │   │   ├── controllers/
+│   │   │   │   │   └── user.controller.ts
+│   │   │   │   ├── entities/
+│   │   │   │   │   ├── upsertGithubUserDTO.ts
+│   │   │   │   │   └── user.entity.ts
+│   │   │   │   ├── services/
+│   │   │   │   │   └── user.service.ts
+│   │   │   │   ├── users.module.ts
+│   │   │   │   └── utils/
+│   │   │   │       └── generateRandomUsername.ts
+│   │   │   └── utils/
+│   │   │       └── validateDTO.ts
+│   │   ├── tracked-projects.txt
+│   │   ├── tsconfig.build.json
+│   │   └── tsconfig.json
+│   └── webapp-next/
+│       ├── common/
+│       │   ├── api/
+│       │   │   ├── auth.ts
+│       │   │   ├── races.ts
+│       │   │   ├── types.ts
+│       │   │   └── user.ts
+│       │   ├── components/
+│       │   │   ├── Avatar.tsx
+│       │   │   ├── BattleMatcher.tsx
+│       │   │   ├── Button.tsx
+│       │   │   ├── buttons/
+│       │   │   │   ├── GithubLoginButton.tsx
+│       │   │   │   └── ModalCloseButton.tsx
+│       │   │   ├── Footer/
+│       │   │   │   └── YoutubeLink.tsx
+│       │   │   ├── Footer.tsx
+│       │   │   ├── Layout.tsx
+│       │   │   ├── modals/
+│       │   │   │   ├── GithubLoginModal.tsx
+│       │   │   │   ├── GithubModal.tsx
+│       │   │   │   ├── Modal.tsx
+│       │   │   │   ├── ProfileModal.tsx
+│       │   │   │   └── SettingsModal.tsx
+│       │   │   ├── NewNavbar.tsx
+│       │   │   ├── Overlay.tsx
+│       │   │   └── overlays/
+│       │   │       ├── GithubLoginOverlay.tsx
+│       │   │       └── SettingsOverlay.tsx
+│       │   ├── github/
+│       │   │   └── stargazers.ts
+│       │   ├── hooks/
+│       │   │   ├── useIsPlaying.ts
+│       │   │   └── useSocket.ts
+│       │   ├── services/
+│       │   │   └── Socket.ts
+│       │   ├── state/
+│       │   │   └── user-store.ts
+│       │   └── utils/
+│       │       ├── clipboard.ts
+│       │       ├── cpmToWPM.ts
+│       │       ├── getServerUrl.ts
+│       │       ├── router.ts
+│       │       └── toHumanReadableTime.ts
+│       ├── components/
+│       │   ├── Countdown.tsx
+│       │   ├── Navbar.tsx
+│       │   └── Stream.tsx
+│       ├── hooks/
+│       │   ├── useKeyMap.ts
+│       │   └── useTotalSeconds.ts
+│       ├── modules/
+│       │   └── play2/
+│       │       ├── components/
+│       │       │   ├── CodeArea.tsx
+│       │       │   ├── HiddenCodeInput.tsx
+│       │       │   ├── IncorrectChars.tsx
+│       │       │   ├── leaderboard/
+│       │       │   │   ├── Leaderboard.tsx
+│       │       │   │   └── LeaderboardButton.tsx
+│       │       │   ├── NextChar.tsx
+│       │       │   ├── play-footer/
+│       │       │   │   ├── ChallengeSource/
+│       │       │   │   │   ├── ChallengeSource.tsx
+│       │       │   │   │   └── index.ts
+│       │       │   │   └── PlayFooter/
+│       │       │   │       ├── index.ts
+│       │       │   │       └── PlayFooter.tsx
+│       │       │   ├── play-header/
+│       │       │   │   └── PlayHeader/
+│       │       │   │       ├── index.tsx
+│       │       │   │       └── PlayHeader.tsx
+│       │       │   ├── race-settings/
+│       │       │   │   └── LanguageSelector.tsx
+│       │       │   ├── RaceSettings.tsx
+│       │       │   ├── ResultsChart.tsx
+│       │       │   ├── SmoothCaret.tsx
+│       │       │   ├── TweetResult.tsx
+│       │       │   ├── TypedChars.tsx
+│       │       │   └── UntypedChars.tsx
+│       │       ├── containers/
+│       │       │   ├── CodeTypingContainer.tsx
+│       │       │   └── ResultsContainer.tsx
+│       │       ├── hooks/
+│       │       │   ├── useChallenge.ts
+│       │       │   ├── useEndGame.ts
+│       │       │   ├── useFocusRef.ts
+│       │       │   ├── useGame.ts
+│       │       │   ├── useGameIdQueryParam.ts
+│       │       │   ├── useIsCompleted.ts
+│       │       │   ├── useNodeRect.ts
+│       │       │   └── useResetStateOnUnmount.ts
+│       │       ├── services/
+│       │       │   └── Game.ts
+│       │       └── state/
+│       │           ├── code-store.ts
+│       │           ├── connection-store.ts
+│       │           ├── game-store.ts
+│       │           ├── settings-store.ts
+│       │           └── trends-store.ts
+│       ├── next-env.d.ts
+│       ├── next.config.js
+│       ├── package.json
+│       ├── pages/
+│       │   ├── 404.tsx
+│       │   ├── _app.tsx
+│       │   ├── _document.tsx
+│       │   ├── index.tsx
+│       │   └── results/
+│       │       └── [id].tsx
+│       ├── postcss.config.js
+│       ├── public/
+│       │   ├── faded-logo.png
+│       │   ├── favicon.ico
+│       │   ├── logo.png
+│       │   └── robots.txt
+│       ├── README.md
+│       ├── Socket.ts
+│       ├── styles/
+│       │   └── globals.css
+│       ├── tailwind.config.js
+│       ├── tsconfig.json
+│       ├── utils/
+│       │   ├── calculateAccuracy.ts
+│       │   ├── cpmToWpm.ts
+│       │   ├── getTimeDifference.ts
+│       │   ├── humanize.ts
+│       │   └── stripIndentation.ts
+│       └── yarn.lock
+├── README.md
+├── reset-db.sh
+├── scripts/
+│   └── reset-db.js
+├── snippets/
+│   ├── javascript/
+│   │   ├── gm_01_001_01_array-methods.js
+│   │   ├── gm_01_001_02_array-methods.js
+│   │   ├── gm_01_002_01_async-patterns.js
+│   │   ├── gm_01_002_02_async-patterns.js
+│   │   ├── gm_01_003_01_common-utilities.js
+│   │   ├── gm_01_003_02_common-utilities.js
+│   │   ├── gm_01_005_01_dom-manipulation.js
+│   │   ├── gm_01_005_02_dom-manipulation.js
+│   │   ├── gm_01_006_01_es6-class-syntax.js
+│   │   ├── gm_01_006_02_es6-class-syntax.js
+│   │   ├── gm_01_007_01_error-handling.js
+│   │   ├── gm_01_007_02_error-handling.js
+│   │   ├── gm_01_008_01_functional-programming-patterns.js
+│   │   ├── gm_01_008_02_functional-programming-patterns.js
+│   │   ├── gm_01_009_01_json-operations.js
+│   │   ├── gm_01_009_02_json-operations.js
+│   │   ├── gm_01_010_01_modern-javascript-patterns.js
+│   │   ├── gm_01_010_02_modern-javascript-patterns.js
+│   │   ├── gm_01_011_01_module-patterns.js
+│   │   ├── gm_01_011_02_module-patterns.js
+│   │   ├── gm_01_012_01_object-manipulation.js
+│   │   ├── gm_01_012_02_object-manipulation.js
+│   │   ├── gm_01_013_01_string-methods.js
+│   │   └── gm_01_013_02_string-methods.js
+│   ├── python/
+│   │   ├── BETA_claude-api-template.py
+│   │   ├── BETA_deepseek-api-template.py
+│   │   ├── BETA_gpt4-api-template.py
+│   │   ├── GAMMA_gemini-api-template.py
+│   │   ├── recover.py
+│   │   └── recover.py:Zone.Identifier
+│   └── typescript/
+│       ├── _app.tsx
+│       ├── CodeArea.tsx
+│       ├── gm_01_014_01_async-patterns.tsx
+│       ├── gm_01_014_02_async-patterns.tsx
+│       ├── gm_01_015_01_common-ui-patterns.tsx
+│       ├── gm_01_015_02_common-ui-patterns.tsx
+│       ├── gm_01_016_01_context-api.tsx
+│       ├── gm_01_016_02_context-api.tsx
+│       ├── gm_01_018_01_data-transformation-patterns.tsx
+│       ├── gm_01_018_02_data-transformation-patterns.tsx
+│       ├── gm_01_019_01_integration-patterns.tsx
+│       ├── gm_01_019_02_integration-patterns.tsx
+│       ├── gm_01_020_01_performance-patterns.tsx
+│       ├── gm_01_020_02_performance-patterns.tsx
+│       ├── gm_01_021_01_react-hook-form-form-handling.tsx
+│       ├── gm_01_021_02_react-hook-form-form-handling.tsx
+│       ├── gm_01_022_01_react-router-navigation.tsx
+│       ├── gm_01_022_02_react-router-navigation.tsx
+│       ├── gm_01_023_01_tanstack-query-react-query-data-fetching.tsx
+│       ├── gm_01_023_02_tanstack-query-react-query-data-fetching.tsx
+│       ├── gm_01_024_01_typescript-patterns.tsx
+│       ├── gm_01_024_02_typescript-patterns.tsx
+│       ├── gm_01_025_01_zustand-state-management.tsx
+│       ├── gm_01_025_02_zustand-state-management.tsx
+│       ├── gm_01_026_01_apidata-patterns.ts
+│       ├── gm_01_026_02_apidata-patterns.ts
+│       ├── gm_01_027_02_advanced-types.ts
+│       ├── gm_01_028_01_basic-type-annotations.ts
+│       ├── gm_01_028_02_basic-type-annotations.ts
+│       ├── gm_01_029_01_class-patterns-typescript-specific.ts
+│       ├── gm_01_029_02_class-patterns-typescript-specific.ts
+│       ├── gm_01_030_01_common-gotchas-to-practice.ts
+│       ├── gm_01_030_02_common-gotchas-to-practice.ts
+│       ├── gm_01_031_01_configuration-patterns.ts
+│       ├── gm_01_031_02_configuration-patterns.ts
+│       ├── gm_01_032_01_error-handling-with-types.ts
+│       ├── gm_01_032_02_error-handling-with-types.ts
+│       ├── gm_01_033_01_function-patterns.ts
+│       ├── gm_01_033_02_function-patterns.ts
+│       ├── gm_01_034_01_interface-patterns.ts
+│       ├── gm_01_034_02_interface-patterns.ts
+│       ├── gm_01_036_01_react-specific-typescript.ts
+│       ├── gm_01_036_02_react-specific-typescript.ts
+│       ├── local-import-runner.ts
+│       ├── parser.service.ts
+│       ├── PlayFooter.tsx
+│       ├── race-events.service.ts
+│       └── race.gateway.ts
+└── yarn.lock
