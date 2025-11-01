@@ -6,6 +6,8 @@ export interface LanguageDTO {
   name: string;
 }
 
+export type CaretStyle = 'line' | 'line-smooth' | 'block' | 'underline';
+
 export interface SettingsState {
   settingsModalIsOpen: boolean;
   languageModalIsOpen: boolean;
@@ -15,52 +17,79 @@ export interface SettingsState {
   publicRacesModalIsOpen: boolean;
   languageSelected: LanguageDTO | null;
   smoothCaret: boolean;
+  caretStyle: CaretStyle;
   syntaxHighlighting: boolean;
   raceIsPublic: boolean;
   defaultIsPublic: boolean;
+  debugMode: boolean; // NEW: Prevents blur for screenshots
 }
 
 const SYNTAX_HIGHLIGHTING_KEY = 'syntaxHighlighting';
-
 const SMOOTH_CARET_KEY = 'smoothCaret';
-
+const CARET_STYLE_KEY = 'caretStyle';
 const DEFAULT_RACE_IS_PUBLIC_KEY = 'defaultRaceIsPublic2';
-
 const LANGUAGE_KEY = 'language';
+const DEBUG_MODE_KEY = 'debugMode';
 
 function getInitialToggleStateFromLocalStorage(
   key: string,
   defaultToggleValue: boolean,
 ): boolean {
-  if (typeof document !== 'undefined' && window) {
-    let toggleStateStr = localStorage.getItem(key);
-    if (!toggleStateStr) {
-      localStorage.setItem(key, defaultToggleValue.toString());
-      toggleStateStr = defaultToggleValue.toString();
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      let toggleStateStr = localStorage.getItem(key);
+      if (!toggleStateStr) {
+        localStorage.setItem(key, defaultToggleValue.toString());
+        toggleStateStr = defaultToggleValue.toString();
+      }
+      return toggleStateStr === 'true';
+    } catch (e) {
+      // localStorage might be disabled or unavailable
+      return defaultToggleValue;
     }
-    return toggleStateStr === 'true' ?? false;
   }
   return defaultToggleValue;
 }
 
-function getInitialLanguageFromLocalStorage(key: string): LanguageDTO | null {
-  if (typeof document !== 'undefined' && window) {
-    let languageStr = localStorage.getItem(key) ?? '';
-    let lang;
+function getInitialCaretStyleFromLocalStorage(key: string): CaretStyle {
+  if (typeof window !== 'undefined' && window.localStorage) {
     try {
-      lang = JSON.parse(languageStr);
+      const style = localStorage.getItem(key) as CaretStyle;
+      if (style && ['line', 'line-smooth', 'block', 'underline'].includes(style)) {
+        return style;
+      }
+      const defaultStyle: CaretStyle = 'line';
+      localStorage.setItem(key, defaultStyle);
+      return defaultStyle;
     } catch (e) {
-      // ignore parsing error
+      // localStorage might be disabled or unavailable
+      return 'line';
     }
-    if (!lang?.language || !lang?.name) {
-      // ELEGANT FIX: If no language is stored, default to JavaScript.
-      const defaultLang = { language: 'javascript', name: 'JavaScript' };
-      localStorage.setItem(key, JSON.stringify(defaultLang));
-      return defaultLang;
-    }
-    return lang;
   }
-  // ELEGANT FIX: Default for non-browser environments (SSR)
+  return 'line';
+}
+
+function getInitialLanguageFromLocalStorage(key: string): LanguageDTO | null {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      let languageStr = localStorage.getItem(key) ?? '';
+      let lang;
+      try {
+        lang = JSON.parse(languageStr);
+      } catch (e) {
+        // ignore parsing error
+      }
+      if (!lang?.language || !lang?.name) {
+        const defaultLang = { language: 'javascript', name: 'JavaScript' };
+        localStorage.setItem(key, JSON.stringify(defaultLang));
+        return defaultLang;
+      }
+      return lang;
+    } catch (e) {
+      // localStorage might be disabled or unavailable
+      return { language: 'javascript', name: 'JavaScript' };
+    }
+  }
   return { language: 'javascript', name: 'JavaScript' };
 }
 
@@ -72,6 +101,7 @@ export const useSettingsStore = create<SettingsState>((_set, _get) => ({
   publicRacesModalIsOpen: false,
   projectModalIsOpen: false,
   smoothCaret: getInitialToggleStateFromLocalStorage(SMOOTH_CARET_KEY, false),
+  caretStyle: getInitialCaretStyleFromLocalStorage(CARET_STYLE_KEY),
   syntaxHighlighting: getInitialToggleStateFromLocalStorage(
     SYNTAX_HIGHLIGHTING_KEY,
     false,
@@ -82,12 +112,24 @@ export const useSettingsStore = create<SettingsState>((_set, _get) => ({
     false,
   ),
   languageSelected: getInitialLanguageFromLocalStorage(LANGUAGE_KEY),
+  debugMode: getInitialToggleStateFromLocalStorage(DEBUG_MODE_KEY, false),
 }));
+
+export const setCaretStyle = (style: CaretStyle) => {
+  localStorage.setItem(CARET_STYLE_KEY, style);
+  useSettingsStore.setState((state) => ({ 
+    ...state, 
+    caretStyle: style,
+    smoothCaret: style === 'line-smooth'
+  }));
+};
 
 export const setCaretType = (caretType: 'smooth' | 'block') => {
   const smoothCaret = caretType === 'smooth';
+  const caretStyle: CaretStyle = smoothCaret ? 'line-smooth' : 'block';
   localStorage.setItem(SMOOTH_CARET_KEY, smoothCaret.toString());
-  useSettingsStore.setState((state) => ({ ...state, smoothCaret }));
+  localStorage.setItem(CARET_STYLE_KEY, caretStyle);
+  useSettingsStore.setState((state) => ({ ...state, smoothCaret, caretStyle }));
 };
 
 export const setLanguage = (language: LanguageDTO | null) => {
@@ -100,6 +142,15 @@ export const setLanguage = (language: LanguageDTO | null) => {
     ...state,
     languageSelected: language,
   }));
+};
+
+export const toggleDebugMode = () => {
+  const debugModeStr = localStorage.getItem(DEBUG_MODE_KEY);
+  let debugMode = debugModeStr === 'true';
+  debugMode = !debugMode;
+  localStorage.setItem(DEBUG_MODE_KEY, debugMode.toString());
+  useSettingsStore.setState((state) => ({ ...state, debugMode }));
+  console.log(`[Debug Mode] ${debugMode ? 'ENABLED' : 'DISABLED'} - Focus behavior ${debugMode ? 'locked for screenshots' : 'normal'}`);
 };
 
 export const toggleDefaultRaceIsPublic = () => {

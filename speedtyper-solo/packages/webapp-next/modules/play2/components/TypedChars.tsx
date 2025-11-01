@@ -16,15 +16,17 @@ export function TypedChars({ language }: TypedCharsProps) {
   const index = useCodeStore((state) => state.index);
   const typedChars = useCodeStore((state) => state.correctChars);
   const typedRef = useRef<HTMLSpanElement>(null);
+
   useEffect(() => {
     if (!isSyntaxHighlightingEnabled) return;
     if (typedRef.current) {
       highlightjs.highlightElement(typedRef.current);
     }
   }, [index, isSyntaxHighlightingEnabled]);
+
   return (
     <span
-      className={`text-violet-400 ${language}`}
+      className={`text-green-400 font-medium ${language}`}
       ref={typedRef}
       style={{ background: "none" }}
     >

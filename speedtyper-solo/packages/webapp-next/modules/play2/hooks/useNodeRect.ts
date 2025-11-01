@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 interface IRect {
   top: number;
@@ -7,34 +7,43 @@ interface IRect {
 
 export function useNodeRect<T extends HTMLElement>(
   refreshValue: string
-): [IRect, (node: T) => void] {
-  const [node, setNode] = useState<T>();
+): [IRect, (node: T | null) => void] {
+  const [node, setNode] = useState<T | null>(null);
   const [rect, setRect] = useState({
     top: 0,
     left: 0,
   });
 
+  // Use useCallback to ensure stable ref callback
+  const refCallback = useCallback((node: T | null) => {
+    if (node) {
+      setNode(node);
+    }
+  }, []);
+
   useEffect(() => {
     if (!node) return;
 
-    // Use getBoundingClientRect for accurate viewport-relative positioning
-    const domRect = node.getBoundingClientRect();
-    
-    // Get the scroll container (the CodeArea container)
-    const scrollContainer = node.closest('.overflow-auto');
-    const scrollTop = scrollContainer?.scrollTop ?? 0;
-    const scrollLeft = scrollContainer?.scrollLeft ?? 0;
-    
-    // Calculate position relative to the scroll container
-    const containerRect = scrollContainer?.getBoundingClientRect();
-    const containerTop = containerRect?.top ?? 0;
-    const containerLeft = containerRect?.left ?? 0;
-    
-    setRect({
-      top: domRect.top - containerTop + scrollTop,
-      left: domRect.left - containerLeft + scrollLeft,
-    });
+    // Use requestAnimationFrame to ensure DOM is fully laid out
+    const updateRect = () => {
+      if (!node) return;
+      
+      setRect({
+        top: node.offsetTop,
+        left: node.offsetLeft,
+      });
+    };
+
+    // Update immediately
+    updateRect();
+
+    // Also update on next frame (handles cases where layout isn't complete)
+    const rafId = requestAnimationFrame(updateRect);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+    };
   }, [node, refreshValue]);
 
-  return [rect, setNode];
+  return [rect, refCallback];
 }
