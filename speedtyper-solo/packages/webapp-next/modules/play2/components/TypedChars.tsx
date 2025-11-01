@@ -20,13 +20,15 @@ export function TypedChars({ language }: TypedCharsProps) {
   useEffect(() => {
     if (!isSyntaxHighlightingEnabled) return;
     if (typedRef.current) {
+      // Clear the highlighted flag before re-highlighting
+      delete typedRef.current.dataset.highlighted;
       highlightjs.highlightElement(typedRef.current);
     }
   }, [index, isSyntaxHighlightingEnabled]);
 
   return (
     <span
-      className={`text-green-400 font-medium ${language}`}
+      className={`font-medium ${language} ${!isSyntaxHighlightingEnabled ? 'text-green-400' : ''}`}
       ref={typedRef}
       style={{ background: "none" }}
     >
