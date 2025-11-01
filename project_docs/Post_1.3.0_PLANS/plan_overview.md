@@ -10,7 +10,7 @@
 
 | Version | Focus                 | Duration | Risk | Rollback | Status |
 | ------- | --------------------- | -------- | ---- | -------- | ------ |
-| v1.4.0  | Foundation Layer      | 3-4 wks  | 🟢   | v1.3.0   | ⏳     |
+| v1.4.0  | Foundation Layer      | 3-4 wks  | 🟢   | v1.3.2   | ⏳     |
 | v1.5.0  | Smart Skip (Basic)    | 2-3 wks  | 🟡   | v1.4.0   | ⏳     |
 | v1.5.1  | Smart Skip (Advanced) | 2-3 wks  | 🟡   | v1.5.0   | ⏳     |
 | v1.6.0  | Visual Enhancement    | 4-6 wks  | 🔴   | v1.5.1   | ⏳     |
@@ -64,7 +64,7 @@
 ## Core Dependencies
 
 ```
-v1.3.0 (baseline)
+v1.3.2 (baseline)
     ↓
 v1.4.0 (LocalUserService + Dashboard)
     ↓ [requires stable userId]
