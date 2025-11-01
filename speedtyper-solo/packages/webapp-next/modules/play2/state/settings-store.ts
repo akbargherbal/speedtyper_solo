@@ -6,8 +6,6 @@ export interface LanguageDTO {
   name: string;
 }
 
-export type CaretStyle = 'line' | 'line-smooth' | 'block' | 'underline';
-
 export interface SettingsState {
   settingsModalIsOpen: boolean;
   languageModalIsOpen: boolean;
@@ -16,17 +14,13 @@ export interface SettingsState {
   projectModalIsOpen: boolean;
   publicRacesModalIsOpen: boolean;
   languageSelected: LanguageDTO | null;
-  smoothCaret: boolean;
-  caretStyle: CaretStyle;
   syntaxHighlighting: boolean;
   raceIsPublic: boolean;
   defaultIsPublic: boolean;
-  debugMode: boolean; // NEW: Prevents blur for screenshots
+  debugMode: boolean;
 }
 
 const SYNTAX_HIGHLIGHTING_KEY = 'syntaxHighlighting';
-const SMOOTH_CARET_KEY = 'smoothCaret';
-const CARET_STYLE_KEY = 'caretStyle';
 const DEFAULT_RACE_IS_PUBLIC_KEY = 'defaultRaceIsPublic2';
 const LANGUAGE_KEY = 'language';
 const DEBUG_MODE_KEY = 'debugMode';
@@ -49,24 +43,6 @@ function getInitialToggleStateFromLocalStorage(
     }
   }
   return defaultToggleValue;
-}
-
-function getInitialCaretStyleFromLocalStorage(key: string): CaretStyle {
-  if (typeof window !== 'undefined' && window.localStorage) {
-    try {
-      const style = localStorage.getItem(key) as CaretStyle;
-      if (style && ['line', 'line-smooth', 'block', 'underline'].includes(style)) {
-        return style;
-      }
-      const defaultStyle: CaretStyle = 'line';
-      localStorage.setItem(key, defaultStyle);
-      return defaultStyle;
-    } catch (e) {
-      // localStorage might be disabled or unavailable
-      return 'line';
-    }
-  }
-  return 'line';
 }
 
 function getInitialLanguageFromLocalStorage(key: string): LanguageDTO | null {
@@ -100,8 +76,6 @@ export const useSettingsStore = create<SettingsState>((_set, _get) => ({
   profileModalIsOpen: false,
   publicRacesModalIsOpen: false,
   projectModalIsOpen: false,
-  smoothCaret: getInitialToggleStateFromLocalStorage(SMOOTH_CARET_KEY, false),
-  caretStyle: getInitialCaretStyleFromLocalStorage(CARET_STYLE_KEY),
   syntaxHighlighting: getInitialToggleStateFromLocalStorage(
     SYNTAX_HIGHLIGHTING_KEY,
     false,
@@ -114,23 +88,6 @@ export const useSettingsStore = create<SettingsState>((_set, _get) => ({
   languageSelected: getInitialLanguageFromLocalStorage(LANGUAGE_KEY),
   debugMode: getInitialToggleStateFromLocalStorage(DEBUG_MODE_KEY, false),
 }));
-
-export const setCaretStyle = (style: CaretStyle) => {
-  localStorage.setItem(CARET_STYLE_KEY, style);
-  useSettingsStore.setState((state) => ({ 
-    ...state, 
-    caretStyle: style,
-    smoothCaret: style === 'line-smooth'
-  }));
-};
-
-export const setCaretType = (caretType: 'smooth' | 'block') => {
-  const smoothCaret = caretType === 'smooth';
-  const caretStyle: CaretStyle = smoothCaret ? 'line-smooth' : 'block';
-  localStorage.setItem(SMOOTH_CARET_KEY, smoothCaret.toString());
-  localStorage.setItem(CARET_STYLE_KEY, caretStyle);
-  useSettingsStore.setState((state) => ({ ...state, smoothCaret, caretStyle }));
-};
 
 export const setLanguage = (language: LanguageDTO | null) => {
   let stored = '';

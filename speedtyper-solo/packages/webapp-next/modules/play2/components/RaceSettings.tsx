@@ -7,7 +7,6 @@ import { useIsOwner, useIsMultiplayer } from "../state/game-store";
 import {
   closeModals,
   openLanguageModal,
-  setCaretType,
   useSettingsStore,
 } from "../state/settings-store";
 import { ActionButton } from "./play-footer/PlayFooter";
@@ -42,7 +41,7 @@ export const RaceSettingsModal: React.FC = () => {
   // In solo mode, always show language selector
   // In multiplayer mode, only owner can change language
   const canSelectLanguage = !isMultiplayer || isOwner;
-  
+
   return (
     <Overlay onOverlayClick={closeModals}>
       <AnimatePresence>
@@ -60,53 +59,6 @@ export const RaceSettingsModal: React.FC = () => {
         </motion.div>
       </AnimatePresence>
     </Overlay>
-  );
-};
-
-export const CaretSelector = () => {
-  const isSmoothCaret = useSettingsStore((s) => s.smoothCaret);
-  const selectedCaretType = isSmoothCaret ? "smooth" : "block";
-  return (
-    <RadioGroup value={selectedCaretType} onChange={setCaretType}>
-      <RadioGroup.Label className="text-xs font-semibold uppercase tracking-widest">
-        Caret style
-      </RadioGroup.Label>
-      <div className="flex w-full font-bold tracking-widest gap-1">
-        <RadioGroup.Option className="w-full cursor-pointer" value="smooth">
-          {({ checked }) => (
-            <div
-              className={`flex items-center h-full w-full p-3 rounded-lg ${
-                checked
-                  ? "bg-purple-200 hover:bg-purple-300"
-                  : "bg-gray-200 hover:bg-gray-300"
-              }`}
-            >
-              <span
-                className="flex flex-col h-full rounded-lg bg-gray-600 mr-4"
-                style={{
-                  width: "2px",
-                }}
-              />
-              <span>Line (smooth)</span>
-            </div>
-          )}
-        </RadioGroup.Option>
-        <RadioGroup.Option className="w-full cursor-pointer" value="block">
-          {({ checked }) => (
-            <div
-              className={`flex items-center h-full w-full p-3 rounded-lg ${
-                checked
-                  ? "bg-purple-200 hover:bg-purple-300"
-                  : "bg-gray-200 hover:bg-gray-300"
-              }`}
-            >
-              <span className="flex flex-col h-full rounded-sm bg-gray-600 mr-4 w-3" />
-              <span>Block</span>
-            </div>
-          )}
-        </RadioGroup.Option>
-      </div>
-    </RadioGroup>
   );
 };
 

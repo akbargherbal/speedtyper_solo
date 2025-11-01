@@ -3,7 +3,6 @@ import Modal from "../modals/Modal";
 import { closeModals } from "../../../modules/play2/state/settings-store";
 import ModalCloseButton from "../buttons/ModalCloseButton";
 import {
-  CaretSelector,
   ToggleSelector,
 } from "../../../modules/play2/components/RaceSettings";
 import {
@@ -50,7 +49,6 @@ export const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
             checked={isPublicRaceByDefault}
             toggleEnabled={toggleDefaultRaceIsPublic}
           />
-          <CaretSelector />
         </Modal>
       </Overlay>
     </>
