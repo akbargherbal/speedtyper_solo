@@ -2,7 +2,7 @@
 
 **Duration:** 3-4 weeks  
 **Risk Level:** 🟢 Low  
-**Rollback Target:** v1.3.0
+**Rollback Target:** v1.3.1
 
 ---
 
@@ -21,7 +21,7 @@
 
 **Dependencies:**
 
-- Builds on: v1.3.0 (current stable baseline)
+- Builds on: v1.3.1 (current stable baseline)
 - Enables: v1.5.0 (skip ranges need persistent user identity)
 
 ---
@@ -36,7 +36,7 @@
 # 1. Verify current state
 cd ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo
 git status
-git tag v1.3.0  # Tag current state as rollback point
+git tag v1.3.1  # Tag current state as rollback point
 
 # 2. Check database health
 cd packages/back-nest
@@ -50,7 +50,7 @@ npm run dev
 
 ### Success Criteria
 
-- ✅ v1.3.0 tagged in git
+- ✅ v1.3.1 tagged in git
 - ✅ Database queries return data
 - ✅ App starts and typing works
 
@@ -1318,8 +1318,8 @@ git push origin v1.4.0
 # Backup current database (has v1.4.0 data)
 cp packages/back-nest/speedtyper-local.db packages/back-nest/speedtyper-local.db.v1.4.0
 
-# Rollback to v1.3.0
-git checkout v1.3.0
+# Rollback to v1.3.1
+git checkout v1.3.1
 npm install
 npm run dev
 
@@ -1340,7 +1340,7 @@ npm run dev
 
 **Success Criteria:**
 
-- [ ] v1.3.0 rollback works (typing functional)
+- [ ] v1.3.1 rollback works (typing functional)
 - [ ] v1.4.0 restoration successful
 - [ ] No data loss during rollback/restore
 
@@ -1385,7 +1385,7 @@ If critical issues discovered:
 Ctrl+C
 
 # Rollback code
-git checkout v1.3.0
+git checkout v1.3.1
 npm install
 npm run dev
 
