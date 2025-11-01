@@ -3,7 +3,7 @@
 **Version:** 1.3.0 → 1.6.0 (Active Development)  
 **Last Updated:** November 1, 2025  
 **Purpose:** Quick reference for LLM collaboration sessions  
-**Token Budget:** ~3,000 tokens (replaces 22,000 token documentation set)
+**Token Budget:** 
 
 ---
 
