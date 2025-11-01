@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useNodeRect } from "../hooks/useNodeRect";
 import { useCodeStore } from "../state/code-store";
 import { useSettingsStore } from "../state/settings-store";
+import { useState, useEffect } from "react";
 import {
   useBlinkingCursorAnimation,
   OFF_WHITE_COLOR as GRAY_COLOR,
@@ -26,9 +27,15 @@ export function NextChar({ focused }: NextCharProps) {
     runBlinkingCursorAnimation
   );
 
+  // Fix hydration error by only rendering SmoothCaret on client
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <>
-      {focused && useSmoothCaret && typeof window !== "undefined" && (
+      {focused && useSmoothCaret && isClient && (
         <SmoothCaret top={top} left={left} />
       )}
       <AnimatePresence>
@@ -37,6 +44,9 @@ export function NextChar({ focused }: NextCharProps) {
           data-active="true"
           animate={controls}
           className="rounded-sm pb-1 pt-2"
+          style={{
+            transition: useSmoothCaret ? 'none' : 'all 0.075s linear',
+          }}
           transition={{
             duration: 1,
             repeat: Infinity,
