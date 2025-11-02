@@ -2,11 +2,26 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import NextNProgress from "nextjs-progressbar";
+import { useEffect } from "react";
 import { Layout } from "../common/components/Layout";
 import { Stream } from "../components/Stream";
+import { closeModals } from "../modules/play2/state/settings-store";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const title = "SpeedTyper Solo | Typing practice for programmers";
+
+  // Global ESC key handler to close all modals
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeModals();
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, []);
+
   return (
     <>
       <div
@@ -53,5 +68,4 @@ function MyApp({ Component, pageProps }: AppProps) {
     </>
   );
 }
-
 export default MyApp;

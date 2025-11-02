@@ -13,6 +13,7 @@ export interface SettingsState {
   profileModalIsOpen: boolean;
   projectModalIsOpen: boolean;
   publicRacesModalIsOpen: boolean;
+  infoModalIsOpen: boolean;
   languageSelected: LanguageDTO | null;
   syntaxHighlighting: boolean;
   raceIsPublic: boolean;
@@ -76,6 +77,7 @@ export const useSettingsStore = create<SettingsState>((_set, _get) => ({
   profileModalIsOpen: false,
   publicRacesModalIsOpen: false,
   projectModalIsOpen: false,
+  infoModalIsOpen: false,
   syntaxHighlighting: getInitialToggleStateFromLocalStorage(
     SYNTAX_HIGHLIGHTING_KEY,
     false,
@@ -144,6 +146,13 @@ export const openLanguageModal = () => {
   }));
 };
 
+export const openInfoModal = () => {
+  useSettingsStore.setState((s) => ({
+    ...s,
+    infoModalIsOpen: true,
+  }));
+};
+
 export const openProfileModal = () => {
   useSettingsStore.setState((s) => ({
     ...s,
@@ -191,6 +200,7 @@ export const closeModals = () => {
     publicRacesModalIsOpen: false,
     languageModalIsOpen: false,
     projectModalIsOpen: false,
+    infoModalIsOpen: false,
   }));
 };
 

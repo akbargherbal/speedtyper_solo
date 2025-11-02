@@ -11,6 +11,8 @@ import { useIsPlaying } from "../hooks/useIsPlaying";
 import Button from "./Button";
 import { NewGithubLoginModal } from "./modals/GithubLoginModal";
 import { SettingsModal } from "./modals/SettingsModal";
+import { InfoModal } from "./modals/InfoModal";
+import { openInfoModal, useSettingsStore } from "../../modules/play2/state/settings-store";
 
 export const navbarFactory = () => {
   return NewNavbar;
@@ -124,6 +126,8 @@ const ProfileSection = () => {
 
 export const NewNavbar = () => {
   const isPlaying = useIsPlaying();
+  const infoModalOpen = useSettingsStore((s) => s.infoModalIsOpen);
+
   return (
     <header
       className="mt-2 h-10 tracking-tighter"
@@ -136,14 +140,12 @@ export const NewNavbar = () => {
           <HomeLink />
           {!isPlaying && (
             <div className="flex gap-2">
-              <Link href="/">
-                <Button
-                  size="sm"
-                  color="invisible"
-                  onClick={() => useGameStore.getState().game?.play()}
-                  leftIcon={<TerminalIcon />}
-                />
-              </Link>
+              <Button
+                size="sm"
+                color="invisible"
+                onClick={openInfoModal}
+                leftIcon={<TerminalIcon />}
+              />
               <Link href="/dashboard">
                 <Button
                   size="sm"
@@ -157,6 +159,9 @@ export const NewNavbar = () => {
           <ProfileSection />
         </div>
       </div>
+      
+      {/* Info Modal */}
+      {infoModalOpen && <InfoModal closeModal={() => {}} />}
     </header>
   );
 };
