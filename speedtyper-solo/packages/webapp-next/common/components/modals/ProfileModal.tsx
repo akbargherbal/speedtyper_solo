@@ -15,13 +15,19 @@ export function ProfileModal({ closeModal }: ProfileModalProps) {
     <Overlay onOverlayClick={closeModal}>
       <div className="text-dark-ocean bg-off-white p-5 rounded">
         <div className="flex items-center">
-          <Image
-            className="rounded-full"
-            width="50"
-            height="50"
-            src={user.avatarUrl}
-            alt=""
-          />
+          {user.avatarUrl ? (
+            <Image
+              className="rounded-full"
+              width="50"
+              height="50"
+              src={user.avatarUrl}
+              alt={user.username}
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-white font-bold text-xl">
+              {user.username.charAt(0).toUpperCase()}
+            </div>
+          )}
           <span className="ml-4 text-lg tracking-wider">{user.username}</span>
         </div>
         <button
