@@ -1,14 +1,13 @@
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { TerminalIcon } from "../../assets/icons/TerminalIcon";
-import { Logo, WebsiteName } from "../../components/Navbar";
+import { Logo } from "../../components/Navbar";
 import { useGameStore } from "../../modules/play2/state/game-store";
 import {
   useConnectionStore,
   ConnectionStatus as ConnectionStatusType,
 } from "../../modules/play2/state/connection-store";
 import { useIsPlaying } from "../hooks/useIsPlaying";
-import { PlayingNow } from "./BattleMatcher";
 import Button from "./Button";
 import { NewGithubLoginModal } from "./modals/GithubLoginModal";
 import { SettingsModal } from "./modals/SettingsModal";
@@ -20,11 +19,13 @@ export const navbarFactory = () => {
 const HomeLink = () => {
   return (
     <Link href="/">
-      <span className="flex items-center cursor-pointer trailing-widest leading-normal text-xl  pl-2 text-off-white hover:text-white mr-2 lg:mr-6">
+      <span className="flex items-center cursor-pointer trailing-widest leading-normal text-xl pl-2 text-off-white hover:text-white mr-2 lg:mr-6">
         <div className="flex items-center mr-4 mb-1">
           <Logo />
         </div>
-        <WebsiteName />
+        <h2 className="hidden sm:block whitespace-no-wrap font-bold text-inherit">
+          SpeedTyper Solo
+        </h2>
       </span>
     </Link>
   );
@@ -151,7 +152,6 @@ export const NewNavbar = () => {
                 />
               </Link>
               <SettingsModal />
-              <PlayingNow />
             </div>
           )}
           <ProfileSection />
