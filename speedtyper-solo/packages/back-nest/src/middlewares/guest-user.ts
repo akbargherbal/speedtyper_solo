@@ -7,12 +7,13 @@ export class GuestUserMiddleware implements NestMiddleware {
   constructor(private localUserService: LocalUserService) {}
 
   async use(req: Request, _: Response, next: NextFunction) {
-    if (req.session && !req.session?.user) {
-      // Assign the full local user object to the session
+    if (req.session) {
+      // CRITICAL FIX: ALWAYS assign local user, don't check if user exists
+      // This overwrites any old ghost users from previous sessions
       const localUser = await this.localUserService.getLocalUser();
       req.session.user = localUser;
-      req.session.user.isAnonymous = false; // Override to ensure results save
-      console.log('[GuestUserMiddleware] ✅ Assigned LOCAL_SUPER_USER to session');
+      req.session.user.isAnonymous = false;
+      console.log('[GuestUserMiddleware] ✅ Assigned LOCAL_SUPER_USER to session:', localUser.id, localUser.username);
     }
     next();
   }
