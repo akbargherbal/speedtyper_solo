@@ -1,4 +1,4 @@
-# Speedtyper Local
+# SpeedTyper Solo
 
 > A local-first typing practice tool for developers. Type your own code, track your progress, improve your speed.
 
@@ -12,8 +12,8 @@
 ### 1. Install
 
 ```bash
-git clone <your-repo-url> speedtyper-local
-cd speedtyper-local
+git clone <your-repo-url> speedtyper-solo
+cd speedtyper-solo
 npm install
 ```
 
@@ -110,7 +110,7 @@ If on Windows, create `C:\Users\<YourName>\scripts\speedtyper.bat`:
 
 ```batch
 @echo off
-wsl bash -c "cd ~/path/to/speedtyper-local && npm run dev"
+wsl bash -c "cd ~/path/to/speedtyper-solo && npm run dev"
 ```
 
 Add `C:\Users\<YourName>\scripts\` to your PATH.
@@ -164,7 +164,7 @@ sqlite> .exit
 - **SQLite storage**: Single-file database, easy backup
 - **Auto-browser open**: Launches automatically on startup
 
-**Progress Tracking (NEW in v1.4.0):**
+**Progress Tracking:**
 
 - **Progress dashboard**: View your typing statistics at `/dashboard`
   - Average WPM and accuracy across all races
@@ -175,36 +175,48 @@ sqlite> .exit
   - No more ephemeral guest users
   - Consistent data across sessions
 
+**User Experience:**
+
+- **Keyboard shortcuts**: Tab (next snippet), Enter (continue), Alt+←/→ (change language), Esc (close modals)
+- **Keyboard shortcuts reference**: Click keyboard icon in navbar to view all shortcuts
+- **Connection indicator**: Visual WebSocket status in navbar
+- **Debug Mode**: Lock focus for screenshots and testing (toggle in settings)
+- **Enhanced error handling**: Clear feedback when no snippets available
+- **Clean UI**: Solo-focused, professional appearance
+- **Settings modal**: Clean, concise settings with actual toggles
+
 **Customization:**
 
 - **Configurable filters**: Customize snippet length, complexity via `parser.config.json`
-- **Smooth caret**: Toggle between block/smooth cursor
-- **Syntax highlighting**: Basic highlighting (toggle in settings)
-
-**User Experience:**
-
-- **Connection indicator**: Visual WebSocket status in navbar
-- **Enhanced import feedback**: Rich console output with statistics
-- **Snippet metadata**: See source file path during practice
-- **Clean UI**: Solo-focused, no multiplayer clutter
+- **Debug Mode toggle**: Control focus lock behavior
+- **Language cycling**: Quickly switch between languages with Alt+Arrow keys
 
 ### 🚧 Coming Soon (v1.5.0+)
 
 - **Smart skipping**: Automatically skip over comments and whitespace
-- **Keyboard shortcuts**: Ctrl+L (language), Ctrl+R (refresh), Enter (next)
 - **Advanced analytics**: More detailed performance insights
+- **Custom snippet collections**: Group snippets by project or topic
 
 ---
 
-## Settings
+## Keyboard Shortcuts
 
-Click ⚙️ (gear icon) in top-right corner:
+**New in v1.4.0!** Click the ⌨️ keyboard icon in the navbar to view all shortcuts.
 
-- **Language**: Filter snippets by programming language
-- **Smooth Caret**: Toggle cursor style (block vs smooth)
-- **Syntax Highlighting**: Enable/disable code colors
+### Typing
 
-Settings persist across sessions (localStorage).
+- **Tab** - Next snippet (new code to type)
+- **Enter** - Continue (from results page)
+
+### Language Selection
+
+- **Alt + ←** - Previous language
+- **Alt + →** - Next language
+
+### Interface
+
+- **Esc** - Close any open modal
+- **Click anywhere** - Focus typing area
 
 ---
 
@@ -225,6 +237,20 @@ Settings persist across sessions (localStorage).
 - Identify which languages need more practice
 - Review past performances
 - Set personal goals (e.g., reach 60 WPM average)
+
+---
+
+## Settings
+
+Click ⚙️ (gear icon) in top-right navbar:
+
+**Available Settings:**
+
+- **Debug Mode**: Lock focus for screenshots and testing (keeps typing area focused even when clicking outside)
+- **Language**: Select programming language on home page or use Alt+←/→ keys
+- **Syntax Highlighting**: Currently disabled for optimal cursor behavior
+
+Settings persist across sessions (localStorage).
 
 ---
 
@@ -252,7 +278,7 @@ Settings persist across sessions (localStorage).
 
 ### No Snippets Appear
 
-**Problem:** Practice page is empty or shows "No challenges"
+**Problem:** Practice page shows "No challenges available"
 
 **Solutions:**
 
@@ -265,6 +291,7 @@ Settings persist across sessions (localStorage).
    ```
    Should show number > 0
 4. Check file syntax: Tree-sitter may skip malformed code
+5. Try different language: Use Alt+←/→ to cycle through available languages
 
 ### Typing Input Not Working
 
@@ -276,16 +303,18 @@ Settings persist across sessions (localStorage).
 2. Refresh page (Ctrl+Shift+R)
 3. Check browser console for errors (F12 → Console)
 4. Restart app: Ctrl+C, then `npm run dev`
+5. If Debug Mode is on, try toggling it off in settings
 
 ### WebSocket Disconnects
 
-**Problem:** "Reconnecting..." message appears
+**Problem:** "Reconnecting..." or red indicator appears in navbar
 
 **Solutions:**
 
 1. Check backend is running (terminal should show logs)
 2. Verify port 1337 is accessible: `curl http://localhost:1337`
 3. Restart app
+4. Check for firewall/antivirus blocking localhost connections
 
 ### Import Fails with Parser Error
 
@@ -311,8 +340,18 @@ Settings persist across sessions (localStorage).
 3. Check database has results:
    ```bash
    cd packages/back-nest
-   sqlite3 speedtyper-local.db "SELECT COUNT(*) FROM results;"
+   sqlite3 speedtyper-local.db "SELECT COUNT(*) FROM result;"
    ```
+
+### Modal Won't Close
+
+**Problem:** Settings or other modal stuck open
+
+**Solutions:**
+
+1. Press **Esc** key (universal close shortcut)
+2. Click outside the modal
+3. Refresh page if modal is unresponsive
 
 ---
 
@@ -357,6 +396,7 @@ View results page or dashboard
 - **Communication**: Socket.IO (WebSockets)
 - **State**: Zustand (frontend state management)
 - **Charts**: Recharts (dashboard visualizations)
+- **Styling**: Tailwind CSS (utility-first styling)
 
 ---
 
@@ -364,7 +404,7 @@ View results page or dashboard
 
 ### Snippet Quality Filters
 
-**Filters are now configurable via `parser.config.json`!**
+**Filters are configurable via `parser.config.json`!**
 
 **Location:** `packages/back-nest/parser.config.json`
 
@@ -415,7 +455,7 @@ View results page or dashboard
 3. Re-import snippets:
 
 ```bash
-   npm run reimport
+npm run reimport
 ```
 
 4. Shorter, more focused snippets will be imported
@@ -508,7 +548,7 @@ npm run reimport  # Re-import snippets
 
 ### Q: Can I add more languages?
 
-**A:** Yes, if tree-sitter has a parser for it. See documentation for adding new languages.
+**A:** Yes, if tree-sitter has a parser for it. Check documentation for adding new languages.
 
 ### Q: How is WPM calculated?
 
@@ -525,7 +565,7 @@ Standard typing metric (5 chars = 1 word).
 **A:** Not yet (planned for future release). Current workaround:
 
 ```bash
-sqlite3 packages/back-nest/speedtyper-local.db ".dump results" > my-results.sql
+sqlite3 packages/back-nest/speedtyper-local.db ".dump result" > my-results.sql
 ```
 
 ### Q: How do I reset my progress?
@@ -539,46 +579,74 @@ npm run reimport
 
 This will delete all race results and statistics. Your code snippets will be re-imported.
 
+### Q: What are all the keyboard shortcuts?
+
+**A:** Click the ⌨️ keyboard icon in the navbar to see the complete list, or press Esc to close any modal.
+
+### Q: What is Debug Mode?
+
+**A:** A setting that locks focus to the typing area, useful for taking screenshots or testing. The typing area stays focused even when you click outside it. Toggle it in Settings (⚙️ icon).
+
 ---
 
 ## Project Status
 
 ### Current Milestone
 
-**v1.4.0** - Foundation Layer Complete
+**v1.4.0** - UI Cleanup and Polish Complete ✅
 
 **What works:**
 
 - ✅ Importing snippets
 - ✅ Typing with real-time feedback
 - ✅ Viewing results
-- ✅ Language selection
+- ✅ Language selection with keyboard shortcuts
 - ✅ Settings persistence
 - ✅ Progress tracking dashboard
 - ✅ Stable user identity
 - ✅ Performance analytics
+- ✅ Keyboard shortcuts documentation
+- ✅ Enhanced error handling
+- ✅ Professional UI with no multiplayer remnants
 
-**Next milestone:** v1.5.0 (smart skipping, keyboard shortcuts)
+**Next milestone:** v1.5.0 (smart skipping, advanced features)
 
 ### Stability
 
-This tool is **stable and ready for daily use**. The core typing workflow is solid, and progress tracking provides meaningful insights into your improvement.
+This tool is **stable and ready for daily use**. The core typing workflow is solid, progress tracking provides meaningful insights, and the UI is polished and professional.
 
 ---
 
 ## Version History
 
-### v1.4.0 (November 2025) - Foundation Layer
+### v1.4.0 (November 2, 2025) - UI Cleanup and Polish
+
+**UI/UX Improvements:**
+
+- ✅ **InfoModal**: Keyboard shortcuts reference accessible from navbar
+- ✅ **Global ESC handler**: Close any modal with Escape key
+- ✅ **Debug Mode toggle**: Added to Settings modal for user control
+- ✅ **Settings improvements**: Better typography, concise content
+- ✅ **Branding update**: "SpeedTyper Solo" identity
+- ✅ **Navbar cleanup**: Removed multiplayer elements (user count, public races)
+
+**Bug Fixes:**
+
+- ✅ Fixed avatar rendering crash (null avatarUrl handling)
+- ✅ Removed broken Settings toggles (syntax highlighting, public races)
+
+**Foundation Features:**
 
 - ✅ **Stable user identity**: All results consolidated under single persistent user
 - ✅ **Progress dashboard**: WPM trends, accuracy stats, language breakdown
 - ✅ **Recent race history**: Quick access to past performances
-- ✅ **Data migration**: Consolidated old guest users into local user
+- ✅ **Data migration**: Tool to consolidate old guest users
 
-### v1.3.x (November 2025) - Stability & Polish
+### v1.3.x (October-November 2025) - Stability & Polish
 
 - ✅ **Backend crash resilience**: Graceful error handling with user feedback
 - ✅ **Enhanced UI feedback**: Connection status, empty state messages
+- ✅ **Keyboard shortcuts**: Alt+Arrows (language), Tab (next snippet), Enter (continue)
 - ✅ **Bug fixes**: Results page race condition, default language handling
 
 ### v1.2.0 (October 2025) - Configuration & Metadata
@@ -603,12 +671,13 @@ This tool is **stable and ready for daily use**. The core typing workflow is sol
 
 1. **Quick start?** → This file (README.md)
 2. **Dashboard usage?** → Navigate to `/dashboard` in the app
-3. **Customizing filters?** → See "Customization" section above
+3. **Keyboard shortcuts?** → Click ⌨️ icon in navbar
+4. **Customizing filters?** → See "Customization" section above
 
 ### Reporting Issues
 
 1. Check troubleshooting section above
-2. Verify you're on the latest version
+2. Verify you're on the latest version: v1.4.0
 3. Include:
    - What you tried to do
    - What happened
@@ -648,8 +717,9 @@ Now that you're set up:
 1. **Add your code** to `snippets/`
 2. **Run `npm run reimport`**
 3. **Start typing** with `npm run dev`
-4. **Track progress** at `/dashboard`
-5. **Set goals** (e.g., reach 60 WPM, 95% accuracy)
-6. **Practice regularly** to see improvement over time
+4. **Learn shortcuts** - Click ⌨️ icon in navbar
+5. **Track progress** at `/dashboard`
+6. **Set goals** (e.g., reach 60 WPM, 95% accuracy)
+7. **Practice regularly** to see improvement over time
 
 **Happy typing! 🚀**
