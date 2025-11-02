@@ -2,7 +2,7 @@
 
 > A local-first typing practice tool for developers. Type your own code, track your progress, improve your speed.
 
-**Version:** 1.2.0  
+**Version:** 1.4.0  
 **Status:** ✅ Stable for daily use
 
 ---
@@ -97,6 +97,9 @@ npm run reimport
 # Continue practicing new snippets
 # (Refresh browser to see new code)
 
+# Check your progress
+# Navigate to Dashboard in the navbar
+
 # Evening: Stop app
 # Ctrl+C in terminal
 ```
@@ -150,29 +153,46 @@ sqlite> .exit
 
 ## Features
 
-### ✅ Current (v1.2.0)
+### ✅ Current (v1.4.0)
 
-- **Configurable filters**: Customize snippet length, complexity via `parser.config.json`
+**Core Features:**
+
 - **Local snippets**: Practice your own code
 - **Tree-sitter parsing**: Smart extraction of functions/classes
 - **Real-time metrics**: WPM, accuracy, completion time
 - **Language selection**: Filter by Python, TypeScript, JavaScript, etc.
-- **Connection indicator**: Visual WebSocket status in navbar
-- **Enhanced import feedback**: Rich console output with statistics
-- **Snippet metadata**: See source file path during practice
-- **Smooth caret**: Toggle between block/smooth cursor
-- **Syntax highlighting**: Basic highlighting (toggle in settings)
-- **Clean UI**: Solo-focused, no multiplayer clutter
 - **SQLite storage**: Single-file database, easy backup
 - **Auto-browser open**: Launches automatically on startup
 
-### 🚧 Coming Soon (v1.3.0)
+**Progress Tracking (NEW in v1.4.0):**
 
+- **Progress dashboard**: View your typing statistics at `/dashboard`
+  - Average WPM and accuracy across all races
+  - Performance trends over time (visual charts)
+  - Language-specific breakdown (races, WPM, accuracy per language)
+  - Recent race history with quick access to results
+- **Stable user identity**: All your results tracked under one persistent user
+  - No more ephemeral guest users
+  - Consistent data across sessions
+
+**Customization:**
+
+- **Configurable filters**: Customize snippet length, complexity via `parser.config.json`
+- **Smooth caret**: Toggle between block/smooth cursor
+- **Syntax highlighting**: Basic highlighting (toggle in settings)
+
+**User Experience:**
+
+- **Connection indicator**: Visual WebSocket status in navbar
+- **Enhanced import feedback**: Rich console output with statistics
+- **Snippet metadata**: See source file path during practice
+- **Clean UI**: Solo-focused, no multiplayer clutter
+
+### 🚧 Coming Soon (v1.5.0+)
+
+- **Smart skipping**: Automatically skip over comments and whitespace
 - **Keyboard shortcuts**: Ctrl+L (language), Ctrl+R (refresh), Enter (next)
-- **Progress dashboard**: WPM trends, accuracy over time
-- **Smart snippets**: Skip comments, focus on logic
-
-See [`docs/FEATURES.md`](docs/FEATURES.md) for full roadmap.
+- **Advanced analytics**: More detailed performance insights
 
 ---
 
@@ -185,6 +205,26 @@ Click ⚙️ (gear icon) in top-right corner:
 - **Syntax Highlighting**: Enable/disable code colors
 
 Settings persist across sessions (localStorage).
+
+---
+
+## Dashboard
+
+**New in v1.4.0!** Access your progress dashboard by clicking the 📊 Dashboard icon in the navbar or navigating to `/dashboard`.
+
+**What you'll see:**
+
+- **Stats Cards**: Average WPM, accuracy, total races, favorite language
+- **Trends Chart**: WPM and accuracy over time (last 30 days)
+- **Language Breakdown**: Performance statistics by programming language
+- **Recent History**: Your most recent typing races (clickable to view details)
+
+**Use cases:**
+
+- Track improvement over time
+- Identify which languages need more practice
+- Review past performances
+- Set personal goals (e.g., reach 60 WPM average)
 
 ---
 
@@ -260,6 +300,20 @@ Settings persist across sessions (localStorage).
 3. Simplify complex files (tree-sitter has limits)
 4. Check error messages for specific files, fix or remove them
 
+### Dashboard Shows No Data
+
+**Problem:** Dashboard displays "No races completed yet"
+
+**Solutions:**
+
+1. Complete at least one typing race first
+2. Refresh the dashboard page
+3. Check database has results:
+   ```bash
+   cd packages/back-nest
+   sqlite3 speedtyper-local.db "SELECT COUNT(*) FROM results;"
+   ```
+
 ---
 
 ## How It Works
@@ -290,6 +344,8 @@ Frontend updates display
 (Repeat until complete)
     ↓
 Results saved to database
+    ↓
+View results page or dashboard
 ```
 
 ### The Tech Stack
@@ -300,8 +356,7 @@ Results saved to database
 - **Parsing**: Tree-sitter (AST-based code analysis)
 - **Communication**: Socket.IO (WebSockets)
 - **State**: Zustand (frontend state management)
-
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for deep dive.
+- **Charts**: Recharts (dashboard visualizations)
 
 ---
 
@@ -309,7 +364,7 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for deep dive.
 
 ### Snippet Quality Filters
 
-**New in v1.2.0:** Filters are now configurable via `parser.config.json`!
+**Filters are now configurable via `parser.config.json`!**
 
 **Location:** `packages/back-nest/parser.config.json`
 
@@ -453,7 +508,7 @@ npm run reimport  # Re-import snippets
 
 ### Q: Can I add more languages?
 
-**A:** Yes, if tree-sitter has a parser for it. See [`docs/ARCHITECTURE.md#adding-a-new-language`](docs/ARCHITECTURE.md).
+**A:** Yes, if tree-sitter has a parser for it. See documentation for adding new languages.
 
 ### Q: How is WPM calculated?
 
@@ -467,11 +522,22 @@ Standard typing metric (5 chars = 1 word).
 
 ### Q: Can I export my results?
 
-**A:** Not yet (planned for v1.3.0). Current workaround:
+**A:** Not yet (planned for future release). Current workaround:
 
 ```bash
-sqlite3 packages/back-nest/speedtyper-local.db ".dump result" > my-results.sql
+sqlite3 packages/back-nest/speedtyper-local.db ".dump results" > my-results.sql
 ```
+
+### Q: How do I reset my progress?
+
+**A:** To start fresh with a clean database:
+
+```bash
+npm run reset
+npm run reimport
+```
+
+This will delete all race results and statistics. Your code snippets will be re-imported.
 
 ---
 
@@ -479,7 +545,7 @@ sqlite3 packages/back-nest/speedtyper-local.db ".dump result" > my-results.sql
 
 ### Current Milestone
 
-**v1.1.0** - Stable for daily use
+**v1.4.0** - Foundation Layer Complete
 
 **What works:**
 
@@ -488,20 +554,46 @@ sqlite3 packages/back-nest/speedtyper-local.db ".dump result" > my-results.sql
 - ✅ Viewing results
 - ✅ Language selection
 - ✅ Settings persistence
+- ✅ Progress tracking dashboard
+- ✅ Stable user identity
+- ✅ Performance analytics
 
-**Known limitations:**
-
-- No progress tracking (results stored but not visualized)
-- No keyboard shortcuts (mouse required for some actions)
-- No snippet metadata (don't know which file you're typing)
-
-**Next milestone:** v1.2.0 (keyboard shortcuts, better UX)
+**Next milestone:** v1.5.0 (smart skipping, keyboard shortcuts)
 
 ### Stability
 
-This tool is **stable enough for daily use**. The core typing workflow is solid.
+This tool is **stable and ready for daily use**. The core typing workflow is solid, and progress tracking provides meaningful insights into your improvement.
 
-Edge cases and advanced features are still being refined.
+---
+
+## Version History
+
+### v1.4.0 (November 2025) - Foundation Layer
+
+- ✅ **Stable user identity**: All results consolidated under single persistent user
+- ✅ **Progress dashboard**: WPM trends, accuracy stats, language breakdown
+- ✅ **Recent race history**: Quick access to past performances
+- ✅ **Data migration**: Consolidated old guest users into local user
+
+### v1.3.x (November 2025) - Stability & Polish
+
+- ✅ **Backend crash resilience**: Graceful error handling with user feedback
+- ✅ **Enhanced UI feedback**: Connection status, empty state messages
+- ✅ **Bug fixes**: Results page race condition, default language handling
+
+### v1.2.0 (October 2025) - Configuration & Metadata
+
+- ✅ **Configurable filters**: `parser.config.json` for snippet quality
+- ✅ **Snippet metadata**: Display source file path
+- ✅ **Critical bug fixes**: Results page, default language
+
+### v1.1.0 (October 2025) - Core Transformation
+
+- ✅ **SQLite migration**: Replaced PostgreSQL
+- ✅ **One-command startup**: `npm run dev`
+- ✅ **Local snippet import**: Practice your own code
+- ✅ **Guest-only auth**: Removed GitHub OAuth
+- ✅ **Solo mode**: Stubbed multiplayer, preserved typing engine
 
 ---
 
@@ -509,16 +601,15 @@ Edge cases and advanced features are still being refined.
 
 ### Documentation
 
-1. **Quick start?** → This file (README-LOCAL.md)
-2. **How it works?** → [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
-3. **What's next?** → [`docs/FEATURES.md`](docs/FEATURES.md)
-4. **Philosophy?** → [`docs/PROJECT_OVERVIEW.md`](docs/PROJECT_OVERVIEW.md)
+1. **Quick start?** → This file (README.md)
+2. **Dashboard usage?** → Navigate to `/dashboard` in the app
+3. **Customizing filters?** → See "Customization" section above
 
 ### Reporting Issues
 
 1. Check troubleshooting section above
-2. Search existing issues (if using Git)
-3. Open new issue with:
+2. Verify you're on the latest version
+3. Include:
    - What you tried to do
    - What happened
    - Error messages (console logs)
@@ -544,7 +635,7 @@ This is a personal fork optimized for solo use.
 
 **Original project:** [speedtyper.dev](https://speedtyper.dev) by [@codicocodes](https://github.com/codicocodes)
 
-**This fork:** Transformed for local, solo practice by [your username]
+**This fork:** Transformed for local, solo practice
 
 **License:** [Same as upstream - see LICENSE file]
 
@@ -557,7 +648,8 @@ Now that you're set up:
 1. **Add your code** to `snippets/`
 2. **Run `npm run reimport`**
 3. **Start typing** with `npm run dev`
-4. **Check roadmap** in [`docs/FEATURES.md`](docs/FEATURES.md)
-5. **Read architecture** if you want to modify code: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+4. **Track progress** at `/dashboard`
+5. **Set goals** (e.g., reach 60 WPM, 95% accuracy)
+6. **Practice regularly** to see improvement over time
 
 **Happy typing! 🚀**

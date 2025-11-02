@@ -66,13 +66,19 @@ function ResultPage() {
             >
               <div className="w-full flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Image
-                    alt={`${data.user.username} profile picture`}
-                    className="rounded-full"
-                    width={50}
-                    height={50}
-                    src={data.user.avatarUrl}
-                  />
+                  {data.user.avatarUrl ? (
+                    <Image
+                      alt={`${data.user.username} profile picture`}
+                      className="rounded-full"
+                      width={50}
+                      height={50}
+                      src={data.user.avatarUrl}
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-white font-bold">
+                      {data.user.username.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   <h1 className="text-lg font-semibold">
                     {data.user.username}
                   </h1>
