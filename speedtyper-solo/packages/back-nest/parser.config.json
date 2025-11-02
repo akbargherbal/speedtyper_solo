@@ -4,9 +4,9 @@
   "version": "1.2.0",
   "filters": {
     "minNodeLength": 100,
-    "maxNodeLength": 600,
-    "maxNumLines": 20,
-    "maxLineLength": 100
+    "maxNodeLength": 3000,
+    "maxNumLines": 30,
+    "maxLineLength": 200
   },
   "parsing": {
     "removeComments": true,
