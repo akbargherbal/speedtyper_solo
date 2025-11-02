@@ -1,7 +1,7 @@
 # Speedtyper Local - Feature Roadmap
 
-**Version:** 1.2.0
-**Last Updated:** October 31, 2025
+**Version:** 1.4.0
+**Last Updated:** November 2, 2025
 **Status:** Living Document
 
 ---
@@ -18,175 +18,230 @@ Features are organized by:
 
 ---
 
-## ✅ Completed Features (v1.0.0 → v1.2.0)
+## ✅ Completed Features (v1.0.0 → v1.4.0)
 
-### v1.2.0 (Stability & Polish)
+### v1.4.0 (UI Polish & Foundation) - November 2, 2025
 
-- ✅ **Snippet Metadata Display** - The results page now shows the origin file of the snippet (e.g., "From: javascript/gm_01_013_01_string-methods.js"), providing better context.
-- ✅ **Configurable Snippet Filters** - The backend parser now correctly loads and applies snippet quality filters from `packages/back-nest/parser.config.json` on startup.
-- ✅ **Critical Bug Fixes:**
-  - **Fixed Results Page Race Condition:** Added automatic retry logic to the results page data fetching. This prevents intermittent blank stats pages by giving the backend a few extra moments to save the result to the database before the frontend requests it.
-  - **Robust Default Language:** The frontend now defaults to JavaScript if no language is selected in local storage. This prevents crashes on fresh installs or after clearing browser data when the previously selected language (e.g., Python) has no available snippets.
+**Theme:** Professional UI, Foundation for Smart Features
 
-### v1.1.0 (Core Transformation)
+- ✅ **InfoModal with Keyboard Shortcuts** - Added comprehensive keyboard shortcuts documentation accessible via keyboard icon in navbar
+- ✅ **Global ESC Key Handler** - Universal ESC key now closes all modals (Settings, Profile, Info, Language) for consistent UX
+- ✅ **Debug Mode Toggle in Settings** - Users can now enable/disable Debug Mode via Settings modal (previously code-only toggle)
+- ✅ **Settings Modal Improvements** - Better typography, concise content, dark theme integration, removed broken toggles
+- ✅ **UI Cleanup Phase 2** - Removed multiplayer UI remnants (user count, public races modal), updated branding to "SpeedTyper Solo"
+- ✅ **Avatar Rendering Fix** - Fixed critical crash when ProfileModal displayed users with null avatarUrl
 
-- ✅ **SQLite Migration** - Replaced PostgreSQL with single-file database.
-- ✅ **One-Command Startup** - `npm run dev` starts everything.
-- ✅ **Local Snippet Import** - Practice your own code from `snippets/` folder.
-- ✅ **Guest-Only Auth** - Removed GitHub OAuth friction.
-- ✅ **Solo Mode** - Stubbed multiplayer broadcasting, preserved typing engine.
-- ✅ **Browser Auto-Open** - App opens automatically at `localhost:3001`.
-- ✅ **UI Cleanup** - Removed leaderboard, fake stats, and multiplayer UI.
+**Files Modified:**
+- `packages/webapp-next/common/components/modals/InfoModal.tsx` (new)
+- `packages/webapp-next/common/components/NewNavbar.tsx`
+- `packages/webapp-next/modules/play2/state/settings-store.ts`
+- `packages/webapp-next/pages/_app.tsx`
+- `packages/webapp-next/common/components/overlays/SettingsOverlay.tsx`
 
----
+**Implementation Time:** ~3 hours across Sessions 36-37
 
-## 🚧 Tier 1: High Priority (Release 1.3.0)
+**Risk:** 🟢 Low (UI-only changes, no core functionality affected)
 
-**Theme:** Stability and Keyboard-Centric Workflow
+### v1.3.0 (Stability & Error Handling) - October 31, 2025
 
-### 1. Backend Crash Resilience ✅
+**Theme:** Crash Resilience and User Feedback
 
-**Status:** **COMPLETED** (Session 24 - October 31, 2025)
-
-**What It Was:**
-Backend would log errors when no challenges existed for a language, but the frontend would show a blank screen with no user feedback.
-
-**What We Fixed:**
-- Added `listenForRaceError()` method to `Game.ts`
-- Frontend now displays user-friendly alert when backend emits `race_error` event
-- Alert includes actionable guidance: "Add code to snippets/ folder and run 'npm run reimport'"
-- Connection state properly updated so user can recover by changing language
+- ✅ **Backend Crash Resilience** - Added `race_error` WebSocket event when no challenges available for selected language
+- ✅ **Frontend Error Display** - User-friendly alerts with actionable guidance ("Add code to snippets/ folder")
+- ✅ **Connection State Recovery** - Proper state cleanup allowing users to recover by changing language
+- ✅ **Working Keyboard Shortcuts** - Tab (next snippet), Enter (continue), Alt+← (prev language), Alt+→ (next language)
 
 **Files Modified:**
 - `packages/webapp-next/modules/play2/services/Game.ts`
+- `packages/back-nest/src/races/race.gateway.ts`
+- `packages/webapp-next/pages/index.tsx`
 
-**Implementation Time:** 15 minutes
+**Implementation Time:** ~1 hour (Session 24)
 
 **Risk:** 🟢 Low (Additive change, no breaking modifications)
 
-### 2. Configurable Keyboard Shortcuts ⚠️
+### v1.2.0 (Stability & Polish) - October 30, 2025
 
-**Status:** Planned (Medium Effort)
+- ✅ **Snippet Metadata Display** - Results page shows origin file (e.g., "From: javascript/gm_01_013_01_string-methods.js")
+- ✅ **Configurable Snippet Filters** - Backend parser loads quality filters from `parser.config.json`
+- ✅ **Critical Bug Fixes:**
+  - Fixed Results Page Race Condition (automatic retry logic)
+  - Robust Default Language (prevents crashes on fresh installs)
+
+### v1.1.0 (Core Transformation) - October 2025
+
+- ✅ **SQLite Migration** - Replaced PostgreSQL with single-file database
+- ✅ **One-Command Startup** - `npm run dev` starts everything
+- ✅ **Local Snippet Import** - Practice your own code from `snippets/` folder
+- ✅ **Guest-Only Auth** - Removed GitHub OAuth friction
+- ✅ **Solo Mode** - Stubbed multiplayer broadcasting, preserved typing engine
+- ✅ **Browser Auto-Open** - App opens automatically at `localhost:3001`
+- ✅ **UI Cleanup Phase 1** - Removed leaderboard, fake stats, and initial multiplayer UI
+
+---
+
+## 🚧 In Progress (v1.5.0 - Next Release)
+
+**Target:** Mid-November 2025  
+**Theme:** Smart Skipping Foundation
+
+### Feature 3.3A: Character-Based Skip Ranges
+
+**Status:** Planned (High Priority)
 
 **What It Is:**
-A system allowing keyboard-centric control of the entire workflow, with user-configurable shortcuts via settings modal.
+Automatically skip leading whitespace and indentation during typing, allowing users to focus on actual code logic rather than spacing.
 
-**Proposed Default Shortcuts:**
+**Implementation Plan:**
 
-- `Enter` - Start next race after completion
-- `Ctrl + L` - Focus language selector
-- `Ctrl + R` - Refresh snippet (get new one)
-- `Escape` - Return to home/reset race
+1. **Backend Skip Range Calculation** (Day 1-2)
+   - Add `skipRanges: [number, number][]` to Challenge entity
+   - Calculate ranges during snippet import (character-based: spaces/tabs)
+   - Store in database for fast retrieval
+
+2. **Backend Skip Configuration** (Day 2-3)
+   - Create `skip-config.json` for skip rules
+   - SkipConfigService to manage rules
+   - Integration with existing keystroke validator
+
+3. **Frontend Cursor Auto-Advancement** (Day 3-4)
+   - Auto-advance cursor over skipped ranges on keypress
+   - Visual indicator of skipped ranges (optional)
+   - Settings toggle to enable/disable feature
+
+4. **User Preferences** (Day 4-5)
+   - Use LocalUserService for userId (requires Feature 3.1)
+   - Store skip preferences per user
+   - Dashboard integration (skip statistics)
 
 **Why It's Important:**
-Reduces friction for power users who prefer keyboard-only workflows.
+Reduces tedious typing of repetitive whitespace, focuses practice on meaningful code patterns.
 
-**Implementation Complexity (Medium Effort, 4-6 hours):**
+**Technical Constraints:**
+- Must maintain <25ms keystroke latency
+- Backend remains source of truth for validation
+- Feature toggle required (users can disable)
 
-- **Frontend:** Rewrite `useKeyMap.ts` to support modifier keys, create a keybinding service, and add a configuration UI in `SettingsModal.tsx`.
+**Risk:** 🟡 Medium (Touches validation system, requires extensive testing)
 
-**Risk:** 🟡 Medium
+**Estimated Effort:** 2-3 weeks
 
-- Current `useKeyMap` is tightly coupled to typing input. Must ensure shortcuts don't conflict with typing characters.
+**Dependencies:** Requires Feature 3.1 (Stable User Identity) - see v1.4.0-feature-3.1-complete tag
 
 ---
 
-### 3. Enhanced User Feedback
+## 📋 Planned Features (v1.5.1+)
 
-**Status:** Proposed (Low Effort)
+### Feature 3.3B: AST-Based Skip Ranges (v1.5.1)
+
+**Status:** Architecture Verified, Implementation Deferred
 
 **What It Is:**
-Improve UI feedback for key application states.
+Extend skip ranges to include comments and docstrings using Tree-sitter AST parsing.
 
-**Proposed Changes (2-3 hours total):**
+**Why Deferred:**
+- Requires Feature 3.3A to be stable first
+- More complex than character-based skipping
+- AST parsing adds latency risk
 
-1. **Connection Status Indicator:** Add a visual indicator in the navbar ("Connected" / "Reconnecting...") using the existing `connection-store.ts`.
-2. **Empty Database State:** If no challenges exist for a selected language, show a helpful message: "No snippets found for [Language]. Add code to `snippets/` and run `npm run reimport`."
+**Risk:** 🟡 Medium (AST parsing complexity)
 
-**Risk:** 🟢 Low (Cosmetic changes).
+**Estimated Effort:** 2-3 weeks (after v1.5.0 stable)
 
 ---
 
-## 🔮 Tier 2: Medium Priority (Release 1.4.0)
+### Feature 3.4: Syntax Highlighting (v1.6.0 - OPTIONAL)
 
-**Theme:** Data and Insights
-
-### 4. User Progress Tracking Dashboard ⚠️
-
-**Status:** Needs Architecture Review (High Effort)
+**Status:** Requires User Validation First ⚠️
 
 **What It Is:**
-A dashboard showing WPM trends over time, accuracy improvements, and language-specific stats.
+Pre-tokenized syntax highlighting using Tree-sitter, with token-based rendering system.
 
-**Architectural Concerns:**
-Requires a decision between a simple **Persistent Guest ID** (via localStorage) or a more robust **Local User Profile** system. The former is recommended to start.
+**Why Optional:**
+- Very high complexity (fundamental rewrite of `CodeArea.tsx`)
+- Significant performance risk
+- Purely visual enhancement (doesn't improve practice)
 
-**Risk:** 🟡 Medium (Data persistence risk with localStorage; backend aggregation queries need optimization).
+**Risk:** 🔴 VERY HIGH
 
----
+**Decision Point:**
+- Must pass Phase 0 validation (user feedback + performance benchmarks)
+- Can skip entirely if validation fails
+- Not critical for core functionality
 
-### 5. Smart Snippets (Visible but Skippable Comments) 🔍
-
-**Status:** Architecture Verified, Implementation Planned (High Effort)
-
-**What It Is:**
-Display code comments visually but automatically skip over them during typing, focusing practice on logic.
-
-**Risk:** 🔴 HIGH
-
-- Core typing engine modification. Cursor jump logic is complex. Breaking changes to payload contract.
-- **Decision:** Defer until core stability and QoL features are complete. Implement behind a feature flag.
-
----
-
-## 🌟 Tier 3: Low Priority / Future Exploration
-
-(Sections below are preserved from the original document with no changes)
-
-### 6. Language-Aware Syntax Highlighting ⚠️
-
-**Status:** High Risk, High Reward (Very High Effort)
-**Risk:** 🔴 VERY HIGH - Fundamental rewrite of `CodeArea.tsx`.
-
-### 7. Custom Snippet Collections
-
-**Status:** Brainstorming (Medium Effort)
-
-### 8. Import from GitHub Gist / Pastebin
-
-**Status:** Idea (Low-Medium Effort)
-
-### 9. Export Progress / Backup
-
-**Status:** Proposed (Low Effort)
+**Estimated Effort:** 4-6 weeks (if pursued)
 
 ---
 
 ## 📊 Feature Priority Matrix
 
-| Feature                  | Impact    | Effort        | Risk          | Priority  |
-| ------------------------ | --------- | ------------- | ------------- | --------- |
-| Backend Crash Resilience | High      | Low           | Low           | Tier 1 ✅ |
-| Keyboard Shortcuts       | High      | Medium        | Medium        | Tier 1 🟡 |
-| Enhanced User Feedback   | Medium    | Low           | Low           | Tier 1 ✅ |
-| Progress Dashboard       | High      | High          | Medium        | Tier 2 🟡 |
-| Smart Snippets           | Very High | High          | **High**      | Tier 2 🔴 |
-| Syntax Highlighting      | Very High | **Very High** | **Very High** | Tier 3 🔴 |
-| Custom Collections       | Medium    | Medium        | Medium        | Tier 3 🟡 |
+| Feature                        | Impact    | Effort        | Risk          | Status       |
+| ------------------------------ | --------- | ------------- | ------------- | ------------ |
+| Backend Crash Resilience       | High      | Low           | Low           | ✅ v1.3.0    |
+| Keyboard Shortcuts             | High      | Low           | Low           | ✅ v1.3.0    |
+| Enhanced User Feedback         | Medium    | Low           | Low           | ✅ v1.3.0    |
+| UI Polish & Cleanup            | Medium    | Low           | Low           | ✅ v1.4.0    |
+| InfoModal & ESC Handler        | Medium    | Low           | Low           | ✅ v1.4.0    |
+| Character-Based Skip Ranges    | High      | Medium        | Medium        | 🟡 v1.5.0    |
+| AST-Based Skip Ranges          | High      | High          | Medium        | 📅 v1.5.1    |
+| Syntax Highlighting            | Very High | **Very High** | **Very High** | 📅 v1.6.0    |
 
 ---
 
 ## 🚀 Next Steps
 
-### For v1.3.0 (Next Session)
+### For v1.5.0 (Current Focus)
 
-- **Phase 1: Stability First**
-  - ✅ Fix the backend crash in the exception filter.
-- **Phase 2: Quality of Life**
-  - ✅ Begin implementation of configurable keyboard shortcuts.
-  - ✅ Implement the enhanced user feedback items (Connection Status, Empty DB State).
-- **Phase 3: Planning**
-  - ✅ Finalize the architecture for the Progress Tracking Dashboard.
+**Prerequisites:**
+- ✅ v1.4.0 tagged and stable
+- ✅ UI polish complete
+- ✅ Documentation updated
+
+**Implementation Phases:**
+
+1. **Week 1: Backend Skip Ranges**
+   - Add skipRanges to Challenge entity
+   - Implement character-based calculation
+   - Write tests for edge cases (all-whitespace lines, mixed tabs/spaces)
+
+2. **Week 2: Frontend Integration**
+   - Cursor auto-advancement logic
+   - Settings toggle implementation
+   - Integration with existing validation system
+
+3. **Week 3: Testing & Polish**
+   - Performance validation (<25ms latency maintained)
+   - Edge case testing
+   - User preference storage
+   - Documentation updates
+
+**Success Criteria:**
+- Skip ranges work for all languages (JavaScript, TypeScript, Python)
+- No typing latency degradation
+- Feature toggleable via Settings
+- All existing tests pass
+
+---
+
+### For v1.5.1 (Future)
+
+**Depends on:** v1.5.0 stable for 1-2 weeks
+
+**Focus:**
+- AST-based comment detection
+- Tree-sitter integration for docstring skipping
+- Merged character + AST skip ranges
+
+---
+
+### For v1.6.0 (Optional - TBD)
+
+**Depends on:** User validation results
+
+**Decision Criteria:**
+- Must pass performance benchmarks (no latency increase)
+- User feedback must be positive
+- Implementation complexity acceptable
 
 ---
 
@@ -204,25 +259,44 @@ If you have ideas not on this roadmap:
 
 ---
 
-## 📝 Changelog Template (For Future Releases)
+## 📝 Recent Changelog
 
-```markdown
-## v1.2.0 (YYYY-MM-DD)
+### v1.4.0 (November 2, 2025)
 
-### Added
+**Added:**
+- InfoModal with keyboard shortcuts documentation
+- Global ESC key handler for all modals
+- Debug Mode toggle in Settings UI
+- Improved Settings modal typography and content
 
-- Keyboard shortcuts (Ctrl+L, Ctrl+R, Enter)
-- Connection status indicator
-- Snippet filename display
+**Fixed:**
+- Avatar rendering crash with null avatarUrl
+- Settings modal broken toggles removed
 
-### Fixed
+**Changed:**
+- Updated branding to "SpeedTyper Solo"
+- Removed multiplayer UI remnants
 
-- [Bug fixes]
+### v1.3.0 (October 31, 2025)
 
-### Changed
+**Added:**
+- Backend race_error event for empty challenge states
+- Frontend error display with actionable guidance
+- Working keyboard shortcuts (Tab, Enter, Alt+Arrows)
 
-- [Breaking changes, if any]
-```
+**Fixed:**
+- Backend crash when no challenges available
+- Connection state recovery flow
+
+### v1.2.0 (October 30, 2025)
+
+**Added:**
+- Snippet metadata display on results page
+- Configurable snippet filters via parser.config.json
+
+**Fixed:**
+- Results page race condition (added retry logic)
+- Default language crash on fresh installs
 
 ---
 

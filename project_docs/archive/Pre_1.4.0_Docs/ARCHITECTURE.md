@@ -1,7 +1,7 @@
 # Speedtyper Local - Architecture Documentation
 
-**Version:** 1.1.0  
-**Last Updated:** October 30, 2025  
+**Version:** 1.4.0  
+**Last Updated:** November 2, 2025  
 **Audience:** Developers modifying the codebase
 
 ---
@@ -78,7 +78,7 @@ Speedtyper Local is a **monorepo** containing two TypeScript applications that c
 | **Next.js**          | 12.2.5  | React framework (SSR/SSG) |
 | **React**            | 18.2.0  | UI library                |
 | **TypeScript**       | 4.7+    | Type-safe frontend code   |
-| **Socket.IO Client** | 2.x     | WebSocket client          |
+| **Socket.IO Client** | 4.x     | WebSocket client          |
 | **Zustand**          | 3.7.2   | State management          |
 | **Tailwind CSS**     | 3.x     | Utility-first styling     |
 
@@ -153,6 +153,7 @@ src/
 ```
 webapp-next/
 ├── pages/                       # Next.js routes
+│   ├── _app.tsx                 # App wrapper (global ESC handler)
 │   ├── index.tsx                # Home/practice page
 │   └── results/[id].tsx         # Results page (post-race)
 │
@@ -163,7 +164,7 @@ webapp-next/
 │   ├── state/                   # Zustand stores
 │   │   ├── game-store.ts        # Race state (id, members, countdown)
 │   │   ├── code-store.ts        # Typing state (input, progress)
-│   │   ├── settings-store.ts    # User preferences (language, etc.)
+│   │   ├── settings-store.ts    # User preferences + modal state (NEW v1.4.0)
 │   │   └── connection-store.ts  # WebSocket connection status
 │   │
 │   ├── components/
@@ -185,7 +186,13 @@ webapp-next/
 ├── common/                      # Shared frontend code
 │   ├── components/
 │   │   ├── NewNavbar.tsx        # Top navigation
-│   │   └── Layout.tsx           # Page wrapper
+│   │   ├── Layout.tsx           # Page wrapper
+│   │   ├── modals/              # NEW v1.4.0
+│   │   │   ├── InfoModal.tsx    # Keyboard shortcuts documentation
+│   │   │   ├── SettingsModal.tsx
+│   │   │   └── ProfileModal.tsx
+│   │   └── overlays/
+│   │       └── SettingsOverlay.tsx  # Settings content (improved v1.4.0)
 │   ├── services/
 │   │   └── Socket.ts            # Socket.IO client wrapper
 │   └── api/                     # REST API calls
@@ -303,7 +310,7 @@ Frontend: Displays WPM, accuracy, chart, etc.
 
 ### 3. WebSocket Contract (Critical)
 
-The frontend and backend communicate via **11 core events**:
+The frontend and backend communicate via **12 core events** (updated v1.3.0):
 
 #### Frontend → Backend (Emits)
 
@@ -325,8 +332,11 @@ The frontend and backend communicate via **11 core events**:
 | `race_started`       | `Date`       | Race officially began (timer start)    |
 | `progress_updated`   | `RacePlayer` | Updated WPM/accuracy/position          |
 | `race_completed`     | `Result`     | Typing finished, results ready         |
+| `race_error`         | `{ error: string }` | **NEW v1.3.0**: No challenges available |
 
 **CRITICAL**: Do not modify this contract without updating both sides.
+
+**v1.3.0 Addition**: The `race_error` event provides user-friendly error messages when backend cannot provide a challenge (e.g., no snippets for selected language). Frontend displays alert with actionable guidance.
 
 ---
 
@@ -354,6 +364,7 @@ The frontend and backend communicate via **11 core events**:
 - username: VARCHAR (auto-generated, e.g., "guest-abc123")
 - isAnonymous: BOOLEAN (always true for local version)
 - githubId: VARCHAR (null for guests)
+- legacyId: VARCHAR (nullable, indexed) -- NEW: For stable user identity
 ```
 
 **result** (Completed races)
@@ -457,6 +468,78 @@ createdRace(socket: Socket, race: Race) {
 
 Building custom heuristics would take weeks and produce inferior results.
 
+### 5. Settings Store as Central Modal State Manager (NEW v1.4.0)
+
+**Decision**: Use `settings-store.ts` to manage all modal open/close states (Settings, Profile, Info, Language, etc.)
+
+**Reasoning:**
+
+- **Single source of truth**: All modals controlled from one store
+- **Global ESC handler**: Close any modal with single `closeModals()` call
+- **Consistent UX**: Prevents multiple modals open simultaneously
+- **Simple integration**: New modals just add boolean to store
+
+**Implementation Pattern:**
+
+```typescript
+// settings-store.ts
+interface SettingsState {
+  settingsModalIsOpen: boolean;
+  profileModalIsOpen: boolean;
+  infoModalIsOpen: boolean;     // NEW v1.4.0
+  // ... other modal states
+}
+
+export const closeModals = () => {
+  useSettingsStore.setState((s) => ({
+    ...s,
+    settingsModalIsOpen: false,
+    profileModalIsOpen: false,
+    infoModalIsOpen: false,
+    // ... close all modals
+  }));
+};
+```
+
+**Global ESC Handler** (`_app.tsx`):
+
+```typescript
+useEffect(() => {
+  const handleEscape = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      closeModals(); // Closes ALL modals
+    }
+  };
+  window.addEventListener("keydown", handleEscape);
+  return () => window.removeEventListener("keydown", handleEscape);
+}, []);
+```
+
+**Benefits:**
+- ✅ Consistent modal behavior across entire app
+- ✅ Easy to add new modals (just add boolean to store)
+- ✅ Global keyboard shortcuts work automatically
+- ✅ No prop drilling for modal state
+
+### 6. InfoModal for Keyboard Shortcuts Documentation (NEW v1.4.0)
+
+**Decision**: Create dedicated modal for keyboard shortcuts instead of Settings bloat
+
+**Reasoning:**
+
+- **Separation of concerns**: Settings = toggles/actions, Info = documentation
+- **Discoverability**: Keyboard icon in navbar opens shortcuts reference
+- **Concise content**: Only working shortcuts documented, no verbosity
+- **Scannable layout**: Visual `<kbd>` elements, organized sections
+
+**Current Keyboard Shortcuts:**
+- **Tab** - Next snippet (refresh challenge)
+- **Enter** - Continue from results page
+- **Alt + ←** - Previous language
+- **Alt + →** - Next language
+- **ESC** - Close any modal
+- **Click anywhere** - Focus typing area
+
 ---
 
 ## Critical Files (Modify With Care)
@@ -473,13 +556,14 @@ Building custom heuristics would take weeks and produce inferior results.
 
 ### Frontend
 
-| File            | Why It's Critical    | Modification Risk           |
-| --------------- | -------------------- | --------------------------- |
-| `Game.ts`       | Main game controller | 🔴 HIGH (breaks everything) |
-| `CodeArea.tsx`  | Typing interface     | 🔴 HIGH (breaks input)      |
-| `game-store.ts` | Race state           | 🟡 MEDIUM (state bugs)      |
-| `code-store.ts` | Typing state         | 🟡 MEDIUM (state bugs)      |
-| `useKeyMap.ts`  | Keyboard shortcuts   | 🟢 LOW (isolated)           |
+| File                | Why It's Critical    | Modification Risk           |
+| ------------------- | -------------------- | --------------------------- |
+| `Game.ts`           | Main game controller | 🔴 HIGH (breaks everything) |
+| `CodeArea.tsx`      | Typing interface     | 🔴 HIGH (breaks input)      |
+| `game-store.ts`     | Race state           | 🟡 MEDIUM (state bugs)      |
+| `code-store.ts`     | Typing state         | 🟡 MEDIUM (state bugs)      |
+| `settings-store.ts` | User preferences + modal state | 🟡 MEDIUM (v1.4.0: manages all modals) |
+| `useKeyMap.ts`      | Keyboard shortcuts   | 🟢 LOW (isolated)           |
 
 **Rule of thumb**: If you're touching files in `races/` or `modules/play2/`, test extensively.
 
@@ -563,6 +647,41 @@ sqlite> .exit
 2. **Backend**: Add route decorator (`@Get()`, `@Post()`, etc.)
 3. **Frontend**: Create API function in `common/api/`
 4. **Frontend**: Call from component or service
+
+### Adding a New Modal (NEW v1.4.0 Pattern)
+
+1. **Create Component**: Add to `common/components/modals/YourModal.tsx`
+2. **Add to Store**: Update `settings-store.ts`:
+   ```typescript
+   interface SettingsState {
+     // ... existing
+     yourModalIsOpen: boolean;  // ADD THIS
+   }
+   
+   // Initial state
+   yourModalIsOpen: false,
+   
+   // Add open function
+   export const openYourModal = () => {
+     useSettingsStore.setState((s) => ({ ...s, yourModalIsOpen: true }));
+   };
+   
+   // Update closeModals
+   export const closeModals = () => {
+     useSettingsStore.setState((s) => ({
+       ...s,
+       yourModalIsOpen: false,  // ADD THIS
+       // ... other modals
+     }));
+   };
+   ```
+3. **Integrate**: Use in component:
+   ```typescript
+   const yourModalOpen = useSettingsStore((s) => s.yourModalIsOpen);
+   {yourModalOpen && <YourModal closeModal={closeModals} />}
+   ```
+4. **Trigger**: Call `openYourModal()` from buttons/handlers
+5. **ESC Works**: Global handler automatically closes it
 
 ### Modifying Snippet Filtering
 
@@ -840,17 +959,185 @@ The original codebase has minimal test coverage. Adding comprehensive tests is a
 
 ---
 
+## Architectural Patterns Established
+
+### v1.4.0 Patterns (NEW)
+
+#### 1. Modal State Management Pattern
+
+**Established**: Central modal state in `settings-store.ts`
+
+**When to use**: Any new modal component
+
+**Benefits**:
+- Single source of truth for all modal states
+- Global keyboard shortcuts work automatically
+- Consistent UX (only one modal open at a time)
+
+**Example**:
+```typescript
+// 1. Add to store
+interface SettingsState {
+  yourModalIsOpen: boolean;
+}
+
+// 2. Create open function
+export const openYourModal = () => {
+  useSettingsStore.setState((s) => ({ ...s, yourModalIsOpen: true }));
+};
+
+// 3. Update closeModals
+export const closeModals = () => {
+  useSettingsStore.setState((s) => ({
+    ...s,
+    yourModalIsOpen: false,
+  }));
+};
+
+// 4. Use in component
+const yourModalOpen = useSettingsStore((s) => s.yourModalIsOpen);
+{yourModalOpen && <YourModal />}
+```
+
+#### 2. Global Keyboard Handler Pattern
+
+**Established**: App-wide keyboard event listener in `_app.tsx`
+
+**When to use**: App-level keyboard shortcuts (ESC, global hotkeys)
+
+**Benefits**:
+- Consistent behavior across all pages
+- No prop drilling
+- Easy to extend with new shortcuts
+
+**Example**:
+```typescript
+// _app.tsx
+useEffect(() => {
+  const handleKeyboard = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      closeModals();
+    }
+    // Add more global shortcuts here
+  };
+  window.addEventListener("keydown", handleKeyboard);
+  return () => window.removeEventListener("keydown", handleKeyboard);
+}, []);
+```
+
+#### 3. InfoModal Documentation Pattern
+
+**Established**: Separate documentation modal from settings/actions
+
+**When to use**: Static reference content (keyboard shortcuts, help text)
+
+**Benefits**:
+- Clear separation: Settings = actions, Info = documentation
+- Prevents settings bloat
+- Easy to update documentation independently
+
+**Example**:
+```typescript
+// InfoModal structure
+<Modal>
+  <Section title="Typing Shortcuts">
+    <ShortcutRow keys="Tab" description="Next snippet" />
+  </Section>
+  <Section title="App Info">
+    <AppVersion />
+  </Section>
+</Modal>
+```
+
+---
+
 ## Extending the Architecture
 
 ### Future Considerations
 
-If planning to add:
+#### v1.5.0: Smart Skipping
 
-- **Progress tracking**: Add dashboard page, REST endpoints, aggregate queries
-- **Smart snippets**: Modify WebSocket payload, add `nonTypableRanges` field
-- **Syntax highlighting**: Integrate library like Prism.js or Monaco, rewrite CodeArea.tsx
+**Architectural Impact**:
+- Add `skipRanges: [number, number][]` to Challenge entity
+- Modify keystroke validation to check skip ranges
+- Frontend cursor auto-advancement logic
+- User preference storage (requires stable user identity)
+
+**Key Decision**: Backend calculates and stores skip ranges during import vs. on-demand calculation
+
+**Performance Concern**: Must maintain <25ms keystroke latency
+
+#### v1.6.0: Syntax Highlighting (Optional)
+
+**Architectural Impact**:
+- Pre-tokenize snippets during import (Tree-sitter)
+- Store tokens in database or calculate on-demand
+- Rewrite `CodeArea.tsx` to render token-based spans
+- Add feature toggle in settings
+
+**Risk**: HIGH - Fundamental change to rendering system
+
+**Validation Required**: User feedback + performance benchmarks before implementation
 
 See `FEATURES.md` for detailed roadmap.
+
+---
+
+## Version History
+
+### v1.4.0 (November 2, 2025)
+
+**Major Changes**:
+- Added InfoModal component for keyboard shortcuts documentation
+- Implemented global ESC key handler in `_app.tsx`
+- Enhanced settings-store to manage all modal states
+- Improved Settings modal UI (typography, content, Debug Mode toggle)
+- Removed multiplayer UI remnants (user count, public races)
+
+**Architectural Patterns**:
+- Established modal state management pattern
+- Established global keyboard handler pattern
+- Established documentation modal pattern
+
+**Files Modified**:
+- `packages/webapp-next/common/components/modals/InfoModal.tsx` (new)
+- `packages/webapp-next/pages/_app.tsx`
+- `packages/webapp-next/modules/play2/state/settings-store.ts`
+- `packages/webapp-next/common/components/NewNavbar.tsx`
+- `packages/webapp-next/common/components/overlays/SettingsOverlay.tsx`
+
+### v1.3.0 (October 31, 2025)
+
+**Major Changes**:
+- Added `race_error` WebSocket event for error handling
+- Frontend displays user-friendly alerts on backend errors
+- Implemented keyboard shortcuts (Tab, Enter, Alt+Arrows)
+
+**WebSocket Contract Update**:
+- Added `race_error` event (backend → frontend)
+
+**Files Modified**:
+- `packages/webapp-next/modules/play2/services/Game.ts`
+- `packages/back-nest/src/races/race.gateway.ts`
+
+### v1.2.0 (October 30, 2025)
+
+**Major Changes**:
+- Configurable snippet filters via `parser.config.json`
+- Snippet metadata display on results page
+- Bug fixes (results page race condition, default language)
+
+**Configuration System**:
+- Established JSON-based configuration pattern
+- Runtime config validation and fallback to defaults
+
+### v1.1.0 (October 2025)
+
+**Major Changes**:
+- SQLite migration (replaced PostgreSQL)
+- Local snippet import system
+- Guest-only authentication
+- Solo mode (multiplayer stubbed)
 
 ---
 

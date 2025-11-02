@@ -1,8 +1,8 @@
 # Speedtyper Local - Project Overview
 
-**Version:** 1.1.0  
+**Version:** 1.4.0  
 **Status:** Active Development  
-**Last Updated:** October 30, 2025
+**Last Updated:** November 2, 2025
 
 ---
 
@@ -37,9 +37,11 @@ The upstream `speedtyper.dev` is excellent but designed for a different use case
 
 ---
 
-## Key Features (v1.1.0)
+## Key Features (v1.4.0)
 
 ### ✅ Implemented
+
+#### Core Features (v1.1.0)
 
 1. **Local Snippet Import**
    - Place your code files in `snippets/python/`, `snippets/typescript/`, etc.
@@ -58,7 +60,7 @@ The upstream `speedtyper.dev` is excellent but designed for a different use case
 
 4. **Clean Solo UI**
    - Removed multiplayer UI elements (leaderboard, battle matcher)
-   - Removed broken/empty stats panels
+   - Professional "SpeedTyper Solo" branding
    - Focus on typing interface only
 
 5. **SQLite Storage**
@@ -66,12 +68,79 @@ The upstream `speedtyper.dev` is excellent but designed for a different use case
    - No PostgreSQL dependency
    - Easy backup/reset via file operations
 
+#### Quality of Life (v1.2.0)
+
+6. **Configurable Snippet Filters**
+   - Edit `parser.config.json` to adjust snippet quality thresholds
+   - Control max/min length, line limits, character limits
+   - No code changes needed
+
+7. **Snippet Metadata Display**
+   - Results page shows origin file (e.g., "From: python/my_script.py")
+   - Better context for what you practiced
+
+8. **Robust Error Handling**
+   - Results page auto-retries on race conditions
+   - Graceful default language fallback
+
+#### Stability & Feedback (v1.3.0)
+
+9. **Backend Crash Resilience**
+   - User-friendly error messages when no snippets available
+   - Clear guidance: "Add code to snippets/ and run 'npm run reimport'"
+   - Connection state properly managed
+
+10. **Working Keyboard Shortcuts**
+    - **Tab** - Next snippet (refresh challenge)
+    - **Enter** - Continue from results page
+    - **Alt + ←** - Previous language
+    - **Alt + →** - Next language
+    - **ESC** - Close any modal
+    - **Click anywhere** - Focus typing area
+
+#### UI Polish (v1.4.0)
+
+11. **InfoModal with Keyboard Shortcuts**
+    - Accessible via keyboard icon in navbar
+    - Comprehensive shortcuts documentation
+    - App info (version, mode, GitHub link)
+
+12. **Global ESC Key Handler**
+    - Universal ESC to close all modals
+    - Consistent behavior across entire app
+
+13. **Debug Mode Toggle**
+    - Enable/disable via Settings UI
+    - Yellow indicator shows when active
+    - Useful for screenshots and testing
+
+14. **Enhanced Settings Modal**
+    - Improved typography and readability
+    - Concise, actionable content
+    - Better dark theme integration
+
+15. **Complete UI Cleanup**
+    - Removed all multiplayer remnants (user count, public races)
+    - Fixed avatar rendering crashes
+    - Professional, polished appearance
+
 ### 🚧 Planned (See FEATURES.md)
 
-- Configurable keyboard shortcuts
-- User progress tracking dashboard
-- Smart snippets (skip comments while typing)
-- Syntax highlighting improvements
+#### v1.5.0 (Next - Smart Skipping Phase 1)
+- Character-based skip ranges (leading spaces/indentation)
+- Backend skip configuration system
+- Frontend cursor auto-advancement
+- User preference storage
+
+#### v1.5.1 (Future - Smart Skipping Phase 2)
+- AST-based skip ranges (comments, docstrings)
+- Tree-sitter integration for comment detection
+- Merged character + AST skip ranges
+
+#### v1.6.0 (Optional - Visual Enhancement)
+- Pre-tokenized syntax highlighting
+- Token-based rendering system
+- Feature toggle (can disable if performance issues)
 
 ---
 
@@ -122,28 +191,39 @@ You control:
 - How snippets are filtered (parser config)
 - What metrics matter (via settings)
 
+### 5. **Never Break Typing** (NEW v1.3.0+)
+The core typing experience is sacred:
+- Keystroke latency must stay <25ms
+- Backend validation is source of truth
+- Any feature that degrades typing gets reverted
+- Extensive testing before merging changes to typing engine
+
 ---
 
 ## Project Status
 
-### Current Milestone: v1.1.0
+### Current Milestone: v1.4.0 ✅
 
 **Completed:**
-- ✅ Core transformation from multiplayer → solo
-- ✅ SQLite migration
-- ✅ Local snippet import system
-- ✅ One-command startup
-- ✅ UI cleanup (removed multiplayer elements)
-- ✅ Cross-platform compatibility (WSL + Windows)
+- ✅ Core transformation from multiplayer → solo (v1.1.0)
+- ✅ SQLite migration and one-command startup (v1.1.0)
+- ✅ Local snippet import system (v1.1.0)
+- ✅ Configurable snippet filters (v1.2.0)
+- ✅ Backend crash resilience (v1.3.0)
+- ✅ Keyboard shortcuts implementation (v1.3.0)
+- ✅ UI polish and cleanup (v1.4.0)
+- ✅ InfoModal and global ESC handler (v1.4.0)
+- ✅ Debug Mode user control (v1.4.0)
+- ✅ Professional UI appearance (v1.4.0)
 
 **In Progress:**
-- 🚧 Documentation overhaul (this file!)
-- 🚧 Feature roadmap prioritization
+- 🚧 v1.5.0 planning (Smart Skipping Phase 1)
+- 🚧 Documentation updates (this session!)
 
 **Next Up:**
-- [ ] Configurable keyboard shortcuts
-- [ ] Progress tracking dashboard
-- [ ] Smart snippet features
+- [ ] Character-based skip ranges (v1.5.0)
+- [ ] Backend skip configuration system (v1.5.0)
+- [ ] Frontend cursor auto-advancement (v1.5.0)
 
 ### Known Limitations
 
@@ -151,6 +231,7 @@ You control:
 2. **Limited language support**: Python, TypeScript, JavaScript, React (15 total parsers available)
 3. **No cloud sync**: All data stored locally
 4. **Single user**: No multi-user scenarios
+5. **Smooth Caret Bug**: "Line (smooth)" caret style has offset issues (use other caret styles)
 
 ### Stability
 
@@ -161,6 +242,8 @@ The core typing workflow is solid. You can:
 - Type without crashes
 - See accurate WPM/accuracy
 - Complete races and view results
+- Use keyboard shortcuts efficiently
+- Access help via InfoModal
 
 Edge cases and advanced features are still being refined.
 
@@ -186,11 +269,11 @@ Frontend renders code in <CodeArea>
   ↓
 User types character
   ↓
-Backend validates keystroke
+Backend validates keystroke (WebSocket)
   ↓
 Backend recalculates WPM/accuracy
   ↓
-Frontend updates display
+Frontend updates display (real-time)
   ↓
 (Repeat until snippet complete)
   ↓
@@ -242,6 +325,10 @@ If you're reading this for the first time:
    # Browser opens automatically → http://localhost:3001
    ```
 
+6. **Access keyboard shortcuts**
+   - Click keyboard icon in navbar → InfoModal opens
+   - Or press ESC to close any modal
+
 See `README-LOCAL.md` for detailed setup instructions.
 
 ---
@@ -260,7 +347,13 @@ speedtyper-solo/
 │   │
 │   └── webapp-next/        # Frontend (Next.js)
 │       ├── modules/play2/  # Typing UI
-│       └── ...
+│       ├── common/
+│       │   ├── components/
+│       │   │   └── modals/  # InfoModal, Settings, etc.
+│       │   └── ...
+│       └── pages/
+│           ├── _app.tsx    # Global ESC handler
+│           └── index.tsx   # Practice page
 │
 ├── snippets/               # Your code goes here
 │   ├── python/
@@ -285,6 +378,23 @@ speedtyper-solo/
 2. **How it works?** → `ARCHITECTURE.md`
 3. **What's next?** → `FEATURES.md`
 4. **Context/philosophy?** → This file
+5. **Quick reference?** → `PROJECT_CONTEXT.md` (condensed for sessions)
+
+### Keyboard Shortcuts Reference
+
+Access via keyboard icon in navbar, or here's a quick reference:
+
+**Typing Shortcuts:**
+- **Tab** - Get next snippet
+- **Enter** - Continue from results page
+
+**Language Selection:**
+- **Alt + ←** - Previous language
+- **Alt + →** - Next language
+
+**Interface Controls:**
+- **ESC** - Close any modal
+- **Click anywhere** - Focus typing area
 
 ### Troubleshooting Common Issues
 
@@ -303,6 +413,64 @@ speedtyper-solo/
 - Check browser console for errors
 - Restart backend: `npm run dev`
 
+**Caret position looks wrong:**
+- Change caret style in Settings (avoid "Line (smooth)")
+- Use "Block", "Line", or "Underline" styles
+
+**Modal won't close:**
+- Press ESC key (universal close)
+- Click outside modal area
+- Refresh browser if stuck
+
+---
+
+## Version History Highlights
+
+### v1.4.0 (November 2, 2025) - UI Polish & Foundation
+
+**Major Features:**
+- InfoModal with keyboard shortcuts documentation
+- Global ESC key handler (closes all modals)
+- Debug Mode toggle in Settings UI
+- Enhanced Settings modal (better typography, concise content)
+- Complete UI cleanup (removed multiplayer remnants)
+- Avatar rendering fixes
+
+**Why This Matters:**
+Professional, polished interface ready for future feature work. Foundation for smart skipping features in v1.5.0.
+
+### v1.3.0 (October 31, 2025) - Stability & Error Handling
+
+**Major Features:**
+- Backend crash resilience (race_error event)
+- User-friendly error messages
+- Working keyboard shortcuts
+
+**Why This Matters:**
+App now handles edge cases gracefully, providing clear guidance when issues occur.
+
+### v1.2.0 (October 30, 2025) - Stability & Polish
+
+**Major Features:**
+- Configurable snippet filters (parser.config.json)
+- Snippet metadata on results page
+- Critical bug fixes (results race condition, default language)
+
+**Why This Matters:**
+Quality of life improvements make the tool more reliable and informative.
+
+### v1.1.0 (October 2025) - Core Transformation
+
+**Major Features:**
+- SQLite migration (replaced PostgreSQL)
+- Local snippet import system
+- One-command startup
+- Guest-only auth
+- Solo mode (multiplayer stubbed)
+
+**Why This Matters:**
+This version established the foundation - local-first, zero-friction, solo-focused.
+
 ---
 
 ## Contributing
@@ -317,8 +485,15 @@ This is a personal fork optimized for solo use. If you want to:
 
 1. Make changes in a feature branch
 2. Test with `npm run dev` (verify typing works)
-3. Commit with descriptive messages
-4. Open PR with explanation
+3. Complete smoke test checklist:
+   - [ ] Start app
+   - [ ] Select language
+   - [ ] Type snippet
+   - [ ] Complete snippet
+   - [ ] View results
+   - [ ] No console errors
+4. Commit with descriptive messages
+5. Open PR with explanation
 
 ---
 

@@ -1,9 +1,9 @@
 # Speedtyper Local: Project Context Reference
 
-**Version:** 1.3.0 → 1.6.0 (Active Development)  
-**Last Updated:** November 1, 2025  
+**Version:** 1.4.0 → 1.6.0 (Active Development)  
+**Last Updated:** November 2, 2025  
 **Purpose:** Quick reference for LLM collaboration sessions  
-**Token Budget:** 
+**Token Budget:** <10,000 tokens
 
 ---
 
@@ -12,14 +12,17 @@
 **What:** Solo typing practice tool for developers - fork of speedtyper.dev  
 **Core Value:** Practice YOUR code (not random GitHub snippets), zero friction, local-first  
 **Tech Stack:** NestJS (backend) + Next.js (frontend) + SQLite + Socket.IO + Tree-sitter  
-**Status:** Stable core (v1.3.0), adding analytics & smart features (v1.4.0-v1.6.0)
+**Status:** Stable core (v1.4.0), adding smart features (v1.5.0-v1.6.0)
 
-### Key Transformations (v1.0 → v1.3)
+### Key Transformations (v1.0 → v1.4)
 - PostgreSQL → SQLite (single file database)
 - GitHub OAuth → Guest users (no auth friction)
 - Multiplayer → Solo (preserved typing engine, stubbed broadcasting)
 - GitHub imports → Local snippets (`snippets/` folder)
 - Complex setup → One command (`npm run dev`)
+- Multiplayer UI → Clean solo interface (v1.4.0)
+- No error handling → Graceful crash resilience (v1.3.0)
+- Broken settings → Polished UI with InfoModal (v1.4.0)
 
 ---
 
@@ -66,7 +69,7 @@ packages/webapp-next/
 │   ├── state/
 │   │   ├── game-store.ts            # Race state (Zustand)
 │   │   ├── code-store.ts            # Typing state (Zustand)
-│   │   └── settings-store.ts        # User preferences
+│   │   └── settings-store.ts        # User preferences + modal state (v1.4.0)
 │   ├── components/
 │   │   ├── CodeArea.tsx             # Main typing interface (CRITICAL)
 │   │   ├── HiddenCodeInput.tsx      # Invisible input field
@@ -78,10 +81,17 @@ packages/webapp-next/
 │   ├── services/
 │   │   └── Socket.ts                # Socket.IO client wrapper
 │   ├── components/
-│   │   └── NewNavbar.tsx            # Top navigation
+│   │   ├── NewNavbar.tsx            # Top navigation
+│   │   ├── modals/                  # NEW v1.4.0
+│   │   │   ├── InfoModal.tsx        # Keyboard shortcuts docs
+│   │   │   ├── SettingsModal.tsx
+│   │   │   └── ProfileModal.tsx
+│   │   └── overlays/
+│   │       └── SettingsOverlay.tsx  # Settings content (improved v1.4.0)
 │   └── api/                         # REST API calls
 │
 └── pages/
+    ├── _app.tsx                     # App wrapper (global ESC handler v1.4.0)
     ├── index.tsx                    # Home/practice page
     └── results/[id].tsx             # Results page
 ```
@@ -131,7 +141,7 @@ packages/back-nest/.env                # Database URL, secrets
 - `race_started` (Date) - Race officially began
 - `progress_updated` (RacePlayer) - Updated WPM/accuracy
 - `race_completed` (Result) - Finished, results ready
-- `race_error` (error) - No challenges available (v1.3.0)
+- `race_error` (error) - **NEW v1.3.0**: No challenges available
 
 **CRITICAL:** Frontend and backend must agree on this contract. Changes require updates to both sides.
 
@@ -139,35 +149,36 @@ packages/back-nest/.env                # Database URL, secrets
 
 ## 3. Current Feature Status
 
-### Completed (v1.0-1.2)
+### Completed (v1.0-v1.4.0)
 - ✅ SQLite migration (single-file database)
 - ✅ Local snippet import (`npm run reimport`)
 - ✅ One-command startup (`npm run dev`)
 - ✅ Solo mode (multiplayer broadcasting stubbed)
 - ✅ Guest-only auth (no GitHub OAuth)
-- ✅ UI cleanup (removed multiplayer elements)
 - ✅ Configurable snippet filters (`parser.config.json`)
-- ✅ Backend crash resilience (error messages to frontend)
+- ✅ Backend crash resilience (race_error event) - v1.3.0
+- ✅ Keyboard shortcuts (Tab, Enter, Alt+Arrows, ESC) - v1.3.0
+- ✅ InfoModal with shortcuts documentation - v1.4.0
+- ✅ Global ESC handler (closes all modals) - v1.4.0
+- ✅ Debug Mode toggle in Settings UI - v1.4.0
+- ✅ UI cleanup (removed multiplayer remnants) - v1.4.0
+- ✅ Enhanced Settings modal (typography, content) - v1.4.0
 
-### Active Development (v1.3.0 - 67% Complete)
-- ✅ Backend error handling (race_error event)
-- 🟡 Keyboard shortcuts (Ctrl+L, Ctrl+R, Enter)
-- 🟡 Enhanced user feedback (connection status, empty state)
-- ⚠️ **BUG: Smooth caret offset** (see Known Issues below)
+### Active Development (v1.5.0 - Next)
+- 🟡 Character-based skip ranges (leading spaces)
+- 🟡 Backend skip configuration system
+- 🟡 Frontend cursor auto-advancement
+- 🟡 User preference storage
 
-### Planned (v1.4.0-v1.6.0)
-**v1.4.0 - Foundation Layer:**
-- Feature 3.1: Stable user identity (Local Super User)
-- Feature 3.2: Progress dashboard (WPM trends, language stats)
-
-**v1.5.0 - Smart Skipping Phase 1:**
-- Feature 3.3A: Character skipping (leading spaces)
-
+### Planned (v1.5.1-v1.6.0)
 **v1.5.1 - Smart Skipping Phase 2:**
-- Feature 3.3B: AST-based node skipping (comments)
+- AST-based skip ranges (comments, docstrings)
+- Tree-sitter integration for comment detection
 
 **v1.6.0 - Visual Enhancement (OPTIONAL):**
-- Feature 3.4: Syntax highlighting (requires user validation first)
+- Pre-tokenized syntax highlighting
+- Token-based rendering system
+- Feature toggle (can disable if performance issues)
 
 ---
 
@@ -179,6 +190,7 @@ packages/back-nest/.env                # Database URL, secrets
 4. **Backend is source of truth** - Validation and calculation server-side, frontend renders
 5. **Incremental releases** - Git tag each version, test rollback before proceeding
 6. **Feature toggles** - New features should be disableable via settings
+7. **UI polish matters** - Professional appearance builds confidence (v1.4.0 focus)
 
 ---
 
@@ -271,6 +283,7 @@ find ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo -name "filename.ts"
 - `parser.service.ts` - Snippet extraction (quality issues)
 - `code-store.ts` - Typing state (cursor bugs)
 - `game-store.ts` - Race state (synchronization issues)
+- `settings-store.ts` - User preferences + modal state (v1.4.0: manages all modals)
 
 **🟢 LOW RISK (Isolated, Easy Rollback):**
 - UI components (buttons, modals, navbars)
@@ -290,7 +303,7 @@ find ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo -name "filename.ts"
 
 ## 8. Known Issues
 
-### ⚠️ **Bug: Smooth Caret Offset (Logged for v1.3.1)**
+### ⚠️ **Bug: Smooth Caret Offset**
 
 **Feature:** Smooth Line Caret Style  
 **File:** `packages/webapp-next/modules/play2/components/SmoothCaret.tsx`
@@ -304,11 +317,15 @@ find ~/Jupyter_Notebooks/speedtyper_solo/speedtyper-solo -name "filename.ts"
 - React Hydration Error sometimes observed after hard refresh (Ctrl+Shift+R)
 - Suggests state mismatch between server and client render
 
+**Workaround:**
+- Use other caret styles: "Block", "Line", or "Underline" (all work correctly)
+- Change via Settings modal
+
 **Recommendation:**
 - Fix if straightforward (alignment calculation issue)
 - Or remove feature if too complex (nice-to-have, not critical)
 
-**Impact:** Low (users can switch to other caret styles)
+**Impact:** Low (users can switch to other caret styles via Settings)
 
 ---
 
@@ -345,16 +362,17 @@ sqlite3 speedtyper-local.db "SQL_QUERY"
 
 ## 10. Version History & Rollback Points
 
-| Version | Status    | Features                              | Rollback Command         |
-|---------|-----------|---------------------------------------|--------------------------|
-| v1.0.0  | ✅ Stable | Initial fork transformation           | `git checkout v1.0.0`    |
-| v1.1.0  | ✅ Stable | SQLite + local imports                | `git checkout v1.1.0`    |
-| v1.2.0  | ✅ Stable | Configurable filters + bug fixes      | `git checkout v1.2.0`    |
-| v1.3.0  | 🟡 Active | Error handling + keyboard shortcuts   | `git checkout v1.3.0`    |
-| v1.4.0  | 📅 Planned | Stable identity + dashboard           | -                        |
-| v1.5.0  | 📅 Planned | Character skipping                    | -                        |
-| v1.5.1  | 📅 Planned | AST-based skipping                    | -                        |
-| v1.6.0  | 📅 Planned | Syntax highlighting (optional)        | -                        |
+| Version | Status      | Features                              | Rollback Command         |
+|---------|-------------|---------------------------------------|--------------------------|
+| v1.0.0  | ✅ Stable   | Initial fork transformation           | `git checkout v1.0.0`    |
+| v1.1.0  | ✅ Stable   | SQLite + local imports                | `git checkout v1.1.0`    |
+| v1.2.0  | ✅ Stable   | Configurable filters + bug fixes      | `git checkout v1.2.0`    |
+| v1.3.0  | ✅ Stable   | Error handling + keyboard shortcuts   | `git checkout v1.3.0`    |
+| v1.3.2  | ✅ Stable   | Baseline for v1.4.0 work              | `git checkout v1.3.2`    |
+| v1.4.0  | ✅ Stable   | UI polish + InfoModal + ESC handler   | `git checkout v1.4.0`    |
+| v1.5.0  | 📅 Planned  | Character skip ranges                 | -                        |
+| v1.5.1  | 📅 Planned  | AST-based skip ranges                 | -                        |
+| v1.6.0  | 📅 Planned  | Syntax highlighting (optional)        | -                        |
 
 **Before Each Release:**
 - Complete smoke test checklist
@@ -391,7 +409,76 @@ sqlite3 speedtyper-local.db "SQL_QUERY"
 
 ---
 
-## 12. When To Request Full Documentation
+## 12. Quick Reference: Keyboard Shortcuts
+
+**Access via:** Keyboard icon in navbar → InfoModal
+
+**Typing Shortcuts:**
+- **Tab** - Next snippet (refresh challenge)
+- **Enter** - Continue from results page
+
+**Language Selection:**
+- **Alt + ←** - Previous language
+- **Alt + →** - Next language
+
+**Interface Controls:**
+- **ESC** - Close any modal (NEW v1.4.0 - universal)
+- **Click anywhere** - Focus typing area
+
+---
+
+## 13. Architectural Patterns (v1.4.0)
+
+### Modal State Management Pattern
+
+**Established:** Central modal state in `settings-store.ts`
+
+**When to use:** Any new modal component
+
+**Example:**
+```typescript
+// 1. Add to store
+interface SettingsState {
+  yourModalIsOpen: boolean;
+}
+
+// 2. Create open function
+export const openYourModal = () => {
+  useSettingsStore.setState((s) => ({ ...s, yourModalIsOpen: true }));
+};
+
+// 3. Update closeModals
+export const closeModals = () => {
+  useSettingsStore.setState((s) => ({
+    ...s,
+    yourModalIsOpen: false,
+  }));
+};
+```
+
+### Global Keyboard Handler Pattern
+
+**Established:** App-wide keyboard event listener in `_app.tsx`
+
+**Benefits:** Consistent behavior, no prop drilling
+
+**Example:**
+```typescript
+// _app.tsx
+useEffect(() => {
+  const handleKeyboard = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      closeModals(); // Closes ALL modals
+    }
+  };
+  window.addEventListener("keydown", handleKeyboard);
+  return () => window.removeEventListener("keydown", handleKeyboard);
+}, []);
+```
+
+---
+
+## 14. When To Request Full Documentation
 
 This condensed reference is sufficient for 95% of sessions. Request full docs when:
 
@@ -404,6 +491,11 @@ This condensed reference is sufficient for 95% of sessions. Request full docs wh
 - Planning features beyond v1.6.0
 - Reviewing full feature roadmap and prioritization
 - Understanding feature dependencies in depth
+
+**PROJECT_OVERVIEW.md** (~6,000 tokens):
+- Understanding project philosophy and history
+- Onboarding new contributors
+- Explaining design decisions to stakeholders
 
 **Feasibility Report** (~8,000 tokens):
 - Reconsidering feature complexity (e.g., "Should we really do syntax highlighting?")
