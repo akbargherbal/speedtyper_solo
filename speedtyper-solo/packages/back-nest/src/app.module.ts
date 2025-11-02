@@ -9,6 +9,7 @@ import { RacesModule } from './races/races.module';
 import { SeederModule } from './seeder/seeder.module';
 import { ResultsModule } from './results/results.module';
 import { AuthModule } from './auth/auth.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { GuestUserMiddleware } from './middlewares/guest-user';
 
 @Module({
@@ -23,6 +24,7 @@ import { GuestUserMiddleware } from './middlewares/guest-user';
     SeederModule,
     UsersModule,
     AuthModule,
+    DashboardModule,  // Added this
   ],
   controllers: [],
   providers: [],
@@ -31,6 +33,6 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(GuestUserMiddleware)
-      .forRoutes('*'); // Apply to all routes
+      .forRoutes('*');
   }
 }
