@@ -24,14 +24,22 @@ export class ResultsHandlerService {
         return;
       }
       player.saved = true;
+
+      // DEBUG: Log user info
+      console.log('[ResultsHandler] User ID:', user.id);
+      console.log('[ResultsHandler] User object:', JSON.stringify(user, null, 2));
+
       let result = this.factory.factory(race, player, user);
-      
+
+      // DEBUG: Log result before save
+      console.log('[ResultsHandler] Result userId:', result.userId);
+      console.log('[ResultsHandler] Result user:', result.user);
+
       // CHANGED: Always save results (removed isAnonymous check for local-first)
       result = await this.results.create(result);
-      
       result.percentile = await this.results.getResultPercentile(result.cpm);
       this.tracker.trackRaceCompleted();
-      
+
       // SOLO MODE: Emit to specific socket instead of broadcasting to room
       this.events.raceCompleted(socket, result);
     }

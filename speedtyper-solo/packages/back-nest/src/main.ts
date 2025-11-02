@@ -28,9 +28,15 @@ async function runServer() {
     credentials: true,
   });
   app.use(json({ limit: '50mb' }));
+
   app.use(sessionMiddleware);
-  // REMOVED: app.use(guestUserMiddleware); - now registered in AppModule
-  app.useWebSocketAdapter(new SessionAdapter(app, sessionMiddleware));
+
+  // Get LocalUserService for both WebSocket adapter and startup initialization
+  const localUserService = app.get(LocalUserService);
+  app.useWebSocketAdapter(
+    new SessionAdapter(app, sessionMiddleware, localUserService),
+  );
+
   app.setGlobalPrefix(GLOBAl_API_PREFIX);
   app.useGlobalPipes(
     new ValidationPipe({
@@ -40,7 +46,6 @@ async function runServer() {
   app.useGlobalFilters(new AllExceptionsFilter());
 
   // Ensure local user exists on startup
-  const localUserService = app.get(LocalUserService);
   await localUserService.ensureLocalUser();
   console.log('[Bootstrap] ✅ Local Super User initialized');
 
