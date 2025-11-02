@@ -25,11 +25,13 @@ export class ResultsHandlerService {
       }
       player.saved = true;
       let result = this.factory.factory(race, player, user);
-      if (!user.isAnonymous) {
-        result = await this.results.create(result);
-      }
+      
+      // CHANGED: Always save results (removed isAnonymous check for local-first)
+      result = await this.results.create(result);
+      
       result.percentile = await this.results.getResultPercentile(result.cpm);
       this.tracker.trackRaceCompleted();
+      
       // SOLO MODE: Emit to specific socket instead of broadcasting to room
       this.events.raceCompleted(socket, result);
     }

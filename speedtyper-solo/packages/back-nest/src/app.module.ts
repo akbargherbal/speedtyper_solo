@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GithubConnectorModule } from './connectors/github/github.module';
 import { ProjectsModule } from './projects/projects.module';
@@ -9,6 +9,7 @@ import { RacesModule } from './races/races.module';
 import { SeederModule } from './seeder/seeder.module';
 import { ResultsModule } from './results/results.module';
 import { AuthModule } from './auth/auth.module';
+import { GuestUserMiddleware } from './middlewares/guest-user';
 
 @Module({
   imports: [
@@ -26,4 +27,10 @@ import { AuthModule } from './auth/auth.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(GuestUserMiddleware)
+      .forRoutes('*'); // Apply to all routes
+  }
+}

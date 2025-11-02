@@ -8,6 +8,7 @@ import { ResultCalculationService } from './result-calculation.service';
 @Injectable()
 export class ResultFactoryService {
   constructor(private resultCalculation: ResultCalculationService) {}
+  
   factory(race: Race, player: RacePlayer, user: User): Result {
     const challenge = race.challenge;
     const result = new Result();
@@ -15,13 +16,15 @@ export class ResultFactoryService {
     const cpm = this.resultCalculation.getCPM(challenge.content, timeMS);
     const mistakes = this.resultCalculation.getMistakesCount(player);
     const accuracy = this.resultCalculation.getAccuracy(player);
+    
     result.raceId = player.raceId;
-    result.user = user;
+    result.userId = user.id;  // CHANGED: Just assign the ID
     result.challenge = challenge;
     result.timeMS = timeMS;
     result.cpm = cpm;
     result.mistakes = mistakes;
     result.accuracy = accuracy;
+    
     return result;
   }
 }

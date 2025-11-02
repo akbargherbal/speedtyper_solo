@@ -12,7 +12,12 @@ export class ResultService {
   ) {}
 
   async create(result: Result): Promise<Result> {
-    return await this.resultsRepository.save(result);
+    const saved = await this.resultsRepository.save(result);
+    // Reload with user and challenge relations for frontend
+    return await this.resultsRepository.findOne({
+      where: { id: saved.id },
+      relations: ['user', 'challenge'],
+    });
   }
 
   async upsertByLegacyId(results: Result[]): Promise<void> {
