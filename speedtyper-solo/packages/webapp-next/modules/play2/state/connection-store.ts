@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import create from "zustand";
+import { create } from "zustand";
 import { fetchRaceStatus } from "../../../common/api/races";
 import SocketLatest from "../../../common/services/Socket";
 import { updateUserInStore } from "../../../common/state/user-store";
@@ -76,7 +76,6 @@ export const useConnectionManager = () => {
 
   useEffect(() => {
     const onAlreadyPlaying = () => {
-      console.log("alreadyPlaying received");
       useConnectionStore.setState((state) => ({
         ...state,
         alreadyPlaying: true,

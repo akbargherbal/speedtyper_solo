@@ -1,4 +1,4 @@
-import create from "zustand";
+import { create } from "zustand";
 import { cpmToWPM } from "../../../common/utils/cpmToWPM";
 
 export interface KeyStroke {

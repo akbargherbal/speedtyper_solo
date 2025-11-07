@@ -1,4 +1,4 @@
-import create from "zustand";
+import { create } from "zustand";
 import { useUserStore } from "../../../common/state/user-store";
 import { cpmToWPM } from "../../../common/utils/cpmToWPM";
 import { getExperimentalServerUrl } from "../../../common/utils/getServerUrl";

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import create from "zustand";
+import { create } from "zustand";
 import { fetchUser } from "../api/user";
 
 export interface User {

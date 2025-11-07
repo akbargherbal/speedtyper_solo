@@ -11,13 +11,9 @@ export function LanguageSelector() {
   const selectedLanguage = useSettingsStore((s) => s.languageSelected);
   const game = useGameStore((s) => s.game);
 
-  console.log("[LanguageSelector] Render - selectedLanguage:", selectedLanguage?.name);
-
   const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedName = event.target.value;
-    
-    console.log("[LanguageSelector] handleLanguageChange called with:", selectedName);
-    
+
     if (!selectedName) {
       // Handle "clear" option
       setLanguage(null);
@@ -29,14 +25,12 @@ export function LanguageSelector() {
     );
 
     if (newLanguage && newLanguage.language !== selectedLanguage?.language) {
-      console.log("[LanguageSelector] Setting language to:", newLanguage.name);
       setLanguage(newLanguage);
       game?.next();
     }
   };
 
   const handleClear = () => {
-    console.log("[LanguageSelector] Clear button clicked");
     setLanguage(null);
   };
 

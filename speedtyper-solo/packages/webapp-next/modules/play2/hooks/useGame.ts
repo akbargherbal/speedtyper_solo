@@ -13,6 +13,14 @@ export const useGame = () => {
     [socket, raceIdQueryParam]
   );
 
+  // Effect to initialize the game state after the game object is created.
+  // This prevents state updates during the render cycle.
+  useEffect(() => {
+    if (game) {
+      game.initialize();
+    }
+  }, [game]);
+
   // Game-specific Keyboard Handler
   useEffect(() => {
     if (!game) return;
@@ -21,15 +29,11 @@ export const useGame = () => {
       // These shortcuts should only be active when a game exists.
       if (event.altKey && event.key === "ArrowRight") {
         event.preventDefault();
-        console.log("[useGame] Alt+Right pressed, calling nextLanguage()");
         nextLanguage();
-        console.log("[useGame] Calling game.next() to refresh snippet");
         game.next();
       } else if (event.altKey && event.key === "ArrowLeft") {
         event.preventDefault();
-        console.log("[useGame] Alt+Left pressed, calling previousLanguage()");
         previousLanguage();
-        console.log("[useGame] Calling game.next() to refresh snippet");
         game.next();
       } else if (event.key === "Tab" && !event.shiftKey) {
         // Allow Shift+Tab for accessibility

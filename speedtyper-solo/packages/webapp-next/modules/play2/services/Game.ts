@@ -38,7 +38,6 @@ export class Game {
     });
   }
   constructor(private socket: SocketLatest, raceId?: string) {
-    this.initializeConnectedState(socket);
     this.onConnectHasRun = false;
     this.onConnect(raceId);
   }
@@ -82,6 +81,17 @@ export class Game {
     const language = useSettingsStore.getState().languageSelected?.language;
     const dto = { language, isPublic };
     this.socket.emit("play", dto);
+  }
+
+  public initialize() {
+    const connected = this.socket.socket.connected;
+    useGameStore.setState((game) => {
+      return {
+        ...game,
+        connected,
+        game: this,
+      };
+    });
   }
 
   private listenForRaceStarted() {
@@ -199,16 +209,6 @@ export class Game {
           connected: false,
         };
       });
-    });
-  }
-  private initializeConnectedState(socket: SocketLatest) {
-    const connected = socket.socket.connected;
-    useGameStore.setState((game) => {
-      return {
-        ...game,
-        connected,
-        game: this,
-      };
     });
   }
 }

@@ -1,4 +1,4 @@
-import create from "zustand";
+import { create } from "zustand";
 import { User, useUserStore } from "../../../common/state/user-store";
 import { Game } from "../services/Game";
 import { useCodeStore } from "./code-store";

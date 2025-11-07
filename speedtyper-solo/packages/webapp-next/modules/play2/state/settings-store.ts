@@ -1,4 +1,4 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import { getExperimentalServerUrl } from '../../../common/utils/getServerUrl';
 import { toast } from 'react-toastify';
 
@@ -120,7 +120,7 @@ export const nextLanguage = () => {
   const nextIndex = (currentIndex + 1) % availableLanguages.length;
   const newLanguage = availableLanguages[nextIndex];
   setLanguage(newLanguage);
-  
+
   // Show toast notification
   toast.info(`Switched to ${newLanguage.name}`, {
     position: "bottom-center",
@@ -144,7 +144,7 @@ export const previousLanguage = () => {
     (currentIndex - 1 + availableLanguages.length) % availableLanguages.length;
   const newLanguage = availableLanguages[nextIndex];
   setLanguage(newLanguage);
-  
+
   // Show toast notification
   toast.info(`Switched to ${newLanguage.name}`, {
     position: "bottom-center",
