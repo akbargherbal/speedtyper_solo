@@ -1,10 +1,17 @@
 import create from 'zustand';
 import { getExperimentalServerUrl } from '../../../common/utils/getServerUrl';
+import { toast } from 'react-toastify';
 
 export interface LanguageDTO {
   language: string;
   name: string;
 }
+
+export const availableLanguages: LanguageDTO[] = [
+  { language: 'typescript', name: 'TypeScript' },
+  { language: 'javascript', name: 'JavaScript' },
+  { language: 'python', name: 'Python' },
+];
 
 export interface SettingsState {
   settingsModalIsOpen: boolean;
@@ -39,7 +46,6 @@ function getInitialToggleStateFromLocalStorage(
       }
       return toggleStateStr === 'true';
     } catch (e) {
-      // localStorage might be disabled or unavailable
       return defaultToggleValue;
     }
   }
@@ -54,7 +60,7 @@ function getInitialLanguageFromLocalStorage(key: string): LanguageDTO | null {
       try {
         lang = JSON.parse(languageStr);
       } catch (e) {
-        // ignore parsing error
+        // ignore
       }
       if (!lang?.language || !lang?.name) {
         const defaultLang = { language: 'javascript', name: 'JavaScript' };
@@ -63,7 +69,6 @@ function getInitialLanguageFromLocalStorage(key: string): LanguageDTO | null {
       }
       return lang;
     } catch (e) {
-      // localStorage might be disabled or unavailable
       return { language: 'javascript', name: 'JavaScript' };
     }
   }
@@ -101,6 +106,53 @@ export const setLanguage = (language: LanguageDTO | null) => {
     ...state,
     languageSelected: language,
   }));
+};
+
+export const nextLanguage = () => {
+  const currentLanguage = useSettingsStore.getState().languageSelected;
+  if (!currentLanguage) {
+    setLanguage(availableLanguages[0]);
+    return;
+  }
+  const currentIndex = availableLanguages.findIndex(
+    (lang) => lang.language === currentLanguage.language,
+  );
+  const nextIndex = (currentIndex + 1) % availableLanguages.length;
+  const newLanguage = availableLanguages[nextIndex];
+  setLanguage(newLanguage);
+  
+  // Show toast notification
+  toast.info(`Switched to ${newLanguage.name}`, {
+    position: "bottom-center",
+    autoClose: 2000,
+    hideProgressBar: true,
+    closeButton: false,
+    className: "bg-dark-lake text-off-white",
+  });
+};
+
+export const previousLanguage = () => {
+  const currentLanguage = useSettingsStore.getState().languageSelected;
+  if (!currentLanguage) {
+    setLanguage(availableLanguages[0]);
+    return;
+  }
+  const currentIndex = availableLanguages.findIndex(
+    (lang) => lang.language === currentLanguage.language,
+  );
+  const nextIndex =
+    (currentIndex - 1 + availableLanguages.length) % availableLanguages.length;
+  const newLanguage = availableLanguages[nextIndex];
+  setLanguage(newLanguage);
+  
+  // Show toast notification
+  toast.info(`Switched to ${newLanguage.name}`, {
+    position: "bottom-center",
+    autoClose: 2000,
+    hideProgressBar: true,
+    closeButton: false,
+    className: "bg-dark-lake text-off-white",
+  });
 };
 
 export const toggleDebugMode = () => {

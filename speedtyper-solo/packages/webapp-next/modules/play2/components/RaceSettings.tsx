@@ -15,7 +15,6 @@ import { LanguageSelector } from "./race-settings/LanguageSelector";
 export const RaceSettings: React.FC = () => {
   const isOpen = useSettingsStore((s) => s.languageModalIsOpen);
   const languageSelected = useSettingsStore((s) => s.languageSelected);
-  const language = languageSelected ? languageSelected.name : "language";
 
   return (
     <>
@@ -28,7 +27,7 @@ export const RaceSettings: React.FC = () => {
             <OnlineIcon />
           </div>
         }
-        text={language}
+        text={languageSelected?.name || "language"}
       />
       {isOpen && <RaceSettingsModal />}
     </>

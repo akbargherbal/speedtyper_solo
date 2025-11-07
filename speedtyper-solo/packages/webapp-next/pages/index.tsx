@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { useSocket } from "../common/hooks/useSocket";
 import { Keys, useKeyMap } from "../hooks/useKeyMap";
 import { CodeTypingContainer } from "../modules/play2/containers/CodeTypingContainer";
@@ -20,19 +20,13 @@ import {
   closeModals,
   useHasOpenModal,
   useSettingsStore,
-  setLanguage,
-  LanguageDTO,
 } from "../modules/play2/state/settings-store";
 import { useIsPlaying } from "../common/hooks/useIsPlaying";
 import { refreshTrends } from "../modules/play2/state/trends-store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
-import useSWR from "swr";
-import { getExperimentalServerUrl } from "../common/utils/getServerUrl";
 
 export const config = { runtime: "experimental-edge" };
-
-const baseUrl = getExperimentalServerUrl();
 
 function Play2Page() {
   const user = useUser();
@@ -45,49 +39,6 @@ function Play2Page() {
   const game = useGame();
   const challenge = useChallenge();
   const [isThrottled, setIsThrottled] = useState(false);
-
-  // Fetch available languages for cycling
-  const { data: languagesData } = useSWR(
-    baseUrl + "/api/languages",
-    (...args) => fetch(...args).then((res) => res.json())
-  );
-  const languages = (languagesData as undefined | LanguageDTO[]) || [];
-  const selectedLanguage = useSettingsStore((s) => s.languageSelected);
-
-  // Language cycling helper
-  const cycleLanguage = useCallback(
-    (direction: "next" | "prev") => {
-      if (languages.length === 0) return;
-
-      const currentIndex = selectedLanguage
-        ? languages.findIndex((l) => l.language === selectedLanguage.language)
-        : -1;
-
-      let newIndex: number;
-      if (direction === "next") {
-        newIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % languages.length;
-      } else {
-        newIndex =
-          currentIndex === -1
-            ? languages.length - 1
-            : (currentIndex - 1 + languages.length) % languages.length;
-      }
-
-      const newLanguage = languages[newIndex];
-      setLanguage(newLanguage);
-      game?.next();
-
-      // Show toast notification
-      toast.info(`Switched to ${newLanguage.name}`, {
-        position: "bottom-center",
-        autoClose: 2000,
-        hideProgressBar: true,
-        closeButton: false,
-        className: "bg-dark-lake text-off-white",
-      });
-    },
-    [languages, selectedLanguage, game]
-  );
 
   // Tab key - Next snippet (existing functionality)
   const { capsLockActive } = useKeyMap(
@@ -119,35 +70,7 @@ function Play2Page() {
     { blockWhenTyping: false }
   );
 
-  // Alt + Right Arrow - Next language
-  useKeyMap(
-    !hasOpenModal && languages.length > 0,
-    Keys.ArrowRight,
-    useCallback(() => {
-      if (isThrottled) return;
-      cycleLanguage("next");
-      setIsThrottled(true);
-      setTimeout(() => {
-        setIsThrottled(false);
-      }, 1000);
-    }, [isThrottled, cycleLanguage]),
-    { requireAlt: true, blockWhenTyping: false }
-  );
-
-  // Alt + Left Arrow - Previous language
-  useKeyMap(
-    !hasOpenModal && languages.length > 0,
-    Keys.ArrowLeft,
-    useCallback(() => {
-      if (isThrottled) return;
-      cycleLanguage("prev");
-      setIsThrottled(true);
-      setTimeout(() => {
-        setIsThrottled(false);
-      }, 1000);
-    }, [isThrottled, cycleLanguage]),
-    { requireAlt: true, blockWhenTyping: false }
-  );
+  // NOTE: Alt+Arrow language cycling is now handled in useGame.ts hook
 
   useSettingsStore((s) => s.settingsModalIsOpen);
   useResetStateOnUnmount();

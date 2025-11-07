@@ -6,17 +6,11 @@ import { useEffect } from "react";
 import { Layout } from "../common/components/Layout";
 import { Stream } from "../components/Stream";
 import { closeModals } from "../modules/play2/state/settings-store";
-import { useGameStore } from "../modules/play2/state/game-store";
-import { useRouter } from "next/router";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const title = "SpeedTyper Solo | Typing practice for programmers";
-  const router = useRouter();
 
-  // CORRECT: Get the 'game' object from the store. Actions are methods on this object.
-  const game = useGameStore((state) => state.game);
-
-  // Global Keyboard Handler
+  // Global Keyboard Handler for NON-GAME actions
   useEffect(() => {
     const handleKeyboard = (event: KeyboardEvent) => {
       // ESC works globally to close modals
@@ -24,25 +18,11 @@ function MyApp({ Component, pageProps }: AppProps) {
         closeModals();
         return;
       }
-
-      // Typing-specific shortcuts only on the main typing page
-      if (router.pathname === "/") {
-        if (event.altKey && event.key === "ArrowRight") {
-          event.preventDefault();
-          game?.nextLanguage(); // Call method on the game object
-        } else if (event.altKey && event.key === "ArrowLeft") {
-          event.preventDefault();
-          game?.previousLanguage(); // Call method on the game object
-        } else if (event.key === "Tab") {
-          event.preventDefault();
-          game?.refreshChallenge(); // Call method on the game object
-        }
-      }
     };
 
     window.addEventListener("keydown", handleKeyboard);
     return () => window.removeEventListener("keydown", handleKeyboard);
-  }, [router.pathname, game]); // Add 'game' to dependency array
+  }, []); // No dependencies, runs once on app load.
 
   return (
     <>
@@ -90,4 +70,5 @@ function MyApp({ Component, pageProps }: AppProps) {
     </>
   );
 }
+
 export default MyApp;

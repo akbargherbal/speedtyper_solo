@@ -1,7 +1,7 @@
 import { faPerson, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AnimatePresence, motion } from "framer-motion";
-import { ButtonHTMLAttributes, useState } from "react";
+import React, { ButtonHTMLAttributes, useState } from "react";
 import { PlayIcon } from "../../../../../assets/icons";
 import { InfoIcon } from "../../../../../assets/icons/InfoIcon";
 import { LinkIcon } from "../../../../../assets/icons/LinkIcon";
@@ -139,23 +139,6 @@ export function PlayFooter({ challenge }: PlayFooterProps) {
                 <ActionButtons />
                 <div className="text-faded-gray flex gap-4 items-center">
                   <SnippetMetadata challenge={challenge} />
-                  {/* SOLO MODE: Login/Signup button removed */}
-                  {/* {isAnonymous && (
-                    <>
-                      <button
-                        onClick={openProfileModal}
-                        className="flex text-xs items-center font-semibold tracking-wide hover:cursor-pointer gap-2 hover:text-off-white"
-                      >
-                        <div className="h-4 w-4 flex items-center">
-                          <FontAwesomeIcon icon={faUserGroup} size="xs" />
-                        </div>
-                        Login | Signup
-                      </button>
-                      {profileModalIsOpen && (
-                        <GithubLoginOverlay closeModal={closeModals} />
-                      )}
-                    </>
-                  )} */}
                   {challenge.projectName && (
                     <ChallengeSource
                       name={challenge.projectName}
@@ -190,7 +173,7 @@ interface ActionButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   text: String;
 }
 
-export function ActionButton({
+export const ActionButton = React.memo(function ActionButton({
   text,
   icon,
   ...buttonProps
@@ -207,7 +190,7 @@ export function ActionButton({
       {icon}
     </button>
   );
-}
+});
 
 function ActionButtons() {
   const game = useGameStore((s) => s.game);
@@ -216,6 +199,7 @@ function ActionButtons() {
   const hasEndTime = useCodeStore((state) => state.endTime);
   const countdown = useGameStore((state) => state.countdown);
   const hasOpenModal = useHasOpenModal();
+
   const canManuallyStartGame =
     !hasOpenModal && isOwner && isMultiplayer && !hasEndTime && !countdown;
   const waitingForOwnerToStart =
@@ -245,23 +229,6 @@ function ActionButtons() {
           }
         />
       )}
-      {/* SOLO MODE: Invite button removed */}
-      {/* <ActionButton
-        text="invite"
-        title="Invite your friends to play"
-        icon={
-          <div className="h-3 w-4">
-            <LinkIcon />
-          </div>
-        }
-        onClick={() => {
-          const url = new URL(window.location.href);
-          if (game?.id) {
-            url.searchParams.set("id", game.id);
-          }
-          copyToClipboard(url.toString(), `${url} copied to clipboard`);
-        }}
-      /> */}
       {isOwner && <RaceSettings />}
       {canManuallyStartGame && (
         <ActionButton
