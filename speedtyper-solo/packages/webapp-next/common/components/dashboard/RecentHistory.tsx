@@ -33,13 +33,13 @@ export function RecentHistory({ recentRaces }: Props) {
             onClick={() => handleRaceClick(race.id)}
           >
             <div className="flex justify-between items-start mb-2">
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <span className="text-white font-medium capitalize">{race.language}</span>
                 <div className="text-gray-400 text-sm mt-1 truncate">
                   {race.challengeTitle}
                 </div>
               </div>
-              <div className="text-gray-400 text-sm ml-4">
+              <div className="text-gray-400 text-sm ml-4 flex-shrink-0">
                 {new Date(race.createdAt).toLocaleDateString()}
               </div>
             </div>

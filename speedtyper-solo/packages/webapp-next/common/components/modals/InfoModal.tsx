@@ -1,13 +1,13 @@
 import React from 'react';
-import { Modal } from './Modal';
+import Modal from './Modal'; // CORRECTED: Default import
 import { Overlay } from '../Overlay';
-import { ModalCloseButton } from '../buttons/ModalCloseButton';
+import ModalCloseButton from '../buttons/ModalCloseButton'; // CORRECTED: Default import
 
 interface InfoModalProps {
   closeModal: () => void;
 }
 
-export const InfoModal: React.FC<InfoModalProps> = ({ closeModal }) => {
+const InfoModal: React.FC<InfoModalProps> = ({ closeModal }) => {
   return (
     <Overlay onOverlayClick={closeModal}>
       <Modal>
@@ -21,13 +21,13 @@ export const InfoModal: React.FC<InfoModalProps> = ({ closeModal }) => {
           <section>
             <h3 className="text-lg font-semibold text-white mb-3">Typing</h3>
             <div className="space-y-2">
-              <ShortcutRow 
-                keys="Tab" 
-                description="Next snippet" 
+              <ShortcutRow
+                keys="Tab"
+                description="Next snippet"
               />
-              <ShortcutRow 
-                keys="Enter" 
-                description="Continue (from results page)" 
+              <ShortcutRow
+                keys="Enter"
+                description="Continue (from results page)"
               />
             </div>
           </section>
@@ -36,13 +36,13 @@ export const InfoModal: React.FC<InfoModalProps> = ({ closeModal }) => {
           <section>
             <h3 className="text-lg font-semibold text-white mb-3">Language</h3>
             <div className="space-y-2">
-              <ShortcutRow 
-                keys="Alt + ←" 
-                description="Previous language" 
+              <ShortcutRow
+                keys="Alt + ←"
+                description="Previous language"
               />
-              <ShortcutRow 
-                keys="Alt + →" 
-                description="Next language" 
+              <ShortcutRow
+                keys="Alt + →"
+                description="Next language"
               />
             </div>
           </section>
@@ -51,13 +51,13 @@ export const InfoModal: React.FC<InfoModalProps> = ({ closeModal }) => {
           <section>
             <h3 className="text-lg font-semibold text-white mb-3">Interface</h3>
             <div className="space-y-2">
-              <ShortcutRow 
-                keys="Esc" 
-                description="Close modals" 
+              <ShortcutRow
+                keys="Esc"
+                description="Close modals"
               />
-              <ShortcutRow 
-                keys="Click anywhere" 
-                description="Focus typing area" 
+              <ShortcutRow
+                keys="Click anywhere"
+                description="Focus typing area"
               />
             </div>
           </section>
@@ -74,9 +74,9 @@ export const InfoModal: React.FC<InfoModalProps> = ({ closeModal }) => {
                 <span className="text-white">Solo Practice</span>
               </div>
               <div className="mt-3">
-                <a 
-                  href="https://github.com/yourusername/speedtyper-solo" 
-                  target="_blank" 
+                <a
+                  href="https://github.com/yourusername/speedtyper-solo"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-400 hover:text-blue-300 transition-colors"
                 >
@@ -106,3 +106,5 @@ const ShortcutRow: React.FC<ShortcutRowProps> = ({ keys, description }) => {
     </div>
   );
 };
+
+export default InfoModal;

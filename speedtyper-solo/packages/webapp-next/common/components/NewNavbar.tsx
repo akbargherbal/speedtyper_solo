@@ -11,8 +11,8 @@ import { useIsPlaying } from "../hooks/useIsPlaying";
 import Button from "./Button";
 import { NewGithubLoginModal } from "./modals/GithubLoginModal";
 import { SettingsModal } from "./modals/SettingsModal";
-import { InfoModal } from "./modals/InfoModal";
-import { openInfoModal, useSettingsStore } from "../../modules/play2/state/settings-store";
+import InfoModal from "./modals/InfoModal";
+import { closeModals, openInfoModal, useSettingsStore } from "../../modules/play2/state/settings-store";
 
 export const navbarFactory = () => {
   return NewNavbar;
@@ -159,9 +159,9 @@ export const NewNavbar = () => {
           <ProfileSection />
         </div>
       </div>
-      
+
       {/* Info Modal */}
-      {infoModalOpen && <InfoModal closeModal={() => {}} />}
+      {infoModalOpen && <InfoModal closeModal={closeModals} />}
     </header>
   );
 };
